@@ -1,0 +1,142 @@
+<krpano>
+
+<!-- =====================================================================
+     ERA = BO XEM ANH / GALLERY (lightbox) cho tour Phu Gia
+     =====================================================================
+     Dung cho tu lieu PHANG (anh tien ich, mat bang, ban do, brochure).
+     Goi tu menu trong era-txv-skin-pgbl.xml:
+       era_img_show('media/xxx.jpg', 'Chu thich')   -> xem 1 anh
+       era_gallery_open()                            -> xem tat ca (prev/next)
+       era_ebro_open()                               -> MO TRANG /ebro/ (8 trang lat) o tab moi
+     Anh dat trong pano/vtour/media/ . Build layer bang action (pr16-safe).
+     ===================================================================== -->
+
+<action name="era_media_build">
+  <!-- nen mo (bam de dong) -->
+  addlayer(era_ov_dim);
+    set(layer[era_ov_dim].type, text); set(layer[era_ov_dim].align, center); set(layer[era_ov_dim].edge, center);
+    set(layer[era_ov_dim].x, 0); set(layer[era_ov_dim].y, 0); set(layer[era_ov_dim].width, 100000); set(layer[era_ov_dim].height, 100000);
+    set(layer[era_ov_dim].bg, true); set(layer[era_ov_dim].bgcolor, 0x0B1A12); set(layer[era_ov_dim].bgalpha, 0.86);
+    set(layer[era_ov_dim].handcursor, true); set(layer[era_ov_dim].onclick, 'era_media_hide()');
+    set(layer[era_ov_dim].zorder, 400); set(layer[era_ov_dim].keep, true); set(layer[era_ov_dim].visible, false);
+  <!-- anh -->
+  addlayer(era_ov_img);
+    set(layer[era_ov_img].align, center); set(layer[era_ov_img].edge, center);
+    set(layer[era_ov_img].x, 0); set(layer[era_ov_img].y, -14);
+    set(layer[era_ov_img].width, '72%'); set(layer[era_ov_img].height, prop);
+    set(layer[era_ov_img].enabled, false); set(layer[era_ov_img].zorder, 401);
+    set(layer[era_ov_img].keep, true); set(layer[era_ov_img].visible, false);
+  <!-- chu thich -->
+  addlayer(era_ov_cap);
+    set(layer[era_ov_cap].type, text); set(layer[era_ov_cap].align, bottom); set(layer[era_ov_cap].edge, bottom);
+    set(layer[era_ov_cap].x, 0); set(layer[era_ov_cap].y, 40);
+    set(layer[era_ov_cap].bg, true); set(layer[era_ov_cap].bgcolor, 0x1E3E2E); set(layer[era_ov_cap].bgalpha, 0.85);
+    set(layer[era_ov_cap].bgroundedge, 18); set(layer[era_ov_cap].padding, '8 18 8 18'); set(layer[era_ov_cap].enabled, false);
+    set(layer[era_ov_cap].css, 'color:#FFFFFF; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:700; text-align:center;');
+    set(layer[era_ov_cap].html, ''); set(layer[era_ov_cap].zorder, 403);
+    set(layer[era_ov_cap].keep, true); set(layer[era_ov_cap].visible, false);
+  <!-- nut dong -->
+  addlayer(era_ov_close);
+    set(layer[era_ov_close].type, text); set(layer[era_ov_close].align, righttop); set(layer[era_ov_close].edge, righttop);
+    set(layer[era_ov_close].x, 22); set(layer[era_ov_close].y, 22); set(layer[era_ov_close].width, 44); set(layer[era_ov_close].height, 44);
+    set(layer[era_ov_close].bg, true); set(layer[era_ov_close].bgcolor, 0x1E3E2E); set(layer[era_ov_close].bgalpha, 0.8); set(layer[era_ov_close].bgroundedge, 22);
+    set(layer[era_ov_close].vcenter, true); set(layer[era_ov_close].handcursor, true);
+    set(layer[era_ov_close].css, 'color:#FFFFFF; font-family:"Phosphor-Light"; font-weight:900; font-size:18px; text-align:center;');
+    set(layer[era_ov_close].html, '&#xe4f6;'); set(layer[era_ov_close].onclick, 'era_media_hide()');
+    set(layer[era_ov_close].zorder, 404); set(layer[era_ov_close].keep, true); set(layer[era_ov_close].visible, false);
+  <!-- prev / next (chi gallery) -->
+  addlayer(era_ov_prev);
+    set(layer[era_ov_prev].type, text); set(layer[era_ov_prev].align, left); set(layer[era_ov_prev].edge, left);
+    set(layer[era_ov_prev].x, 20); set(layer[era_ov_prev].y, 0); set(layer[era_ov_prev].width, 48); set(layer[era_ov_prev].height, 48);
+    set(layer[era_ov_prev].bg, true); set(layer[era_ov_prev].bgcolor, 0x1E3E2E); set(layer[era_ov_prev].bgalpha, 0.8); set(layer[era_ov_prev].bgroundedge, 24);
+    set(layer[era_ov_prev].vcenter, true); set(layer[era_ov_prev].handcursor, true);
+    set(layer[era_ov_prev].css, 'color:#FFFFFF; font-family:"Phosphor-Light"; font-weight:900; font-size:18px; text-align:center;');
+    set(layer[era_ov_prev].html, '&#xe138;'); set(layer[era_ov_prev].onclick, 'era_gal_prev()');
+    set(layer[era_ov_prev].zorder, 404); set(layer[era_ov_prev].keep, true); set(layer[era_ov_prev].visible, false);
+  addlayer(era_ov_next);
+    set(layer[era_ov_next].type, text); set(layer[era_ov_next].align, right); set(layer[era_ov_next].edge, right);
+    set(layer[era_ov_next].x, 20); set(layer[era_ov_next].y, 0); set(layer[era_ov_next].width, 48); set(layer[era_ov_next].height, 48);
+    set(layer[era_ov_next].bg, true); set(layer[era_ov_next].bgcolor, 0x1E3E2E); set(layer[era_ov_next].bgalpha, 0.8); set(layer[era_ov_next].bgroundedge, 24);
+    set(layer[era_ov_next].vcenter, true); set(layer[era_ov_next].handcursor, true);
+    set(layer[era_ov_next].css, 'color:#FFFFFF; font-family:"Phosphor-Light"; font-weight:900; font-size:18px; text-align:center;');
+    set(layer[era_ov_next].html, '&#xe13a;'); set(layer[era_ov_next].onclick, 'era_gal_next()');
+    set(layer[era_ov_next].zorder, 404); set(layer[era_ov_next].keep, true); set(layer[era_ov_next].visible, false);
+</action>
+
+<!-- hien nen + anh + chu + dong -->
+<action name="era_media_common">
+  set(layer[era_ov_dim].visible, true);
+  set(layer[era_ov_img].visible, true);
+  set(layer[era_ov_cap].visible, true);
+  set(layer[era_ov_close].visible, true);
+</action>
+<action name="era_media_hide">
+  set(layer[era_ov_dim].visible, false);
+  set(layer[era_ov_img].visible, false);
+  set(layer[era_ov_cap].visible, false);
+  set(layer[era_ov_close].visible, false);
+  set(layer[era_ov_prev].visible, false);
+  set(layer[era_ov_next].visible, false);
+</action>
+
+<!-- xem 1 anh: %1 url %2 chu thich -->
+<action name="era_img_show">
+  set(layer[era_ov_prev].visible, false);
+  set(layer[era_ov_next].visible, false);
+  set(layer[era_ov_img].url, %1);
+  set(layer[era_ov_cap].html, %2);
+  era_media_common();
+</action>
+
+<!-- ===== GALLERY (prev/next) — pr16 KHONG luu mang => if-chain + wrapper khong tham so ===== -->
+<action name="era_g0"> set(layer[era_ov_img].url,'media/nhamau.jpg');       set(layer[era_ov_cap].html,'Nhà mẫu - Phối cảnh'); </action>
+<action name="era_g1"> set(layer[era_ov_img].url,'media/ti-cafe.jpg');      set(layer[era_ov_cap].html,'Cafe Đôi Dép'); </action>
+<action name="era_g2"> set(layer[era_ov_img].url,'media/ti-congvien.jpg');  set(layer[era_ov_cap].html,'Công viên'); </action>
+<action name="era_g3"> set(layer[era_ov_img].url,'media/ti-apollo.jpg');    set(layer[era_ov_cap].html,'Apollo Garden'); </action>
+<action name="era_g4"> set(layer[era_ov_img].url,'media/ti-hoca.jpg');      set(layer[era_ov_cap].html,'Hồ Cá Koi'); </action>
+<action name="era_g5"> set(layer[era_ov_img].url,'media/ti-vuonthien.jpg'); set(layer[era_ov_cap].html,'Vườn thiền &amp; Yoga'); </action>
+<action name="era_e0"> set(layer[era_ov_img].url,'media/ebro-1.jpg'); set(layer[era_ov_cap].html,'E-Brochure - Trang 1'); </action>
+<action name="era_e1"> set(layer[era_ov_img].url,'media/ebro-2.jpg'); set(layer[era_ov_cap].html,'E-Brochure - Trang 2'); </action>
+
+<action name="era_gal_render">
+  if(era_gal_mode == ebro,
+    if(era_gi == 0, era_e0(); );
+    if(era_gi == 1, era_e1(); );
+  ,
+    if(era_gi == 0, era_g0(); );
+    if(era_gi == 1, era_g1(); );
+    if(era_gi == 2, era_g2(); );
+    if(era_gi == 3, era_g3(); );
+    if(era_gi == 4, era_g4(); );
+    if(era_gi == 5, era_g5(); );
+  );
+</action>
+<action name="era_gal_start">
+  set(era_gi, 0); era_gal_render(); era_media_common();
+  set(layer[era_ov_prev].visible, true); set(layer[era_ov_next].visible, true);
+</action>
+<action name="era_gal_next"> inc(era_gi); if(era_gi GE era_gcount, set(era_gi, 0)); era_gal_render(); </action>
+<action name="era_gal_prev"> dec(era_gi); if(era_gi LT 0, set(era_gi, calc(era_gcount - 1))); era_gal_render(); </action>
+
+<action name="era_gallery_open"> set(era_gal_mode, gal);  set(era_gcount, 6); era_gal_start(); </action>
+<!-- 🔴 11/08/2026 — Anh Tony chot: nut E-Brochure trong tour mo THANG trang /ebro/
+     (8 trang lat, ban moi) thay vi lightbox 2 anh to gap cu.
+     Mo tab moi (_blank) de nguoi xem KHONG mat tour dang xoay.
+     Ban lightbox cu giu lai ben duoi (era_ebro_open_lightbox_cu) de bat lai neu can. -->
+<action name="era_ebro_open">   openurl('/ebro/', '_top'); </action>
+<action name="era_ebro_open_lightbox_cu">   set(era_gal_mode, ebro); set(era_gcount, 2); era_gal_start(); </action>
+
+<!-- ===== WRAPPER goi tu menu (onclick khong co dau phay/&, tranh bay parse) ===== -->
+<action name="era_open_map">    era_img_show('media/vitri-map.jpg',  'Bản đồ vị trí'); </action>
+<action name="era_ti_cafe">     era_img_show('media/ti-cafe.jpg',     'Cafe Đôi Dép'); </action>
+<action name="era_ti_congvien"> era_img_show('media/ti-congvien.jpg', 'Công viên'); </action>
+<action name="era_ti_apollo">   era_img_show('media/ti-apollo.jpg',   'Apollo Garden'); </action>
+<action name="era_ti_hoca">     era_img_show('media/ti-hoca.jpg',     'Hồ Cá Koi'); </action>
+<action name="era_ti_vuonthien">era_img_show('media/ti-vuonthien.jpg','Vườn thiền &amp; Yoga'); </action>
+<action name="era_nm_phoicanh">  era_img_show('media/nhamau.jpg',  'Nhà mẫu - Phối cảnh'); </action>
+<action name="era_nm_mb5x20">    era_img_show('media/mb-5x20.jpg', 'Mặt bằng nhà liền kề 5x20'); </action>
+<action name="era_nm_mb7x20">    era_img_show('media/mb-7x20.jpg', 'Mặt bằng nhà song lập 7x20'); </action>
+
+<events name="era_media_events" keep="true" onxmlcomplete="era_media_build();" />
+
+</krpano>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>E-Brochure — Phú Gia Bảo Lộc | ERA Vietnam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/light/style.css">
+<link rel="preload" as="image" href="img/bia.webp">
+<style>
+  :root{
+    --base:#0D2620; --panel:#0E2821; --gold:#BF9642;
+    --lime:#9BDC4C; --teal:#5FE5BE; --accent:#A9F0C4;
+    --text:#EDF8EF; --text2:#BAD8C3; --dim:#83A08D; --line:rgba(203,240,214,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--text);
+    background:radial-gradient(120% 80% at 50% -10%,#16342B 0%,#0D2620 46%,#081712 100%);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 26px;flex-wrap:wrap}
+  .brand img{height:32px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+  .htitle{text-align:right}
+  .htitle h1{font-size:22px;font-weight:800;letter-spacing:.3px}
+  .htitle span{font-size:12px;color:var(--text2)}
+
+  .stage{display:flex;flex-direction:column;align-items:center;gap:14px;padding:4px 16px 28px}
+
+  /* ===== Trang lat ===== */
+  #flip{width:min(94vw,1080px);touch-action:pan-y}
+  #flip .page{background:var(--panel);overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.42)}
+  #flip .page img{width:100%;height:100%;display:block;object-fit:cover}
+
+  /* ===== Thanh dieu khien ===== */
+  .ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+  .ctrl button{height:46px;min-width:46px;padding:0 14px;border-radius:999px;border:1px solid var(--line);cursor:pointer;
+    background:rgba(14,40,33,.72);color:var(--text);font-size:14px;font-weight:600;font-family:inherit;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    transition:background .18s,color .18s,border-color .18s}
+  .ctrl button:hover{background:rgba(95,229,190,.18);color:var(--accent);border-color:rgba(159,220,76,.5)}
+  .ctrl button i{font-size:20px}
+  .ctrl .nav{width:46px;padding:0;font-size:22px}
+  .ctrl .pg{min-width:74px;text-align:center;font-size:13px;font-weight:700;color:var(--text2)}
+  .cap{font-size:13px;color:var(--dim);text-align:center;min-height:18px}
+
+  /* ===== Dai thumbnail ===== */
+  .thumbs{display:flex;gap:8px;overflow-x:auto;max-width:min(94vw,1080px);padding:4px 2px 8px;scrollbar-width:thin}
+  .thumbs img{height:66px;width:auto;border-radius:6px;border:1px solid var(--line);opacity:.55;cursor:pointer;
+    transition:opacity .18s,border-color .18s,transform .18s}
+  .thumbs img:hover{opacity:.9;transform:translateY(-2px)}
+  .thumbs img.on{opacity:1;border-color:var(--lime);box-shadow:0 0 0 1px rgba(159,220,76,.5)}
+
+  /* ===== Phong to (lightbox) ===== */
+  /* KHONG dung flex o day: flex se tu can giua anh TRUOC, roi transform translate
+     cong them mot lan nua -> anh nhay lech. Anh phai absolute goc 0,0 de toa do
+     trong transform la toa do tuyet doi so voi khung nhin. */
+  #lb{position:fixed;inset:0;z-index:2147483000;background:rgba(4,14,11,.97);display:none;
+    overflow:hidden;touch-action:none}
+  #lb.on{display:block}
+  #lb img{position:absolute;top:0;left:0;max-width:none;transform-origin:0 0;
+    cursor:grab;user-select:none;-webkit-user-drag:none}
+  #lb img.drag{cursor:grabbing}
+  .lbbar{position:fixed;top:14px;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:2147483001;pointer-events:none}
+  .lbbar > *{pointer-events:auto}
+  .lbbar .tag{padding:0 16px;height:44px;display:flex;align-items:center;border-radius:999px;
+    background:rgba(14,40,33,.82);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--text2)}
+  .lbhint{position:fixed;bottom:16px;left:0;right:0;text-align:center;font-size:12px;color:var(--dim);z-index:2147483001}
+
+  /* ===== Fallback slider (neu StPageFlip loi) ===== */
+  .fb{width:min(94vw,620px)}
+  .fb img{width:100%;border-radius:12px;border:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,.4);display:none}
+  .fb img.on{display:block}
+
+  @media(max-width:640px){
+    .htitle h1{font-size:18px}
+    .thumbs img{height:52px}
+    .ctrl button{height:42px;min-width:42px;font-size:13px}
+    .ctrl .nav{width:42px}
+  }
+</style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="/" target="_top"><img src="../assets/wordmark.png" alt="Phú Gia Bảo Lộc"></a>
+    <div class="htitle"><h1>E-Brochure</h1><span>Ấn phẩm giới thiệu dự án · lật trang</span></div>
+  </header>
+
+  <div class="stage">
+    <div id="flip"></div>
+    <div class="fb" id="fallback" style="display:none"></div>
+
+    <div class="ctrl">
+      <button class="nav" id="prev" aria-label="Trang trước">&#8249;</button>
+      <div class="pg" id="pg">— / —</div>
+      <button class="nav" id="next" aria-label="Trang sau">&#8250;</button>
+      <button id="zoom" aria-label="Phóng to trang"><i class="ph-light ph-magnifying-glass-plus"></i>Phóng to</button>
+    </div>
+    <div class="cap" id="cap"></div>
+
+    <div class="thumbs" id="thumbs"></div>
+  </div>
+
+  <!-- Lightbox phong to -->
+  <div id="lb" aria-hidden="true">
+    <img id="lbimg" alt="">
+    <div class="lbbar">
+      <div class="tag" id="lbtag"></div>
+      <button class="nav" id="lbout" style="height:44px;width:44px;border-radius:999px;border:1px solid var(--line);background:rgba(14,40,33,.82);color:var(--text);font-size:22px;cursor:pointer">−</button>
+      <button class="nav" id="lbin"  style="height:44px;width:44px;border-radius:999px;border:1px solid var(--line);background:rgba(14,40,33,.82);color:var(--text);font-size:22px;cursor:pointer">+</button>
+      <button class="nav" id="lbx"   style="height:44px;width:44px;border-radius:999px;border:1px solid var(--line);background:rgba(14,40,33,.82);color:var(--text);font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div class="lbhint">Lăn chuột / chụm 2 ngón để phóng · kéo để di chuyển · nhấn đúp để về vừa khung · Esc để đóng</div>
+  </div>
+
+  <script src="../assets/eranav.js" data-active="ebro"></script>
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"
+          onerror="window.__stFailed=true"></script>
+  <script>
+  /* ============================================================
+     8 trang cat tu to gap Leaflet PGBL Opt2 (850x550mm, mat 1).
+     - 4 trang DOC nguyen khoi: bia / 03 ly do / vi tri / top ky quan
+     - 2 khoi NGANG (mat bang tong the, mat bang nha) moi khoi cat
+       doi thanh 2 nua a|b, xep canh nhau de man hinh rong ghep lai
+       thanh trang doi lien mach. Nut PHONG TO luon mo ban NGUYEN
+       KHOI khong cat.
+     - Mat 2 cua PDF (mat bang phan lo) KHONG dua vao day: da co ban
+       tuong tac 354 lo o muc Gio hang.
+     ============================================================ */
+  var PAGES = [
+    {src:'img/bia.webp',           zoom:'img/zoom-bia.webp',        t:'Bìa — Phú Gia Bảo Lộc'},
+    {src:'img/ly-do.webp',         zoom:'img/zoom-ly-do.webp',      t:'03 lý do sở hữu'},
+    {src:'img/vi-tri.webp',        zoom:'img/zoom-vi-tri.webp',     t:'Vị trí kết nối & liên kết vùng'},
+    {src:'img/mb-tongthe-a.webp',  zoom:'img/zoom-mb-tongthe.webp', t:'Mặt bằng tổng thể'},
+    {src:'img/mb-tongthe-b.webp',  zoom:'img/zoom-mb-tongthe.webp', t:'30+ tiện ích nội khu'},
+    {src:'img/mb-nha-a.webp',      zoom:'img/zoom-mb-nha.webp',     t:'Mặt bằng nhà đơn lập'},
+    {src:'img/mb-nha-b.webp',      zoom:'img/zoom-mb-nha.webp',     t:'Mặt bằng nhà song lập'},
+    {src:'img/tien-ich.webp',      zoom:'img/zoom-tien-ich.webp',   t:'Top kỳ quan tiện ích'}
+  ];
+  var SRC = PAGES.map(function(p){ return p.src; });
+
+  var prevBtn = document.getElementById('prev'),
+      nextBtn = document.getElementById('next'),
+      zoomBtn = document.getElementById('zoom'),
+      pgLabel = document.getElementById('pg'),
+      capEl   = document.getElementById('cap'),
+      thumbEl = document.getElementById('thumbs');
+
+  var cur = 0, goTo = function(){};
+
+  /* ---------- dai thumbnail ---------- */
+  PAGES.forEach(function(p,i){
+    var im = document.createElement('img');
+    im.src = p.src; im.alt = p.t; im.title = (i+1)+'. '+p.t; im.loading = 'lazy';
+    im.onclick = function(){ goTo(i); };
+    thumbEl.appendChild(im);
+  });
+  function paint(i, spread){
+    cur = i;
+    var hasRight = spread && i > 0 && i+1 < PAGES.length;
+    pgLabel.textContent = (hasRight ? (i+1)+'–'+(i+2) : (i+1)) + ' / ' + PAGES.length;
+    capEl.textContent   = hasRight ? PAGES[i].t + ' · ' + PAGES[i+1].t : PAGES[i].t;
+    var ims = thumbEl.querySelectorAll('img');
+    ims.forEach(function(m,idx){ m.classList.toggle('on', idx===i); });
+    var on = ims[i];
+    if(on && on.scrollIntoView) on.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  }
+
+  /* ---------- lightbox phong to ---------- */
+  var lb = document.getElementById('lb'), lbimg = document.getElementById('lbimg'),
+      lbtag = document.getElementById('lbtag');
+  var Z = {s:1, x:0, y:0, fit:1, w:0, h:0};
+
+  function lbApply(){ lbimg.style.transform = 'translate('+Z.x+'px,'+Z.y+'px) scale('+Z.s+')'; }
+  function lbFit(){
+    var vw = innerWidth, vh = innerHeight;
+    Z.fit = Math.min(vw/Z.w, vh/Z.h) * 0.94;
+    Z.s = Z.fit;
+    Z.x = (vw - Z.w*Z.s)/2; Z.y = (vh - Z.h*Z.s)/2;
+    lbApply();
+  }
+  function lbZoom(f, cx, cy){
+    var ns = Math.max(Z.fit*0.9, Math.min(Z.fit*10, Z.s*f));
+    if(cx===undefined){ cx = innerWidth/2; cy = innerHeight/2; }
+    var k = ns/Z.s;
+    Z.x = cx - (cx - Z.x)*k; Z.y = cy - (cy - Z.y)*k; Z.s = ns;
+    lbApply();
+  }
+  function lbOpen(i){
+    var p = PAGES[i];
+    lbtag.textContent = p.t;
+    lb.classList.add('on'); lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+    lbimg.onload = function(){ Z.w = lbimg.naturalWidth; Z.h = lbimg.naturalHeight; lbFit(); };
+    lbimg.src = p.zoom;
+    if(lbimg.complete && lbimg.naturalWidth){ Z.w = lbimg.naturalWidth; Z.h = lbimg.naturalHeight; lbFit(); }
+  }
+  function lbClose(){ lb.classList.remove('on'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+  zoomBtn.onclick = function(){ lbOpen(cur); };
+  document.getElementById('lbx').onclick = lbClose;
+  document.getElementById('lbin').onclick  = function(){ lbZoom(1.4); };
+  document.getElementById('lbout').onclick = function(){ lbZoom(1/1.4); };
+  lb.addEventListener('wheel', function(e){ e.preventDefault(); lbZoom(e.deltaY<0?1.15:1/1.15, e.clientX, e.clientY); }, {passive:false});
+  lbimg.addEventListener('dblclick', lbFit);
+  addEventListener('resize', function(){ if(lb.classList.contains('on')) lbFit(); });
+
+  /* keo bang chuot */
+  var drag=null;
+  lbimg.addEventListener('pointerdown', function(e){
+    if(e.pointerType==='touch') return;
+    drag={x:e.clientX-Z.x, y:e.clientY-Z.y}; lbimg.classList.add('drag'); lbimg.setPointerCapture(e.pointerId);
+  });
+  lbimg.addEventListener('pointermove', function(e){
+    if(!drag) return; Z.x=e.clientX-drag.x; Z.y=e.clientY-drag.y; lbApply();
+  });
+  ['pointerup','pointercancel'].forEach(function(ev){
+    lbimg.addEventListener(ev, function(){ drag=null; lbimg.classList.remove('drag'); });
+  });
+
+  /* cham: 1 ngon keo, 2 ngon chum */
+  var tps={}, pinch=null;
+  lb.addEventListener('touchstart', function(e){
+    if(e.touches.length===1){ tps={x:e.touches[0].clientX-Z.x, y:e.touches[0].clientY-Z.y}; pinch=null; }
+    else if(e.touches.length===2){
+      var a=e.touches[0], b=e.touches[1];
+      pinch={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),
+             cx:(a.clientX+b.clientX)/2, cy:(a.clientY+b.clientY)/2};
+    }
+  }, {passive:true});
+  lb.addEventListener('touchmove', function(e){
+    e.preventDefault();
+    if(e.touches.length===2 && pinch){
+      var a=e.touches[0], b=e.touches[1];
+      var d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+      lbZoom(d/pinch.d, pinch.cx, pinch.cy); pinch.d=d;
+    } else if(e.touches.length===1 && !pinch){
+      Z.x=e.touches[0].clientX-tps.x; Z.y=e.touches[0].clientY-tps.y; lbApply();
+    }
+  }, {passive:false});
+  lb.addEventListener('touchend', function(e){ if(e.touches.length===0) pinch=null; }, {passive:true});
+
+  /* ---------- fallback: truot anh ---------- */
+  function startFallback(){
+    document.getElementById('flip').style.display = 'none';
+    var fb = document.getElementById('fallback');
+    fb.style.display = 'block';
+    PAGES.forEach(function(p,idx){
+      var im = document.createElement('img');
+      im.src = p.src; im.alt = p.t;
+      if(idx===0) im.className='on';
+      im.onclick = function(){ lbOpen(cur); };
+      fb.appendChild(im);
+    });
+    function show(i){
+      var imgs = fb.querySelectorAll('img');
+      imgs.forEach(function(m,idx){ m.classList.toggle('on', idx===i); });
+      paint(i);
+    }
+    goTo = show;
+    prevBtn.onclick = function(){ show((cur-1+PAGES.length)%PAGES.length); };
+    nextBtn.onclick = function(){ show((cur+1)%PAGES.length); };
+    show(0);
+  }
+
+  /* ---------- trang lat that ---------- */
+  function startFlip(){
+    var el = document.getElementById('flip');
+    var pageFlip = new St.PageFlip(el, {
+      width: 775, height: 1000,          /* ti le that cua 1 canh: 212,5 x 274,5 mm */
+      size: 'stretch',
+      minWidth: 280, maxWidth: 620,
+      minHeight: 361, maxHeight: 800,
+      maxShadowOpacity: 0.5,
+      showCover: true,
+      drawShadow: true,
+      mobileScrollSupport: true,
+      usePortrait: true                   /* man hep tu chuyen 1 trang / man rong ghep trang doi */
+    });
+    pageFlip.loadFromImages(SRC);
+
+    /* 🔴 StPageFlip bo qua lenh lat khi dang chay animation, va su kien 'flip'
+       khong phai luc nao cung ban dung luc -> so trang de bi treo o gia tri cu.
+       Chot bang cach DOI SOAT dinh ky getCurrentPageIndex(), re va luon dung. */
+    var last = -1;
+    function sync(){
+      var i = pageFlip.getCurrentPageIndex();
+      if(i === last) return;
+      last = i;
+      paint(i, pageFlip.getOrientation && pageFlip.getOrientation() === 'landscape');
+    }
+    pageFlip.on('flip', sync);
+    pageFlip.on('init', sync);
+    pageFlip.on('changeOrientation', function(){ last = -1; sync(); });
+    setInterval(sync, 250);
+
+    /* turnToPage = nhay thang, khong bi nuot lenh nhu flip() */
+    goTo = function(i){ pageFlip.turnToPage(i); last = -1; sync(); };
+    prevBtn.onclick = function(){ pageFlip.flipPrev(); };
+    nextBtn.onclick = function(){ pageFlip.flipNext(); };
+    setTimeout(sync, 300);
+  }
+
+  /* ---------- phim tat ---------- */
+  addEventListener('keydown', function(e){
+    if(lb.classList.contains('on')){
+      if(e.key==='Escape') lbClose();
+      if(e.key==='+'||e.key==='=') lbZoom(1.4);
+      if(e.key==='-') lbZoom(1/1.4);
+      return;
+    }
+    if(e.key==='ArrowLeft')  prevBtn.onclick();
+    if(e.key==='ArrowRight') nextBtn.onclick();
+    if(e.key==='Enter')      lbOpen(cur);
+  });
+
+  addEventListener('load', function(){
+    if (window.__stFailed || typeof St === 'undefined' || !St.PageFlip) startFallback();
+    else { try { startFlip(); } catch(e){ startFallback(); } }
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano>
+
+<!-- ================================================================
+     MB-TOUR.XML - FILE BOC NGOAI
+     KHONG sua pano.xml goc do krpano sinh ra.
+     Muon build lai tile luc nao cung duoc, file nay khong bi mat.
+     ================================================================ -->
+
+<include url="pano.xml" />
+
+<!-- Toa do da xac nhan dung ngay 04/08/2026 - da tat calib.
+     Muon bat lai de kiem tra thi bo dau chu thich dong duoi:
+<include url="calib.xml" />
+-->
+
+<include url="lots_hotspots.xml" />
+
+
+<!-- ============ BANG THONG TIN LO ============ -->
+
+<layer name="infobox" type="container" keep="true"
+       align="lefttop" x="16" y="16" width="270" height="176"
+       bgcolor="0xFFFFFF" bgalpha="0.97" bgroundedge="10"
+       bgborder="2 0xC8102E 1.0"
+       bgshadow="0 3 14 0x000000 0.28"
+       visible="false" zorder="200">
+
+	<layer name="info_tag" type="text" keep="true"
+	       align="lefttop" x="16" y="14"
+	       html="THONG TIN LO DAT"
+	       css="font-family:Inter,Arial,sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; color:#999999;"
+	       bg="false" enabled="false" />
+
+	<layer name="info_title" type="text" keep="true"
+	       align="lefttop" x="16" y="30"
+	       html=""
+	       css="font-family:Inter,Arial,sans-serif; font-size:26px; font-weight:700; color:#C8102E;"
+	       bg="false" enabled="false" />
+
+	<layer name="info_body" type="text" keep="true"
+	       align="lefttop" x="16" y="68" width="238"
+	       html=""
+	       css="font-family:Inter,Arial,sans-serif; font-size:13px; line-height:22px; color:#000000;"
+	       bg="false" enabled="false" />
+
+	<layer name="info_close" type="text" keep="true"
+	       align="righttop" x="12" y="12"
+	       html="X"
+	       css="font-family:Inter,Arial,sans-serif; font-size:14px; font-weight:700; color:#FFFFFF;"
+	       bgcolor="0x0C0C44" bgalpha="1.0" bgroundedge="12"
+	       width="24" height="24" vcenter="true" txtshadow=""
+	       handcursor="true"
+	       onclick="set(layer[infobox].visible,false); set(hotspot[get(lastlot)].fillalpha,0.32);" />
+</layer>
+
+
+<!-- ============ HANH DONG ============ -->
+
+<!-- QUAN TRONG: txtadd() NOI THEM chu khong ghi de.
+     Vi vay moi bien PHAI set(bien,'') truoc, va chi goi txtadd 1 lan duy nhat
+     cho moi bien. Neu khong, click lo thu 2 se bi dinh chu vao lo thu 1. -->
+
+<action name="showlot">
+	set(lastlot, %1);
+
+	txtadd(jsc, 'eraPick("', get(hotspot[%1].lotcode), '")');
+	jscall(get(jsc));
+	set(jsc, '');
+
+	set(ttl, '');
+	txtadd(ttl, get(hotspot[%1].lotcode));
+	copy(layer[info_title].html, ttl);
+
+	set(fdir, '');
+	if(hotspot[%1].lotdir != '',
+		txtadd(fdir, '<br/>Huong: <b>', get(hotspot[%1].lotdir), '</b>');
+	);
+
+	set(fpri, '');
+	if(hotspot[%1].lotprice != '',
+		txtadd(fpri, '<br/>Gia: <b>', get(hotspot[%1].lotprice), ' trieu</b>');
+	);
+
+	set(fsta, '');
+	if(hotspot[%1].lotstatus == 'con',
+		txtadd(fsta, '<br/><span style="color:#41B3E0;font-weight:700;">CON HANG</span>');
+	);
+	if(hotspot[%1].lotstatus == 'giu',
+		txtadd(fsta, '<br/><span style="color:#FF9015;font-weight:700;">GIU CHO</span>');
+	);
+	if(hotspot[%1].lotstatus == 'ban',
+		txtadd(fsta, '<br/><span style="color:#C8102E;font-weight:700;">DA BAN</span>');
+	);
+
+	set(t, '');
+	txtadd(t, 'Dien tich: <b>', get(hotspot[%1].lotarea), ' m2</b>',
+	          get(fdir), get(fpri), get(fsta));
+	copy(layer[info_body].html, t);
+
+	set(bh, 128);
+	if(fdir != '', inc(bh, 22); );
+	if(fpri != '', inc(bh, 22); );
+	set(layer[infobox].height, get(bh));
+
+	<!-- 11/08: bang thong tin da chuyen len THE NOI giua-tren ban do (index.html #detbox)
+	     nen KHONG bat hop nho goc trai cua krpano nua. Muon bat lai thi bo chu thich dong duoi:
+	set(layer[infobox].visible, true);
+	-->
+</action>
+
+<!-- Thanh nav gim day trang (assets/eranav.js) cao ~86px nen phai don nut dieu khien
+     cua defaultskin len cho khoi bi che  ->  dong set(layer[defaultskin_buttons].y, 98)
+     trong action era_init ben duoi.
+     BAY 11/08: TUYET DOI KHONG khai bao lai layer defaultskin_buttons o cap goc de sua y.
+     Lam vay krpano BO LUON ANH NEN, chi con hotspot noi tren nen trang. -->
+
+<action name="era_init" autorun="onstart">
+	set(bgcolor, 0xFFFFFF);
+	set(layer[defaultskin_buttons].y, 98);
+	delayedcall(0.4,
+		set(view.fovmin, 0.02);
+		lookto(0.0, 0.0, 0.7066, smooth(), true, true);
+	);
+	delayedcall(1.2, set(layer[hint].visible, true); );
+	delayedcall(7.0, tween(layer[hint].alpha, 0, 0.6, default, set(layer[hint].visible,false)); );
+</action>
+
+<layer name="hint" type="text" keep="true"
+       align="bottom" y="104"
+       html="Bấm vào ô màu trên bản đồ để xem thông tin lô"
+       css="font-family:Inter,Arial,sans-serif; font-size:13px; font-weight:600; color:#FFFFFF;"
+       bgcolor="0x0C0C44" bgalpha="0.92" bgroundedge="18"
+       padding="10 18" enabled="false" visible="false" zorder="150" />
+
+</krpano>

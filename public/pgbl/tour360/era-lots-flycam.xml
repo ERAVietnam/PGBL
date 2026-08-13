@@ -1,0 +1,315 @@
+<krpano>
+
+<!-- ==================================================================
+     ERA VIETNAM · GIM MA LO TREN ANH FLYCAM 360
+     Include additive - KHONG dung vao skin/vtourskin.xml.
+     Chi song trong scene "scene_matbang_flycam".
+
+     LUONG LAM VIEC CUA ANH TONY:
+       1) Vao muc  Mat bang can  >  Ma lo tren flycam
+       2) Bam nut  DAT MA LO (hoac phim L)  o goc phai duoi
+       3) Bam  + DAT LO MOI  roi click len dung vi tri lo tren anh
+       4) Cua so hien ra - go/chon ma lo trong danh sach 100 lo ERA
+       5) Gim hien len. Keo gim de chinh cho dung.
+       6) Dat duoc >= 4 lo roi thi bam  GOI Y TU DONG  de may bung
+          not cac lo con lai - Anh chi can chinh lai vai cai lech.
+       7) Bam  XUAT CODE  -> copy khoi lenh -> dan xuong muc DU LIEU
+          o cuoi file nay -> luu file -> xong vinh vien.
+
+     Chua bam XUAT CODE thi cac gim van duoc luu tam trong trinh duyet
+     (localStorage), reload khong mat.
+
+     Ky thuat: dung addhotspot + set (an toan krpano 1.19-pr16),
+     giong het cach era-poi-360.xml dang chay.
+     ================================================================== -->
+
+
+<!-- ==================================================================
+     1. TAO 1 GIM LO
+        era_lot( ath , atv , 'MA LO' , ten_hotspot )
+          %1 ath  -180..180   %2 atv  -90..90 (duong = thap hon)
+          %3 ma lo hien thi (vd A11-01)
+          %4 ten hotspot, khong duoc co dau gach ngang (vd lot_A11_01)
+     ================================================================== -->
+<action name="era_lot">
+  addhotspot(%4);
+  set(hotspot[%4].malo, %3);
+  <!-- 🔴 11/08: co RIENG de nhan dien gim lo. KHONG dung "malo != null" de loc nua -
+       krpano tra ve CHUOI "null" cho thuoc tinh khong ton tai nen moi hotspot khac
+       (POI, skin, vr_cursor) deu lot luoi -> XUAT CODE ra 90 dong rac. -->
+  set(hotspot[%4].islot, true);
+  set(hotspot[%4].type, text);
+  set(hotspot[%4].html, %3);
+  set(hotspot[%4].ath, %1);
+  set(hotspot[%4].atv, %2);
+  set(hotspot[%4].edge, center);
+  set(hotspot[%4].distorted, false);
+  set(hotspot[%4].zoom, false);
+  set(hotspot[%4].bg, true);
+  set(hotspot[%4].bgcolor, 0x0D2620);
+  set(hotspot[%4].bgalpha, 0.80);
+  set(hotspot[%4].bgroundedge, 9);
+  set(hotspot[%4].bgborder, '1 0x7ADD8B 0.80');
+  set(hotspot[%4].bgshadow, '0 1 5 0x000000 0.50');
+  set(hotspot[%4].padding, '3 8 3 8');
+  set(hotspot[%4].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:11px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;');
+  set(hotspot[%4].handcursor, true);
+  set(hotspot[%4].zorder, 60);
+  set(hotspot[%4].onover,  era_lot_over(); );
+  set(hotspot[%4].onout,   era_lot_out(); );
+  set(hotspot[%4].onclick, era_lot_clicked(); );
+  set(hotspot[%4].ondown,  era_lot_down(); );
+  set(hotspot[%4].onup,    era_lot_up(); );
+</action>
+
+
+<!-- ================== 2. SU KIEN TREN TUNG GIM ====================
+     Cac action nay chay trong pham vi hotspot (caller = hotspot),
+     nen set(bgalpha, ...) la dang sua chinh gim do.                 -->
+
+<action name="era_lot_over">
+  tween(bgalpha, 1.0, 0.10);
+  set(bgborder, '2 0xA9F0C4 1.0');
+  set(zorder, 90);
+  js( lotHover('get(malo)') );
+</action>
+
+<action name="era_lot_out">
+  tween(bgalpha, 0.80, 0.10);
+  set(bgborder, '1 0x7ADD8B 0.80');
+  set(zorder, 60);
+  js( lotOut() );
+</action>
+
+<action name="era_lot_clicked">
+  js( lotClick('get(malo)') );
+</action>
+
+<action name="era_lot_down">
+  if(lots_edit_on == true, draghotspot(); );
+</action>
+
+<action name="era_lot_up">
+  if(lots_edit_on == true, era_lots_save_draft(); );
+</action>
+
+
+<!-- ================== 3. BANG DIEU KHIEN (goc phai duoi) ==========
+     Dat ben PHAI de khong dam vao panel "Diem nhin hien tai" va
+     cum nut POI dang nam goc trai duoi.                             -->
+
+<action name="era_lots_ui_build">
+  if(lots_ui_built != true, era_lots_ui_make(); );
+</action>
+
+<action name="era_lots_ui_make">
+  set(lots_ui_built, true);
+  set(lots_edit_on, false);
+  set(lots_add_mode, false);
+
+  addlayer(lots_edit_btn);
+  set(layer[lots_edit_btn].type, text);
+  set(layer[lots_edit_btn].align, rightbottom); set(layer[lots_edit_btn].edge, rightbottom);
+  set(layer[lots_edit_btn].x, 16); set(layer[lots_edit_btn].y, 16);
+  set(layer[lots_edit_btn].bg, true); set(layer[lots_edit_btn].bgcolor, 0x0D2620);
+  set(layer[lots_edit_btn].bgalpha, 0.85); set(layer[lots_edit_btn].bgroundedge, 9);
+  set(layer[lots_edit_btn].bgborder, '1 0xCBF0D6 0.25');
+  set(layer[lots_edit_btn].padding, '8 13 8 13'); set(layer[lots_edit_btn].handcursor, true);
+  set(layer[lots_edit_btn].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:12px; font-weight:700;');
+  set(layer[lots_edit_btn].html, 'ĐẶT MÃ LÔ (L)');
+  set(layer[lots_edit_btn].zorder, 220);
+  set(layer[lots_edit_btn].keep, true); set(layer[lots_edit_btn].visible, false);
+  set(layer[lots_edit_btn].onclick, era_lots_toggle_edit(); );
+
+  era_lots_btn(lots_add_btn,  56, 0x1565C0, '&#43; ĐẶT LÔ MỚI',  era_lots_arm() );
+  era_lots_btn(lots_del_btn,  96, 0x8A1020, 'XOÁ LÔ VỪA ĐẶT',   era_lots_del_last() );
+  era_lots_btn(lots_auto_btn,136, 0x6B4FBB, 'GỢI Ý TỰ ĐỘNG',    era_lots_auto() );
+  era_lots_btn(lots_exp_btn, 176, 0x1B9E5A, 'XUẤT CODE',        era_lots_export() );
+
+  addlayer(lots_readout);
+  set(layer[lots_readout].type, text);
+  set(layer[lots_readout].align, top); set(layer[lots_readout].y, 16);
+  set(layer[lots_readout].bg, true); set(layer[lots_readout].bgcolor, 0x0D2620);
+  set(layer[lots_readout].bgalpha, 0.90); set(layer[lots_readout].bgroundedge, 10);
+  set(layer[lots_readout].bgborder, '1 0xCBF0D6 0.20');
+  set(layer[lots_readout].padding, '10 18 10 18'); set(layer[lots_readout].enabled, false);
+  set(layer[lots_readout].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:13px; text-align:center;');
+  set(layer[lots_readout].html, '');
+  set(layer[lots_readout].zorder, 221);
+  set(layer[lots_readout].keep, true); set(layer[lots_readout].visible, false);
+</action>
+
+<!-- helper dung 1 nut phu:  era_lots_btn( ten , y , mau , chu , hanh_dong ) -->
+<action name="era_lots_btn">
+  addlayer(%1);
+  set(layer[%1].type, text);
+  set(layer[%1].align, rightbottom); set(layer[%1].edge, rightbottom);
+  set(layer[%1].x, 16); set(layer[%1].y, %2);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, %3);
+  set(layer[%1].bgalpha, 0.95); set(layer[%1].bgroundedge, 9);
+  set(layer[%1].padding, '8 13 8 13'); set(layer[%1].handcursor, true);
+  set(layer[%1].css, 'color:#FFFFFF; font-family:Inter, Arial, sans-serif; font-size:12px; font-weight:700;');
+  set(layer[%1].html, %4);
+  set(layer[%1].zorder, 220);
+  set(layer[%1].keep, true); set(layer[%1].visible, false);
+  set(layer[%1].onclick, %5);
+</action>
+
+<!-- bat/tat che do dat -->
+<action name="era_lots_toggle_edit">
+  if(lots_edit_on == true,
+    set(lots_edit_on, false);
+    set(lots_add_mode, false);
+    era_lots_editui(false);
+    set(layer[lots_edit_btn].bgcolor, 0x0D2620);
+    set(layer[lots_edit_btn].html, 'ĐẶT MÃ LÔ (L)');
+  ,
+    set(lots_edit_on, true);
+    set(lots_add_mode, false);
+    era_lots_editui(true);
+    set(layer[lots_readout].html, 'CHẾ ĐỘ ĐẶT · bấm ĐẶT LÔ MỚI rồi click lên ảnh · kéo gim để chỉnh');
+    set(layer[lots_edit_btn].bgcolor, 0xC8102E);
+    set(layer[lots_edit_btn].html, 'XONG (L)');
+  );
+</action>
+
+<action name="era_lots_editui">
+  set(layer[lots_add_btn].visible, %1);
+  set(layer[lots_del_btn].visible, %1);
+  set(layer[lots_auto_btn].visible, %1);
+  set(layer[lots_exp_btn].visible, %1);
+  set(layer[lots_readout].visible, %1);
+</action>
+
+<!-- bat che do "click ke tiep se dat 1 lo" -->
+<action name="era_lots_arm">
+  if(lots_edit_on == true,
+    set(lots_add_mode, true);
+    set(layer[lots_readout].html, 'CLICK lên ảnh tại vị trí lô cần gim (1 lần)');
+  );
+</action>
+
+<!-- click len anh khi dang arm -> lay toa do -> mo bang chon ma lo -->
+<action name="era_lots_click_add">
+  if(lots_edit_on == true,
+    if(lots_add_mode == true,
+      screentosphere(mouse.x, mouse.y, lk_ath, lk_atv);
+      set(lots_add_mode, false);
+      set(layer[lots_readout].html, 'Chọn mã lô trong cửa sổ...');
+      js( eraLotPick(get(lk_ath), get(lk_atv)) );
+    );
+  );
+</action>
+
+
+<!-- ================== 4. XOA / LUU / XUAT ========================= -->
+
+<!-- xoa gim vua dat gan nhat (JS nho ten hotspot cuoi) -->
+<action name="era_lots_del_last">
+  js( eraLotDelLast() );
+</action>
+
+<!-- xoa 1 gim theo ten hotspot -->
+<action name="era_lot_remove">
+  removehotspot(%1);
+  era_lots_save_draft();
+</action>
+
+<!-- xoa sach moi gim dang co -->
+<action name="era_lots_clear">
+  for(set(i, hotspot.count), i GT 0, dec(i),
+    set(j, calc(i - 1));
+    if(hotspot[get(j)].islot == true, removehotspot(get(hotspot[get(j)].name)); );
+  );
+</action>
+
+<!-- gom toa do hien tai -> luu nhap vao localStorage -->
+<action name="era_lots_save_draft">
+  set(sdraft, '');
+  for(set(i, 0), i LT hotspot.count, inc(i),
+    if(hotspot[get(i)].islot == true,
+      txtadd(sdraft, get(sdraft), get(hotspot[get(i)].ath));
+      txtadd(sdraft, get(sdraft), '|');
+      txtadd(sdraft, get(sdraft), get(hotspot[get(i)].atv));
+      txtadd(sdraft, get(sdraft), '|');
+      txtadd(sdraft, get(sdraft), get(hotspot[get(i)].malo));
+      txtadd(sdraft, get(sdraft), '|');
+      txtadd(sdraft, get(sdraft), get(hotspot[get(i)].name));
+      txtadd(sdraft, get(sdraft), '###');
+    );
+  );
+  js( eraLotSave(get(sdraft)) );
+</action>
+
+<!-- goi y tu dong: JS tinh tu cac lo Anh da dat roi bung phan con lai -->
+<action name="era_lots_auto">
+  js( eraLotAuto() );
+</action>
+
+<!-- xuat khoi lenh de dan xuong muc DU LIEU cuoi file -->
+<action name="era_lots_export">
+  set(exp, '');
+  for(set(i, 0), i LT hotspot.count, inc(i),
+    if(hotspot[get(i)].islot == true,
+      txtadd(exp, get(exp), '  era_lot( ');
+      txtadd(exp, get(exp), get(hotspot[get(i)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(i)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(i)].malo));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(i)].name));
+      txtadd(exp, get(exp), ' );###');
+    );
+  );
+  js( eraLotExport(get(exp)) );
+  trace(get(exp));
+</action>
+
+
+<!-- ================== 5. NAP THEO SCENE =========================== -->
+
+<action name="era_lots_sync">
+  era_lots_ui_build();
+  if(xml.scene == 'scene_matbang_flycam',
+    set(layer[lots_edit_btn].visible, true);
+    js( eraLotRestore() );
+  ,
+    set(lots_edit_on, false);
+    set(lots_add_mode, false);
+    era_lots_editui(false);
+    set(layer[lots_edit_btn].visible, false);
+    set(layer[lots_edit_btn].bgcolor, 0x0D2620);
+    set(layer[lots_edit_btn].html, 'ĐẶT MÃ LÔ (L)');
+    js( lotOut() );
+  );
+</action>
+
+<!-- su kien rieng, khong dung ten cua skin / POI / media -->
+<events name="era_lots_events" keep="true"
+        onnewpano="era_lots_sync();"
+        onclick="era_lots_click_add();"
+        onkeydown="if(keycode == 76, era_lots_toggle_edit(); );" />
+
+
+<!-- ==================================================================
+     ==================   DU LIEU GIM LO - DAN O DAY   ==============
+     Moi dong 1 lo:  era_lot( ath , atv , 'MA LO' , ten_hotspot );
+     Khong go tay - bam XUAT CODE roi dan de len phan trong ben duoi.
+     ================================================================== -->
+<action name="era_lots_data">
+  <!-- ĐỢT 1 - 11/08/2026 - 11 lo cum A5 Anh Tony gim tay (moc chuan de bung tiep) -->
+  era_lot( 4.30, 78.65, 'A5-06', lot_A5_06 );
+  era_lot( 4.61, 79.88, 'A5-07', lot_A5_07 );
+  era_lot( 5.51, 81.07, 'A5-08', lot_A5_08 );
+  era_lot( 7.41, 82.27, 'A5-09', lot_A5_09 );
+  era_lot( 9.42, 83.54, 'A5-10', lot_A5_10 );
+  era_lot( 31.65, 81.09, 'A5-15', lot_A5_15 );
+  era_lot( 28.38, 80.09, 'A5-16', lot_A5_16 );
+  era_lot( 24.82, 78.97, 'A5-17', lot_A5_17 );
+  era_lot( 23.03, 78.04, 'A5-18', lot_A5_18 );
+  era_lot( 20.39, 76.86, 'A5-19', lot_A5_19 );
+  era_lot( 18.51, 75.78, 'A5-20', lot_A5_20 );
+</action>
+
+</krpano>

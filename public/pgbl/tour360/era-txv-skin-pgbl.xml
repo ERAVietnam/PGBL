@@ -1,0 +1,523 @@
+<krpano>
+
+<!-- =====================================================================
+     ERA VIETNAM = SKIN "PHIEN 4 = GRADIENT SUONG MAI x CHOI THONG"
+     =====================================================================
+     Ap cho tour B (flycam 360) du an PHU GIA BAO LOC. Chi scene_02 SONG.
+     Port tu thiet ke phien 4 (Skin PGBL Phien 4.dc.html).
+     Additive: KHONG dung vtourskin.xml. Build layer bang addlayer()+set()
+     trong action, goi onxmlcomplete (pattern da kiem chung cho pr16).
+
+     GIU NGUYEN moi ten action era_* + moi dich link (hop dong MAP-LINK.md).
+     PHIEN 4 (chot): ICON = Phosphor Light (family "Phosphor-Light"),
+     FONT chu = Inter, palette xanh reu + nhan lime->teal, kinh = cach A
+     (bgalpha dam + bgborder 0xCBF0D6 0.18), so lieu panel mau 0x7ADD8B.
+     THEM man INTRO (splash) che shell luc mo tour.
+
+     ICON can <link> Phosphor Light + FONT Inter trong tour.html (da doi).
+     Moi nav = 3 lop: hit + icon + chu. Chu tieng Viet CO DAU.
+     Nghiem thu qua tour_testingserver.exe. Loi => phim ` xem console.
+     ===================================================================== -->
+
+<!-- ============ CONFIG (palette phien 4) ============ -->
+<action name="era_cfg">
+  set(era_c_base,   0x0D2620);   <!-- nen toi xanh reu -->
+  set(era_c_panel,  0x0E2821);   <!-- panel/glass toi -->
+  set(era_c_dark,   0x0D2620);   <!-- alias base cho helper cu -->
+  set(era_c_mid,    0x12332A);   <!-- nav bar dark glass -->
+  set(era_c_lime,   0x9BDC4C);   <!-- xanh chanh (gradient 1) -->
+  set(era_c_teal,   0x5FE5BE);   <!-- xanh ngoc (gradient 2) -->
+  set(era_c_accent, 0x5FE5BE);
+  set(era_c_active, 0xA9F0C4);   <!-- chu nav active (mint sang) -->
+  set(era_c_navtx,  0xDCEFDA);   <!-- chu nav idle -->
+  set(era_c_txt,    0xEDF8EF);   <!-- chu chinh -->
+  set(era_c_sub,    0xBAD8C3);   <!-- chu phu -->
+  set(era_c_muted,  0x83A08D);   <!-- chu mo -->
+  set(era_c_stat,   0x7ADD8B);   <!-- so lieu (diem giua gradient) -->
+  set(era_c_border, 0xCBF0D6);   <!-- vien kinh -->
+  set(era_c_gold,   0xBF9642);   <!-- vien badge ERA (giu) -->
+  set(era_c_mint,   0xDFF4E2);
+  set(era_c_white,  0xFFFFFF);
+  set(era_prj_name, 'PHÚ GIA BẢO LỘC');
+  set(era_in_intro, false);   <!-- intro giờ là lớp DOM 3D (three.js) phủ trên, không dùng intro krpano -->
+</action>
+
+<!-- ============ HELPER hop nen / nut ============ -->
+<action name="era_box">
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, %2); set(layer[%1].edge, %2);
+  set(layer[%1].x, %3); set(layer[%1].y, %4); set(layer[%1].width, %5); set(layer[%1].height, %6);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, %7); set(layer[%1].bgroundedge, %8);
+  set(layer[%1].enabled, false); set(layer[%1].zorder, %9);
+  set(layer[%1].keep, true); set(layer[%1].visible, true);
+</action>
+
+<action name="era_btn">
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, %2); set(layer[%1].edge, %2);
+  set(layer[%1].x, %3); set(layer[%1].y, %4); set(layer[%1].width, %5); set(layer[%1].height, %6);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, %7); set(layer[%1].bgroundedge, 8);
+  set(layer[%1].vcenter, true); set(layer[%1].handcursor, true);
+  set(layer[%1].css, 'color:#072A1D; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:700; text-align:center;');
+  set(layer[%1].html, %9); set(layer[%1].zorder, %8);
+  set(layer[%1].keep, true); set(layer[%1].visible, true);
+</action>
+
+<!-- nut icon Phosphor (1 lop, dung cho toolbar) -->
+<action name="era_faicon">
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, %2); set(layer[%1].edge, %2);
+  set(layer[%1].x, %3); set(layer[%1].y, %4); set(layer[%1].width, %5); set(layer[%1].height, %5);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, get(era_c_panel)); set(layer[%1].bgalpha, 0.55); set(layer[%1].bgroundedge, 22);
+  set(layer[%1].borderwidth, 1); set(layer[%1].bordercolor, get(era_c_border)); set(layer[%1].borderalpha, 0.18);
+  set(layer[%1].vcenter, true); set(layer[%1].handcursor, true);
+  set(layer[%1].css, 'color:#EDF8EF; font-family:"Phosphor-Light"; font-size:18px; text-align:center;');
+  set(layer[%1].html, %6); set(layer[%1].onclick, %7); set(layer[%1].zorder, 201);
+  set(layer[%1].keep, true); set(layer[%1].visible, true);
+</action>
+
+<!-- ============ P1 NAV (3 lop: hit + icon + chu) ============ -->
+<!-- muc SONG: %1 ten %2 x %3 glyph(Phosphor) %4 label %5 onclick -->
+<action name="era_navitem">
+  <!-- lop hit + nen active -->
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, bottom); set(layer[%1].edge, bottom);
+  set(layer[%1].x, %2); set(layer[%1].y, 6); set(layer[%1].width, 138); set(layer[%1].height, 52);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, get(era_c_lime)); set(layer[%1].bgalpha, 0); set(layer[%1].bgroundedge, 14);
+  set(layer[%1].handcursor, true); set(layer[%1].onclick, %5);
+  set(layer[%1].onover, 'era_nav_gold(%1)'); set(layer[%1].onout, 'era_nav_restore(%1)');
+  set(layer[%1].zorder, 208); set(layer[%1].keep, true); set(layer[%1].visible, true);
+  <!-- icon -->
+  addlayer(%1_ic);
+  set(layer[%1_ic].type, text); set(layer[%1_ic].align, bottom); set(layer[%1_ic].edge, bottom);
+  set(layer[%1_ic].x, %2); set(layer[%1_ic].y, 28); set(layer[%1_ic].width, 150); set(layer[%1_ic].height, 26);
+  set(layer[%1_ic].bg, false); set(layer[%1_ic].enabled, false); set(layer[%1_ic].vcenter, true);
+  set(layer[%1_ic].css, 'color:#DCEFDA; font-family:"Phosphor-Light"; font-size:22px; text-align:center;');
+  set(layer[%1_ic].html, %3); set(layer[%1_ic].zorder, 212); set(layer[%1_ic].keep, true); set(layer[%1_ic].visible, true);
+  <!-- chu -->
+  addlayer(%1_tx);
+  set(layer[%1_tx].type, text); set(layer[%1_tx].align, bottom); set(layer[%1_tx].edge, bottom);
+  set(layer[%1_tx].x, %2); set(layer[%1_tx].y, 8); set(layer[%1_tx].width, 150); set(layer[%1_tx].height, 20);
+  set(layer[%1_tx].bg, false); set(layer[%1_tx].enabled, false); set(layer[%1_tx].vcenter, true);
+  set(layer[%1_tx].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:600; text-align:center;');
+  set(layer[%1_tx].html, %4); set(layer[%1_tx].zorder, 212); set(layer[%1_tx].keep, true); set(layer[%1_tx].visible, true);
+</action>
+
+<!-- 🔴 12/08 — TAT TAM 1 MUC NAV (Anh Tony chot: Gallery, anh dang cap nhat).
+     Lam mo + go bam NHUNG VAN GIU DU 3 lop %1 / %1_ic / %1_tx, vi
+     era_shell_set + era_responsive con tro vao ten do — xoa lop di thi krpano
+     TU TAO lop rong, im lang, rat kho lan ra (bay da ghi 11/08).
+     BAT LAI: xoa dong goi era_navdim(...) va tra onclick ve ham cu. -->
+<action name="era_navdim">
+  set(layer[%1].enabled, false);
+  set(layer[%1].handcursor, false);
+  set(layer[%1].bgalpha, 0);
+  set(layer[%1_ic].alpha, 0.4);
+  set(layer[%1_tx].alpha, 0.4);
+</action>
+
+<!-- hanh dong RONG cho muc dang tat — giu ten de khong co cho nao goi vao ten khong ton tai -->
+<action name="era_gallery_soon">
+</action>
+
+<!-- muc CHET: hien nhung mo + khong bam. %1 ten %2 x %3 glyph %4 label -->
+<action name="era_navdead">
+  addlayer(%1_ic);
+  set(layer[%1_ic].type, text); set(layer[%1_ic].align, bottom); set(layer[%1_ic].edge, bottom);
+  set(layer[%1_ic].x, %2); set(layer[%1_ic].y, 28); set(layer[%1_ic].width, 150); set(layer[%1_ic].height, 26);
+  set(layer[%1_ic].bg, false); set(layer[%1_ic].enabled, false); set(layer[%1_ic].vcenter, true); set(layer[%1_ic].alpha, 0.4);
+  set(layer[%1_ic].css, 'color:#DCEFDA; font-family:"Phosphor-Light"; font-size:22px; text-align:center;');
+  set(layer[%1_ic].html, %3); set(layer[%1_ic].zorder, 212); set(layer[%1_ic].keep, true); set(layer[%1_ic].visible, true);
+  addlayer(%1_tx);
+  set(layer[%1_tx].type, text); set(layer[%1_tx].align, bottom); set(layer[%1_tx].edge, bottom);
+  set(layer[%1_tx].x, %2); set(layer[%1_tx].y, 8); set(layer[%1_tx].width, 150); set(layer[%1_tx].height, 20);
+  set(layer[%1_tx].bg, false); set(layer[%1_tx].enabled, false); set(layer[%1_tx].vcenter, true); set(layer[%1_tx].alpha, 0.4);
+  set(layer[%1_tx].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:600; text-align:center;');
+  set(layer[%1_tx].html, %4); set(layer[%1_tx].zorder, 212); set(layer[%1_tx].keep, true); set(layer[%1_tx].visible, true);
+</action>
+
+<!-- hover / active = mau bac ha (mint). Giu ten action de khong pha loi goi -->
+<action name="era_nav_gold">
+  set(layer[%1_ic].css, 'color:#A9F0C4; font-family:"Phosphor-Light"; font-size:22px; text-align:center;');
+  set(layer[%1_tx].css, 'color:#A9F0C4; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:700; text-align:center;');
+</action>
+<action name="era_nav_white">
+  set(layer[%1_ic].css, 'color:#DCEFDA; font-family:"Phosphor-Light"; font-size:22px; text-align:center;');
+  set(layer[%1_tx].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:600; text-align:center;');
+</action>
+<action name="era_nav_restore">
+  if(era_active_nav == %1, era_nav_gold(%1); , era_nav_white(%1); );
+</action>
+
+<action name="era_nav_setactive">
+  if(era_active_nav !== null,
+    set(layer[get(era_active_nav)].bgalpha, 0);
+    era_nav_white(get(era_active_nav));
+  );
+  set(era_active_nav, %1);
+  set(layer[%1].bgcolor, get(era_c_lime));
+  set(layer[%1].bgalpha, 0.16);
+  era_nav_gold(%1);
+</action>
+
+<!-- ============ P2 SUBMENU (dark glass, chu sang) ============ -->
+<action name="era_sub">
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, bottom); set(layer[%1].edge, bottom);
+  set(layer[%1].x, %2); set(layer[%1].y, %3); set(layer[%1].width, %4); set(layer[%1].height, 40);
+  set(layer[%1].bg, false); set(layer[%1].vcenter, true); set(layer[%1].handcursor, true);
+  set(layer[%1].padding, '0 16 0 16');
+  set(layer[%1].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:600; text-align:left;');
+  set(layer[%1].html, %5); set(layer[%1].onclick, %6);
+  set(layer[%1].onover, 'set(layer[get(name)].css, "color:#9BDC4C; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:700; text-align:left;")');
+  set(layer[%1].onout,  'set(layer[get(name)].css, "color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:600; text-align:left;")');
+  set(layer[%1].zorder, 231); set(layer[%1].keep, true); set(layer[%1].visible, false);
+</action>
+
+<action name="era_sub_dead">
+  addlayer(%1);
+  set(layer[%1].type, text); set(layer[%1].align, bottom); set(layer[%1].edge, bottom);
+  set(layer[%1].x, %2); set(layer[%1].y, %3); set(layer[%1].width, %4); set(layer[%1].height, 40);
+  set(layer[%1].bg, false); set(layer[%1].vcenter, true); set(layer[%1].handcursor, false); set(layer[%1].enabled, false); set(layer[%1].alpha, 0.4);
+  set(layer[%1].padding, '0 16 0 16');
+  set(layer[%1].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:14px; font-weight:600; text-align:left;');
+  set(layer[%1].html, %5);
+  set(layer[%1].zorder, 231); set(layer[%1].keep, true); set(layer[%1].visible, false);
+</action>
+
+<!-- pr16 KHONG luu mang bien tu tao => bo array, chi dinh layer theo ten -->
+<action name="era_reg_sub">
+  era_sub(%1, %3, %4, %5, %6, %7);
+</action>
+<action name="era_reg_sub_dead">
+  era_sub_dead(%1, %3, %4, %5, %6);
+</action>
+
+<action name="era_menu_hideall">
+  set(layer[era_pop_vitri].visible, false);
+  set(layer[era_pop_tienich].visible, false);
+  set(layer[era_pop_nhamau].visible, false);
+  set(layer[era_pop_matbang].visible, false);
+  set(layer[era_sv1].visible, false); set(layer[era_sv2].visible, false);
+  set(layer[era_sn1].visible, false); set(layer[era_sn2].visible, false); set(layer[era_sn3].visible, false);
+  set(layer[era_st1].visible, false); set(layer[era_st2].visible, false); set(layer[era_st3].visible, false); set(layer[era_st4].visible, false); set(layer[era_st5].visible, false);
+  set(layer[era_sm1].visible, false); set(layer[era_sm2].visible, false);
+  set(era_menu_open, '');
+</action>
+
+<action name="era_menu_showitems">
+  if(%1 == vitri,   set(layer[era_sv1].visible, true); set(layer[era_sv2].visible, true); );
+  if(%1 == nhamau,  set(layer[era_sn1].visible, true); set(layer[era_sn2].visible, true); set(layer[era_sn3].visible, true); );
+  if(%1 == tienich, set(layer[era_st1].visible, true); set(layer[era_st2].visible, true); set(layer[era_st3].visible, true); set(layer[era_st4].visible, true); set(layer[era_st5].visible, true); );
+  if(%1 == matbang, set(layer[era_sm1].visible, true); set(layer[era_sm2].visible, true); );
+</action>
+
+<action name="era_menu_toggle">
+  if(era_menu_open == %1,
+    era_menu_hideall();
+  ,
+    era_menu_hideall();
+    set(era_menu_open, %1);
+    set(layer[calc('era_pop_' + '%1')].visible, true);
+    era_menu_showitems(%1);
+  );
+</action>
+
+<action name="era_go_live">
+  loadscene(scene_02-toan-canh, null, MERGE, BLEND(0.6));
+  era_menu_hideall();
+</action>
+
+<!-- mo trang mat bang tien ich (web thuan) - wrapper khong tham so tranh bay dau phay -->
+<action name="era_go_tienich">
+  openurl('/tienich/', _top);
+</action>
+
+<!-- Mat bang can: 2 cach xem ma lo -->
+<action name="era_go_giohang">
+  openurl('/giohang/', _top);
+</action>
+<action name="era_go_mbflycam">
+  loadscene(scene_matbang_flycam, null, MERGE, BLEND(0.6));
+  era_menu_hideall();
+</action>
+
+<!-- ============ P3 PANEL "DIEM NHIN HIEN TAI" ============
+     🔴 11/08 (toi) Anh Tony chot GO BO HAN o MOI scene.
+     Giu lai TEN action (than rong) vi con 1 cho goi o era_pgbl_build va
+     1 cho o events onnewpano. Xoa han ten action thi krpano IM LANG bo qua,
+     kho lan ra sau nay. Muon bat lai: bo cap the <!== ==> quanh khoi ben duoi.
+     ==================================================== -->
+<action name="era_viewpanel_build">
+</action>
+
+<!--  KHOI CU (da tat):
+  era_box(era_vp_bg, leftbottom, 18, 92, 322, 116, get(era_c_panel), 16, 206);
+    set(layer[era_vp_bg].bgalpha, 0.70);
+    set(layer[era_vp_bg].borderwidth, 1); set(layer[era_vp_bg].bordercolor, get(era_c_border)); set(layer[era_vp_bg].borderalpha, 0.18);
+  addlayer(era_vp_label);
+    set(layer[era_vp_label].type, text); set(layer[era_vp_label].align, leftbottom); set(layer[era_vp_label].edge, leftbottom);
+    set(layer[era_vp_label].x, 34); set(layer[era_vp_label].y, 178); set(layer[era_vp_label].bg, false); set(layer[era_vp_label].enabled, false);
+    set(layer[era_vp_label].css, 'color:#7ADD8B; font-family:Inter, Arial, sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; text-align:left;');
+    set(layer[era_vp_label].html, 'ĐIỂM NHÌN HIỆN TẠI');
+    set(layer[era_vp_label].zorder, 208); set(layer[era_vp_label].keep, true); set(layer[era_vp_label].visible, true);
+  addlayer(era_vp_title);
+    set(layer[era_vp_title].type, text); set(layer[era_vp_title].align, leftbottom); set(layer[era_vp_title].edge, leftbottom);
+    set(layer[era_vp_title].x, 34); set(layer[era_vp_title].y, 148); set(layer[era_vp_title].width, 300); set(layer[era_vp_title].bg, false); set(layer[era_vp_title].enabled, false);
+    set(layer[era_vp_title].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:16px; font-weight:700; text-align:left;');
+    set(layer[era_vp_title].html, 'Toàn cảnh khu đô thị');
+    set(layer[era_vp_title].zorder, 208); set(layer[era_vp_title].keep, true); set(layer[era_vp_title].visible, true);
+  addlayer(era_vp_desc);
+    set(layer[era_vp_desc].type, text); set(layer[era_vp_desc].align, leftbottom); set(layer[era_vp_desc].edge, leftbottom);
+    set(layer[era_vp_desc].x, 34); set(layer[era_vp_desc].y, 124); set(layer[era_vp_desc].width, 300); set(layer[era_vp_desc].bg, false); set(layer[era_vp_desc].enabled, false);
+    set(layer[era_vp_desc].css, 'color:#BAD8C3; font-family:Inter, Arial, sans-serif; font-size:12px; text-align:left;');
+    set(layer[era_vp_desc].html, 'Rừng thông Bảo Lộc bao quanh dự án');
+    set(layer[era_vp_desc].zorder, 208); set(layer[era_vp_desc].keep, true); set(layer[era_vp_desc].visible, true);
+  addlayer(era_vp_stats);
+    set(layer[era_vp_stats].type, text); set(layer[era_vp_stats].align, leftbottom); set(layer[era_vp_stats].edge, leftbottom);
+    set(layer[era_vp_stats].x, 34); set(layer[era_vp_stats].y, 100); set(layer[era_vp_stats].width, 300); set(layer[era_vp_stats].bg, false); set(layer[era_vp_stats].enabled, false);
+    set(layer[era_vp_stats].css, 'color:#7ADD8B; font-family:Inter, Arial, sans-serif; font-size:12px; font-weight:700; text-align:left;');
+    set(layer[era_vp_stats].html, '354 lô đất    ·    18°C    ·    90° TP.HCM');
+    set(layer[era_vp_stats].zorder, 208); set(layer[era_vp_stats].keep, true); set(layer[era_vp_stats].visible, true);
+  era_update_viewpanel();
+-->
+
+<action name="era_update_viewpanel">
+</action>
+
+<!-- ============ P4 MAN INTRO (splash) ============ -->
+<action name="era_intro_build">
+  <!-- scrim toi de chu noi (khong chan xoay pano) -->
+  era_box(era_intro_dim, center, 0, 0, 100000, 100000, 0x0A1F19, 0, 320);
+    set(layer[era_intro_dim].bgalpha, 0.55); set(layer[era_intro_dim].enabled, false);
+  <!-- eyebrow -->
+  addlayer(era_intro_eyebrow);
+    set(layer[era_intro_eyebrow].type, text); set(layer[era_intro_eyebrow].align, center); set(layer[era_intro_eyebrow].edge, center);
+    set(layer[era_intro_eyebrow].x, 0); set(layer[era_intro_eyebrow].y, -150); set(layer[era_intro_eyebrow].width, 600); set(layer[era_intro_eyebrow].bg, false); set(layer[era_intro_eyebrow].enabled, false);
+    set(layer[era_intro_eyebrow].css, 'color:#7ADD8B; font-family:Inter, Arial, sans-serif; font-size:12px; font-weight:700; letter-spacing:4px; text-align:center;');
+    set(layer[era_intro_eyebrow].html, 'TOUR THỰC TẾ ẢO 360°');
+    set(layer[era_intro_eyebrow].zorder, 322); set(layer[era_intro_eyebrow].keep, true); set(layer[era_intro_eyebrow].visible, true);
+  <!-- title -->
+  addlayer(era_intro_title);
+    set(layer[era_intro_title].type, text); set(layer[era_intro_title].align, center); set(layer[era_intro_title].edge, center);
+    set(layer[era_intro_title].x, 0); set(layer[era_intro_title].y, -96); set(layer[era_intro_title].width, 900); set(layer[era_intro_title].bg, false); set(layer[era_intro_title].enabled, false);
+    set(layer[era_intro_title].css, 'color:#F2FBF4; font-family:Inter, Arial, sans-serif; font-size:64px; font-weight:800; letter-spacing:-2px; text-align:center;');
+    set(layer[era_intro_title].html, 'PHÚ GIA BẢO LỘC');
+    set(layer[era_intro_title].zorder, 322); set(layer[era_intro_title].keep, true); set(layer[era_intro_title].visible, true);
+  <!-- subtitle -->
+  addlayer(era_intro_sub);
+    set(layer[era_intro_sub].type, text); set(layer[era_intro_sub].align, center); set(layer[era_intro_sub].edge, center);
+    set(layer[era_intro_sub].x, 0); set(layer[era_intro_sub].y, -36); set(layer[era_intro_sub].width, 700); set(layer[era_intro_sub].bg, false); set(layer[era_intro_sub].enabled, false);
+    set(layer[era_intro_sub].css, 'color:#C6E3CF; font-family:Inter, Arial, sans-serif; font-size:15px; letter-spacing:1px; text-align:center;');
+    set(layer[era_intro_sub].html, 'Bảo Lộc · Lâm Đồng · Cao nguyên 800m');
+    set(layer[era_intro_sub].zorder, 322); set(layer[era_intro_sub].keep, true); set(layer[era_intro_sub].visible, true);
+  <!-- description -->
+  addlayer(era_intro_desc);
+    set(layer[era_intro_desc].type, text); set(layer[era_intro_desc].align, center); set(layer[era_intro_desc].edge, center);
+    set(layer[era_intro_desc].x, 0); set(layer[era_intro_desc].y, 16); set(layer[era_intro_desc].width, 480); set(layer[era_intro_desc].bg, false); set(layer[era_intro_desc].enabled, false);
+    set(layer[era_intro_desc].css, 'color:#BAD8C3; font-family:Inter, Arial, sans-serif; font-size:13px; line-height:20px; text-align:center;');
+    set(layer[era_intro_desc].html, 'Cao nguyên Bảo Lộc, độ cao 800m. Kéo để xoay, cuộn để phóng, bấm điểm sáng để xem tiện ích.');
+    set(layer[era_intro_desc].zorder, 322); set(layer[era_intro_desc].keep, true); set(layer[era_intro_desc].visible, true);
+  <!-- CTA -->
+  era_btn(era_intro_cta, center, 0, 92, 210, 48, get(era_c_lime), 322, 'Bắt đầu khám phá');
+    set(layer[era_intro_cta].bgroundedge, 14);
+    set(layer[era_intro_cta].css, 'color:#072A1D; font-family:Inter, Arial, sans-serif; font-size:15px; font-weight:700; text-align:center;');
+    set(layer[era_intro_cta].onclick, 'era_intro_enter()');
+    set(layer[era_intro_cta].onover, 'set(layer[era_intro_cta].bgalpha,0.90)');
+    set(layer[era_intro_cta].onout,  'set(layer[era_intro_cta].bgalpha,1.0)');
+</action>
+
+<action name="era_intro_show">
+  set(era_in_intro, true);
+  era_shell_set(false);
+  set(layer[era_intro_dim].visible, true); set(layer[era_intro_eyebrow].visible, true);
+  set(layer[era_intro_title].visible, true); set(layer[era_intro_sub].visible, true);
+  set(layer[era_intro_desc].visible, true); set(layer[era_intro_cta].visible, true);
+</action>
+
+<action name="era_intro_enter">
+  set(layer[era_intro_dim].visible, false); set(layer[era_intro_eyebrow].visible, false);
+  set(layer[era_intro_title].visible, false); set(layer[era_intro_sub].visible, false);
+  set(layer[era_intro_desc].visible, false); set(layer[era_intro_cta].visible, false);
+  set(era_in_intro, false);
+  era_shell_set(true);
+  era_nav_setactive(era_n_toancanh);
+  era_go_live();
+  era_update_crumb();
+  era_responsive();
+</action>
+
+<!-- bat/tat toan bo shell (nav + chrome + panel) -->
+<action name="era_shell_set">
+  set(layer[era_nav_bg].visible, %1);
+  set(layer[era_n_toancanh].visible, %1); set(layer[era_n_toancanh_ic].visible, %1); set(layer[era_n_toancanh_tx].visible, %1);
+  set(layer[era_n_vitri].visible, %1); set(layer[era_n_vitri_ic].visible, %1); set(layer[era_n_vitri_tx].visible, %1);
+  set(layer[era_n_matbang].visible, %1); set(layer[era_n_matbang_ic].visible, %1); set(layer[era_n_matbang_tx].visible, %1);
+  set(layer[era_n_nhamau].visible, %1); set(layer[era_n_nhamau_ic].visible, %1); set(layer[era_n_nhamau_tx].visible, %1);
+  set(layer[era_n_tienich].visible, %1); set(layer[era_n_tienich_ic].visible, %1); set(layer[era_n_tienich_tx].visible, %1);
+  set(layer[era_n_gallery].visible, %1); set(layer[era_n_gallery_ic].visible, %1); set(layer[era_n_gallery_tx].visible, %1);
+  set(layer[era_n_ebro].visible, %1); set(layer[era_n_ebro_ic].visible, %1); set(layer[era_n_ebro_tx].visible, %1);
+  <!-- 🔴 11/08: da go logo ERA + thanh ten du an + the "Diem nhin hien tai".
+       4 dong cu de lai o day, muon bat lai thi bo dau chu thich. -->
+  <!-- set(layer[era_logo_bg].visible, %1); set(layer[era_logo_txt].visible, %1); set(layer[era_crumb].visible, %1); -->
+  set(layer[era_tb_info].visible, %1); set(layer[era_tb_mute].visible, %1); set(layer[era_tb_full].visible, %1);
+  <!-- set(layer[era_vp_bg].visible, %1); set(layer[era_vp_label].visible, %1); set(layer[era_vp_title].visible, %1); -->
+  <!-- set(layer[era_vp_desc].visible, %1); set(layer[era_vp_stats].visible, %1); -->
+</action>
+
+<!-- ============ P5 CHROME ============ -->
+<action name="era_chrome_build">
+<!-- 🔴 11/08: Anh Tony chot BO logo ERA + thanh ten du an (breadcrumb).
+     Khoi tao 3 lop era_logo_bg / era_logo_txt / era_crumb da tat ben duoi.
+     Toolbar phai (info, loa, toan man) VAN GIU.
+  era_box(era_logo_bg, lefttop, 18, 18, 66, 66, get(era_c_white), 40, 200);
+    set(layer[era_logo_bg].bgalpha, 0.92); set(layer[era_logo_bg].borderwidth, 2); set(layer[era_logo_bg].bordercolor, get(era_c_gold));
+  addlayer(era_logo_txt);
+    set(layer[era_logo_txt].type, text); set(layer[era_logo_txt].align, lefttop); set(layer[era_logo_txt].edge, lefttop);
+    set(layer[era_logo_txt].x, 18); set(layer[era_logo_txt].y, 18); set(layer[era_logo_txt].width, 66); set(layer[era_logo_txt].height, 66);
+    set(layer[era_logo_txt].bg, false); set(layer[era_logo_txt].enabled, false); set(layer[era_logo_txt].vcenter, true);
+    set(layer[era_logo_txt].css, 'color:#0D2620; font-family:Inter, Arial, sans-serif; font-size:19px; font-weight:800; letter-spacing:1px; text-align:center;');
+    set(layer[era_logo_txt].html, 'ERA');
+    set(layer[era_logo_txt].zorder, 201); set(layer[era_logo_txt].keep, true); set(layer[era_logo_txt].visible, true);
+
+  addlayer(era_crumb);
+    set(layer[era_crumb].type, text); set(layer[era_crumb].align, lefttop); set(layer[era_crumb].edge, lefttop);
+    set(layer[era_crumb].x, 96); set(layer[era_crumb].y, 34);
+    set(layer[era_crumb].bg, true); set(layer[era_crumb].bgcolor, get(era_c_panel)); set(layer[era_crumb].bgalpha, 0.7);
+    set(layer[era_crumb].borderwidth, 1); set(layer[era_crumb].bordercolor, get(era_c_border)); set(layer[era_crumb].borderalpha, 0.18);
+    set(layer[era_crumb].bgroundedge, 18); set(layer[era_crumb].padding, '7 16 7 16'); set(layer[era_crumb].enabled, false);
+    set(layer[era_crumb].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:600;');
+    set(layer[era_crumb].html, get(era_prj_name)); set(layer[era_crumb].zorder, 201);
+    set(layer[era_crumb].keep, true); set(layer[era_crumb].visible, true);
+-->
+
+  <!-- toolbar phai: icon Phosphor -->
+  era_faicon(era_tb_info, righttop, 16, 18, 40, '&#xe2ce;', 'era_guide_show()');   <!-- info -->
+  era_faicon(era_tb_mute, righttop, 16, 64, 40, '&#xe44a;', 'era_toggle_mute()');   <!-- speaker-high -->
+  era_faicon(era_tb_full, righttop, 16, 110, 40, '&#xe0a2;', 'set(fullscreen, calc(!fullscreen))'); <!-- arrows-out -->
+
+  <!-- modal huong dan -->
+  era_box(era_guide_dim, center, 0, 0, 100000, 100000, 0x000000, 0, 300);
+    set(layer[era_guide_dim].bgalpha, 0.55); set(layer[era_guide_dim].visible, false);
+  era_box(era_guide_bg, center, 0, 0, 460, 260, get(era_c_panel), 16, 301);
+    set(layer[era_guide_bg].bgalpha, 0.90);
+    set(layer[era_guide_bg].borderwidth, 1); set(layer[era_guide_bg].bordercolor, get(era_c_border)); set(layer[era_guide_bg].borderalpha, 0.18);
+    set(layer[era_guide_bg].visible, false);
+  addlayer(era_guide_txt);
+    set(layer[era_guide_txt].type, text); set(layer[era_guide_txt].align, center); set(layer[era_guide_txt].edge, center);
+    set(layer[era_guide_txt].x, 0); set(layer[era_guide_txt].y, -12); set(layer[era_guide_txt].width, 400); set(layer[era_guide_txt].enabled, false); set(layer[era_guide_txt].bg, false);
+    set(layer[era_guide_txt].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:14px; line-height:24px; text-align:center;');
+    set(layer[era_guide_txt].html, '[b]HƯỚNG DẪN THAO TÁC[/b][br][br]Nhấn và kéo chuột để xoay cảnh[br]Cuộn chuột để phóng to / thu nhỏ[br]Bấm nút phía dưới để đổi khu vực');
+    set(layer[era_guide_txt].zorder, 302); set(layer[era_guide_txt].keep, true); set(layer[era_guide_txt].visible, false);
+  era_btn(era_guide_ok, center, 0, 92, 150, 40, get(era_c_lime), 302, 'Bắt đầu xem');
+    set(layer[era_guide_ok].onclick, 'era_guide_hide()'); set(layer[era_guide_ok].visible, false);
+</action>
+
+<action name="era_guide_show"> set(layer[era_guide_dim].visible,true); set(layer[era_guide_bg].visible,true); set(layer[era_guide_txt].visible,true); set(layer[era_guide_ok].visible,true); </action>
+<action name="era_guide_hide"> set(layer[era_guide_dim].visible,false); set(layer[era_guide_bg].visible,false); set(layer[era_guide_txt].visible,false); set(layer[era_guide_ok].visible,false); </action>
+<action name="era_toggle_mute">
+  if(era_muted,
+    set(era_muted, false); set(layer[era_tb_mute].html, '&#xe44a;'); set(layer[era_tb_mute].css, 'color:#EDF8EF; font-family:"Phosphor-Light"; font-size:18px; text-align:center;');
+  ,
+    set(era_muted, true);  set(layer[era_tb_mute].html, '&#xe45a;'); set(layer[era_tb_mute].css, 'color:#9BDC4C; font-family:"Phosphor-Light"; font-size:18px; text-align:center;');
+  );
+</action>
+
+<!-- ============ BUILD CHINH ============ -->
+<action name="era_pgbl_build">
+  era_cfg();
+  set(era_active_nav, null); set(era_menu_open, ''); set(era_muted, false); set(era_sub_count, 0);
+
+  set(layer[skin_control_bar].visible, false);
+  set(layer[skin_control_bar_bg].visible, false);
+  set(layer[skin_title].visible, false);
+  set(layer[skin_splitter_bottom].visible, false);
+
+  <!-- nen thanh nav full-width (dark glass) -->
+  addlayer(era_nav_bg);
+    set(layer[era_nav_bg].type, text); set(layer[era_nav_bg].align, bottom); set(layer[era_nav_bg].edge, bottom);
+    set(layer[era_nav_bg].x, 0); set(layer[era_nav_bg].y, 0); set(layer[era_nav_bg].width, '100%'); set(layer[era_nav_bg].height, 64);
+    set(layer[era_nav_bg].bg, true); set(layer[era_nav_bg].bgcolor, get(era_c_mid)); set(layer[era_nav_bg].bgalpha, 0.82);
+    set(layer[era_nav_bg].enabled, false); set(layer[era_nav_bg].zorder, 205);
+    set(layer[era_nav_bg].keep, true); set(layer[era_nav_bg].visible, true);
+
+  <!-- 7 muc: icon Phosphor + chu co dau. SONG tru Phan Khu (MO cho noi ruot nhanh A) -->
+  era_navitem(era_n_toancanh, -450, '&#xe7ae;', 'Toàn Cảnh',  'era_nav_setactive(era_n_toancanh); era_go_live()');
+  era_navitem(era_n_vitri,    -300, '&#xe316;', 'Vị Trí',     'era_menu_toggle(vitri)');
+  era_navitem(era_n_matbang,  -150, '&#xe464;', 'Mặt bằng căn', 'era_menu_toggle(matbang)');
+  era_navitem(era_n_nhamau,      0, '&#xe2c4;', 'Nhà Mẫu',    'era_menu_toggle(nhamau)');
+  era_navitem(era_n_tienich,   150, '&#xe6a2;', 'Mặt bằng tiện ích', 'era_nav_setactive(era_n_tienich); era_go_tienich()');
+  <!-- 🔴 12/08: Anh Tony chot TAT TAM Gallery (hinh anh dang cap nhat).
+       BAT LAI = tra dong duoi ve 'era_nav_setactive(era_n_gallery); era_gallery_open()'
+       va xoa dong era_navdim(era_n_gallery). Action era_gallery_open() VAN CON NGUYEN. -->
+  era_navitem(era_n_gallery,   300, '&#xe834;', 'Gallery <span style="color:#BF9642; font-size:9px; font-weight:700;">SẮP CÓ</span>', 'era_gallery_soon()');
+  era_navdim(era_n_gallery);
+  era_navitem(era_n_ebro,      450, '&#xe0e6;', 'E-Brochure', 'era_nav_setactive(era_n_ebro); era_ebro_open()');
+
+  <!-- submenu Vi Tri -->
+  era_box(era_pop_vitri, bottom, -300, 68, 230, 96, get(era_c_panel), 12, 230);
+    set(layer[era_pop_vitri].bgalpha, 0.80);
+    set(layer[era_pop_vitri].borderwidth, 1); set(layer[era_pop_vitri].bordercolor, get(era_c_border)); set(layer[era_pop_vitri].borderalpha, 0.18);
+    set(layer[era_pop_vitri].visible, false);
+  era_reg_sub(era_sv1, vitri, -300, 72,  230, 'Bản đồ vị trí',        'era_nav_setactive(era_n_vitri); era_open_map()');
+  era_reg_sub(era_sv2, vitri, -300, 116, 230, 'Toàn cảnh khu đô thị', 'era_nav_setactive(era_n_vitri); era_go_live()');
+
+  <!-- submenu Tien Ich -->
+  era_box(era_pop_tienich, bottom, 150, 68, 232, 228, get(era_c_panel), 12, 230);
+    set(layer[era_pop_tienich].bgalpha, 0.80);
+    set(layer[era_pop_tienich].borderwidth, 1); set(layer[era_pop_tienich].bordercolor, get(era_c_border)); set(layer[era_pop_tienich].borderalpha, 0.18);
+    set(layer[era_pop_tienich].visible, false);
+  era_reg_sub(era_st1, tienich, 150, 72,  232, 'Cafe Đôi Dép',        'era_nav_setactive(era_n_tienich); era_ti_cafe()');
+  era_reg_sub(era_st2, tienich, 150, 116, 232, 'Công viên',           'era_nav_setactive(era_n_tienich); era_ti_congvien()');
+  era_reg_sub(era_st3, tienich, 150, 160, 232, 'Apollo Garden',       'era_nav_setactive(era_n_tienich); era_ti_apollo()');
+  era_reg_sub(era_st4, tienich, 150, 204, 232, 'Hồ Cá Koi',           'era_nav_setactive(era_n_tienich); era_ti_hoca()');
+  era_reg_sub(era_st5, tienich, 150, 248, 232, 'Vườn thiền &amp; Yoga','era_nav_setactive(era_n_tienich); era_ti_vuonthien()');
+
+  <!-- submenu Nha Mau -->
+  era_box(era_pop_nhamau, bottom, 0, 68, 240, 140, get(era_c_panel), 12, 230);
+    set(layer[era_pop_nhamau].bgalpha, 0.80);
+    set(layer[era_pop_nhamau].borderwidth, 1); set(layer[era_pop_nhamau].bordercolor, get(era_c_border)); set(layer[era_pop_nhamau].borderalpha, 0.18);
+    set(layer[era_pop_nhamau].visible, false);
+  era_reg_sub(era_sn1, nhamau, 0, 72,  240, 'Nhà mẫu - Phối cảnh',    'era_nav_setactive(era_n_nhamau); era_nm_phoicanh()');
+  era_reg_sub(era_sn2, nhamau, 0, 116, 240, 'Mặt bằng liền kề 5x20',  'era_nav_setactive(era_n_nhamau); era_nm_mb5x20()');
+  era_reg_sub(era_sn3, nhamau, 0, 160, 240, 'Mặt bằng song lập 7x20', 'era_nav_setactive(era_n_nhamau); era_nm_mb7x20()');
+
+  <!-- submenu Mat bang can: 2 cach xem ma lo -->
+  era_box(era_pop_matbang, bottom, -150, 68, 260, 96, get(era_c_panel), 12, 230);
+    set(layer[era_pop_matbang].bgalpha, 0.80);
+    set(layer[era_pop_matbang].borderwidth, 1); set(layer[era_pop_matbang].bordercolor, get(era_c_border)); set(layer[era_pop_matbang].borderalpha, 0.18);
+    set(layer[era_pop_matbang].visible, false);
+  era_reg_sub(era_sm1, matbang, -150, 72,  260, 'Mã lô trên mặt bằng', 'era_nav_setactive(era_n_matbang); era_go_giohang()');
+  era_reg_sub(era_sm2, matbang, -150, 116, 260, 'Mã lô trên flycam',   'era_nav_setactive(era_n_matbang); era_go_mbflycam()');
+
+  era_chrome_build();
+  era_viewpanel_build();
+
+  era_nav_setactive(era_n_toancanh);
+  era_update_crumb();
+  era_responsive();
+</action>
+
+<!-- ============ BREADCRUMB + RESPONSIVE ============ -->
+<action name="era_update_crumb">
+</action>
+
+<action name="era_responsive">
+  if(!era_in_intro,
+    if(stagewidth LT 900,
+      set(layer[era_n_gallery].visible, false); set(layer[era_n_gallery_ic].visible, false); set(layer[era_n_gallery_tx].visible, false);
+      set(layer[era_n_ebro].visible, false); set(layer[era_n_ebro_ic].visible, false); set(layer[era_n_ebro_tx].visible, false);
+      <!-- 🔴 11/08: bo era_crumb + era_vp_* (da go han) -->
+    ,
+      set(layer[era_n_gallery].visible, true); set(layer[era_n_gallery_ic].visible, true); set(layer[era_n_gallery_tx].visible, true);
+      set(layer[era_n_ebro].visible, true); set(layer[era_n_ebro_ic].visible, true); set(layer[era_n_ebro_tx].visible, true);
+    );
+  );
+</action>
+
+<events name="era_txv_pgbl_events" keep="true"
+        onxmlcomplete="era_pgbl_build();"
+        onnewpano="era_update_crumb(); era_update_viewpanel();"
+        onresize="era_responsive();" />
+
+</krpano>

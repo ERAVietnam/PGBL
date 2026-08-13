@@ -1,0 +1,194 @@
+<krpano>
+
+<!-- ==================================================================
+     ERA VIETNAM - SKIN "SkySOLIS" cho krpano 1.19-pr16
+     Build pr16 loi khi parse nhieu <layer> cung luc, NHUNG tao layer
+     bang addlayer+set thi luon chay => toan bo UI tao trong action era_build,
+     goi o onxmlcomplete. Sua chu/mau trong action nay.
+     ================================================================== -->
+
+<!-- helper: nut bam (nen mau, chu trang giua) -->
+<action name="era_btn">
+  addlayer(%1);
+  set(layer[%1].type, text);
+  set(layer[%1].align, %2);
+  set(layer[%1].x, %3); set(layer[%1].y, %4);
+  set(layer[%1].width, %5); set(layer[%1].height, %6);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, %7); set(layer[%1].bgroundedge, 10);
+  set(layer[%1].vcenter, true); set(layer[%1].handcursor, true);
+  set(layer[%1].css, 'color:#FFFFFF; font-family:Arial; font-size:13px; font-weight:bold; text-align:center;');
+  set(layer[%1].html, %9);
+  set(layer[%1].zorder, %8);
+  set(layer[%1].keep, true); set(layer[%1].visible, true);
+</action>
+
+<!-- helper: hop nen (khong bam) -->
+<action name="era_box">
+  addlayer(%1);
+  set(layer[%1].type, text);
+  set(layer[%1].align, %2);
+  set(layer[%1].x, %3); set(layer[%1].y, %4);
+  set(layer[%1].width, %5); set(layer[%1].height, %6);
+  set(layer[%1].bg, true); set(layer[%1].bgcolor, %7); set(layer[%1].bgroundedge, %8);
+  set(layer[%1].enabled, false);
+  set(layer[%1].zorder, %9);
+  set(layer[%1].keep, true); set(layer[%1].visible, true);
+</action>
+
+<action name="era_build">
+  <!-- 1. HEADER -->
+  era_box(era_hdr_bg, lefttop, 16, 16, 150, 52, 0xC8102E, 12, 100);
+  era_box(era_logo_mark, lefttop, 28, 25, 34, 34, 0xFFFFFF, 8, 101);
+    set(layer[era_logo_mark].vcenter, true);
+    set(layer[era_logo_mark].css, 'color:#C8102E; font-family:Arial; font-size:18px; font-weight:bold; text-align:center;');
+    set(layer[era_logo_mark].html, 'P');
+  addlayer(era_logo_txt);
+    set(layer[era_logo_txt].type, text); set(layer[era_logo_txt].align, lefttop);
+    set(layer[era_logo_txt].x, 70); set(layer[era_logo_txt].y, 21); set(layer[era_logo_txt].enabled, false); set(layer[era_logo_txt].bg, false);
+    set(layer[era_logo_txt].css, 'color:#FFFFFF; font-family:Arial; font-size:14px; font-weight:bold; line-height:14px;');
+    set(layer[era_logo_txt].html, 'LOGO');
+    set(layer[era_logo_txt].zorder, 101); set(layer[era_logo_txt].keep, true); set(layer[era_logo_txt].visible, true);
+
+  <!-- breadcrumb -->
+  addlayer(era_crumb);
+    set(layer[era_crumb].type, text); set(layer[era_crumb].align, lefttop);
+    set(layer[era_crumb].x, 178); set(layer[era_crumb].y, 30);
+    set(layer[era_crumb].bg, true); set(layer[era_crumb].bgcolor, 0x0C0C44); set(layer[era_crumb].bgalpha, 0.55);
+    set(layer[era_crumb].bgroundedge, 20); set(layer[era_crumb].padding, '7 16 7 16'); set(layer[era_crumb].enabled, false);
+    set(layer[era_crumb].css, 'color:#FFFFFF; font-family:Arial; font-size:13px; font-weight:bold;');
+    set(layer[era_crumb].html, 'Toan Canh'); set(layer[era_crumb].zorder, 100);
+    set(layer[era_crumb].keep, true); set(layer[era_crumb].visible, true);
+
+  <!-- 2. NUT PHAI -->
+  era_btn(era_btn_full, righttop, 16, 16,  42, 42, 0xC8102E, 101, 'FS');
+    set(layer[era_btn_full].onclick, 'set(fullscreen,calc(!fullscreen))');
+  era_btn(era_btn_fav,  righttop, 16, 68,  42, 42, 0xC8102E, 101, '&#9734;');
+  era_btn(era_btn_lang, righttop, 16, 120, 42, 42, 0xC8102E, 101, 'EN');
+  era_btn(era_btn_web,  righttop, 16, 172, 42, 42, 0xC8102E, 101, 'WEB');
+    set(layer[era_btn_web].onclick, 'openurl(https://era.vn, _blank)');
+
+  <!-- 3. PANEL THONG TIN DU AN (bang Tony gui) -->
+  era_box(era_info_bg, lefttop, 16, 82, 250, 424, 0x0C0C44, 14, 99);
+    set(layer[era_info_bg].bgalpha, 0.82);
+  era_box(era_info_mk, lefttop, 30, 94, 22, 22, 0xC8102E, 5, 100);
+    set(layer[era_info_mk].vcenter, true);
+    set(layer[era_info_mk].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold; text-align:center;');
+    set(layer[era_info_mk].html, 'P');
+  addlayer(era_info_name);
+    set(layer[era_info_name].type, text); set(layer[era_info_name].align, lefttop);
+    set(layer[era_info_name].x, 60); set(layer[era_info_name].y, 97); set(layer[era_info_name].enabled, false); set(layer[era_info_name].bg, false);
+    set(layer[era_info_name].css, 'color:#FFFFFF; font-family:Arial; font-size:14px; font-weight:bold;');
+    set(layer[era_info_name].html, 'THÔNG TIN DỰ ÁN');
+    set(layer[era_info_name].zorder, 100); set(layer[era_info_name].keep, true); set(layer[era_info_name].visible, true);
+  addlayer(era_info_body);
+    set(layer[era_info_body].type, text); set(layer[era_info_body].align, lefttop);
+    set(layer[era_info_body].x, 30); set(layer[era_info_body].y, 132); set(layer[era_info_body].width, 224); set(layer[era_info_body].enabled, false); set(layer[era_info_body].bg, false);
+    set(layer[era_info_body].css, 'color:#E7ECF3; font-family:Arial; font-size:11.5px; line-height:15px;');
+    set(layer[era_info_body].html, 'CHỦ ĐẦU TƯ[br][b]ERAS Đà Lạt[/b][br][br]TÊN PHÁP LÝ DỰ ÁN[br][b]Khu Dân Cư Nông Thôn Mới Đô Thị Xanh[/b][br][br]VỊ TRÍ[br][b]Phường 3 Bảo Lộc, tỉnh Lâm Đồng[/b][br][br]QUY MÔ[br][b]91.248 m²[/b][br][br]LOẠI SẢN PHẨM[br][b]Shophouse, nhà liền kề phố, nhà liền kề vườn, biệt thự[/b][br][br]SỐ LƯỢNG SẢN PHẨM[br][b]357[/b][br][br]DIỆN TÍCH[br][b]Từ 100 - 400 m²[/b]');
+    set(layer[era_info_body].zorder, 100); set(layer[era_info_body].keep, true); set(layer[era_info_body].visible, true);
+
+  <!-- 4. NGAY / DEM — [DA XOA theo yeu cau] -->
+
+  <!-- 5. MENU PHAI DUOI -->
+  era_btn(era_m_vitri,   rightbottom, 270, 20, 92,  42, 0x0C0C44, 101, 'Vi Tri');
+    set(layer[era_m_vitri].bgalpha, 0.72); set(layer[era_m_vitri].onclick, 'era_toggle(era_pop_vitri)');
+  era_btn(era_m_tienich, rightbottom, 170, 20, 96,  42, 0x0C0C44, 101, 'Tien Ich');
+    set(layer[era_m_tienich].bgalpha, 0.72); set(layer[era_m_tienich].onclick, 'openurl(../tienich/index.html, _blank)');
+  era_btn(era_m_nhamau,  rightbottom, 16,  20, 150, 42, 0xC8102E, 101, 'Xem Giỏ Hàng');
+    set(layer[era_m_nhamau].onclick, 'openurl(../giohang/index.html, _blank)');
+
+  <!-- popup Vi Tri -->
+  era_box(era_pop_vitri, rightbottom, 16, 72, 220, 60, 0xFFFFFF, 10, 104);
+    set(layer[era_pop_vitri].visible, false);
+  era_btn(era_pv1, rightbottom, 16, 160, 220, 44, 0xFFFFFF, 105, '1. Tong the');
+    set(layer[era_pv1].css, 'color:#0C0C44; font-family:Arial; font-size:13px; font-weight:bold; text-align:left;');
+    set(layer[era_pv1].padding, '0 14 0 14'); set(layer[era_pv1].visible, false);
+    set(layer[era_pv1].onclick, 'loadscene(scene_01-tong-the,null,MERGE,BLEND(0.6)); era_hide_vitri()');
+  era_btn(era_pv2, rightbottom, 16, 72, 220, 44, 0xFFFFFF, 105, 'Toan canh khu do thi');
+    set(layer[era_pv2].css, 'color:#0C0C44; font-family:Arial; font-size:13px; font-weight:bold; text-align:left;');
+    set(layer[era_pv2].padding, '0 14 0 14'); set(layer[era_pv2].visible, false);
+    set(layer[era_pv2].onclick, 'loadscene(scene_02-toan-canh,null,MERGE,BLEND(0.6)); era_hide_vitri()');
+  era_btn(era_pv3, rightbottom, 16, 72, 220, 44, 0xFFFFFF, 105, '3. View doi nui');
+    set(layer[era_pv3].css, 'color:#0C0C44; font-family:Arial; font-size:13px; font-weight:bold; text-align:left;');
+    set(layer[era_pv3].padding, '0 14 0 14'); set(layer[era_pv3].visible, false);
+    set(layer[era_pv3].onclick, 'loadscene(scene_03-view-nui,null,MERGE,BLEND(0.6)); era_hide_vitri()');
+
+  <!-- popup Tien Ich — tien ich cao cap du an -->
+  era_box(era_pop_tienich, rightbottom, 16, 72, 234, 300, 0xFFFFFF, 10, 104);
+    set(layer[era_pop_tienich].enabled, true);
+    set(layer[era_pop_tienich].css, 'color:#0C0C44; font-family:Arial; font-size:12.5px; line-height:26px;');
+    set(layer[era_pop_tienich].padding, '8 16 8 16');
+    set(layer[era_pop_tienich].html, '[b]TIỆN ÍCH CAO CẤP[/b][br]Nhà hàng[br]Cupid Garden[br]Eden Garden[br]Minerva Garden[br]Apolo Garden[br]Tháp nghiêng Pisa[br]Quảng trường[br]Sân tập Golf[br]Khu chiếu phim ngoài trời[br]An ninh 24/7');
+    set(layer[era_pop_tienich].visible, false);
+
+  <!-- 6. ZOOM -->
+  era_btn(era_zoom_in,  right, 16, -24, 40, 40, 0x0C0C44, 100, '+');
+    set(layer[era_zoom_in].bgalpha, 0.72); set(layer[era_zoom_in].css, 'color:#FFFFFF; font-family:Arial; font-size:22px; font-weight:bold; text-align:center;');
+    set(layer[era_zoom_in].onclick, 'tween(view.fov, calc(view.fov-12), 0.4)');
+  era_btn(era_zoom_out, right, 16, 24, 40, 40, 0x0C0C44, 100, '-');
+    set(layer[era_zoom_out].bgalpha, 0.72); set(layer[era_zoom_out].css, 'color:#FFFFFF; font-family:Arial; font-size:22px; font-weight:bold; text-align:center;');
+    set(layer[era_zoom_out].onclick, 'tween(view.fov, calc(view.fov+12), 0.4)');
+
+  <!-- an skin mac dinh krpano cho giong SkySOLIS -->
+  set(layer[skin_control_bar].visible, false);
+  set(layer[skin_control_bar_bg].visible, false);
+  set(layer[skin_title].visible, false);
+  set(layer[skin_splitter_bottom].visible, false);
+
+  era_update_crumb();
+  era_responsive();
+</action>
+
+
+<!-- ============ HANH DONG TUONG TAC ============ -->
+<action name="era_hide_vitri">
+  set(layer[era_pop_vitri].visible, false);
+  set(layer[era_pv1].visible, false);
+  set(layer[era_pv2].visible, false);
+  set(layer[era_pv3].visible, false);
+</action>
+<action name="era_toggle">
+  if(layer[%1].visible,
+    era_hide_vitri(); set(layer[era_pop_tienich].visible, false);
+  ,
+    era_hide_vitri(); set(layer[era_pop_tienich].visible, false);
+    if(%1 == era_pop_vitri,
+      set(layer[era_pop_vitri].visible, true);
+      <!-- [TAM AN] chi hien 1 scene Toan canh; bo comment 2 dong duoi de bat lai pv1/pv3 -->
+      set(layer[era_pv2].visible, true);
+    ,
+      set(layer[era_pop_tienich].visible, true);
+    );
+  );
+</action>
+
+<action name="era_update_crumb">
+  if(scene[get(xml.scene)].title !== null,
+    txtadd(layer[era_crumb].html, 'Toan Canh  -  ', get(scene[get(xml.scene)].title));
+  );
+</action>
+
+<action name="era_responsive">
+  if(stagewidth LT 640,
+    set(layer[era_info_bg].visible, false);
+    set(layer[era_info_mk].visible, false);
+    set(layer[era_info_name].visible, false);
+    set(layer[era_info_body].visible, false);
+    set(layer[era_crumb].visible, false);
+    set(layer[era_logo_txt].visible, false);
+  ,
+    set(layer[era_info_bg].visible, true);
+    set(layer[era_info_mk].visible, true);
+    set(layer[era_info_name].visible, true);
+    set(layer[era_info_body].visible, true);
+    set(layer[era_crumb].visible, true);
+    set(layer[era_logo_txt].visible, true);
+  );
+</action>
+
+<events name="era_events" keep="true"
+        onnewpano="era_update_crumb();"
+        onxmlcomplete="era_build();"
+        onresize="era_responsive();" />
+
+</krpano>

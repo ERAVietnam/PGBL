@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano>
+
+<!-- ================================================================
+     CALIB.XML - KIEM CHUNG HE TOA DO
+     Muc dich: xac nhan cong thuc doi pixel -> ath/atv la dung
+     TRUOC KHI ve hang loat 800 lo.
+
+     Cong thuc dang kiem chung:
+       ath = (px / 7021 - 0.5) x 1.000000
+       atv = (py / 4961 - 0.5) x 0.706595
+
+     CACH DOC KET QUA:
+     - Khung DO phai trung khit 4 canh cua anh mat bang
+     - Khung XANH phai bao dung khoi lo A5 (A5-01 ... A5-23)
+     Neu lech -> cong thuc sai, bao lai truoc khi ve tiep.
+
+     Sau khi xac nhan xong: xoa dong <include url="calib.xml" />
+     trong file mb-tour.xml
+     ================================================================ -->
+
+<!-- 1. KHUNG BIEN ANH - phai trung 4 canh -->
+<hotspot name="calib_frame"
+         polyline="true" polylineclosed="true"
+         bordercolor="0xC8102E" borderwidth="4" borderalpha="1.0"
+         enabled="false" capture="false" zorder="900">
+	<point ath="-0.499000" atv="-0.352598" />
+	<point ath=" 0.499000" atv="-0.352598" />
+	<point ath=" 0.499000" atv=" 0.352598" />
+	<point ath="-0.499000" atv=" 0.352598" />
+</hotspot>
+
+<!-- 2. KHUNG KHOI A5 - px (2060,2200) den (2850,2930) -->
+<hotspot name="calib_a5"
+         fillcolor="0x41B3E0" fillalpha="0.30"
+         bordercolor="0x41B3E0" borderwidth="3" borderalpha="1.0"
+         enabled="false" capture="false" zorder="901">
+	<point ath="-0.206524" atv="-0.039948" />
+	<point ath="-0.094017" atv="-0.039948" />
+	<point ath="-0.094017" atv=" 0.064019" />
+	<point ath="-0.206524" atv=" 0.064019" />
+</hotspot>
+
+<!-- 3. TAM ANH - phai nam chinh giua -->
+<hotspot name="calib_center"
+         fillcolor="0xFF9015" fillalpha="0.9"
+         bordercolor="0x0C0C44" borderwidth="2"
+         enabled="false" capture="false" zorder="902">
+	<point ath="-0.004000" atv="-0.002800" />
+	<point ath=" 0.004000" atv="-0.002800" />
+	<point ath=" 0.004000" atv=" 0.002800" />
+	<point ath="-0.004000" atv=" 0.002800" />
+</hotspot>
+
+</krpano>

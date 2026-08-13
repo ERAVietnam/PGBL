@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano>
+
+<!-- ============================================================
+     LO DAT - Khu do thi Phu Gia Bao Loc
+     Tao tu ERA Lot Editor - 16:38:40 11/8/2026
+     Tong: 98 lo
+     Toa do doi tu pixel 7021x4961 sang krpano hfov=1 vfov=0.706595
+     ============================================================ -->
+
+<style name="LOT" keep="true"
+       polyline="false" borderwidth="1.2" borderalpha="0.85"
+       fillalpha="0.32" handcursor="true" capture="true"
+       onover="tween(fillalpha,0.60,0.12);"
+       onout="tween(fillalpha,0.32,0.12);"
+       onclick="showlot(get(name));" />
+
+<hotspot name="lot_A5_10" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-10" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.129398" atv="-0.016736" />
+  <point ath="-0.109600" atv="0.005341" />
+  <point ath="-0.115867" atv="0.010896" />
+  <point ath="-0.135949" atv="-0.011038" />
+</hotspot>
+
+<hotspot name="lot_A5_09" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-09" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.116009" atv="0.011038" />
+  <point ath="-0.121991" atv="0.016308" />
+  <point ath="-0.141789" atv="-0.005626" />
+  <point ath="-0.135949" atv="-0.010896" />
+</hotspot>
+
+<hotspot name="lot_A5_08" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-08" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.141789" atv="-0.005484" />
+  <point ath="-0.148056" atv="0.000071" />
+  <point ath="-0.128116" atv="0.022290" />
+  <point ath="-0.121991" atv="0.016593" />
+</hotspot>
+
+<hotspot name="lot_A5_07" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-07" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.148056" atv="0.000071" />
+  <point ath="-0.154180" atv="0.005484" />
+  <point ath="-0.134383" atv="0.027845" />
+  <point ath="-0.128258" atv="0.022148" />
+</hotspot>
+
+<hotspot name="lot_A5_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-06" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.134383" atv="0.027845" />
+  <point ath="-0.140649" atv="0.033400" />
+  <point ath="-0.160447" atv="0.011038" />
+  <point ath="-0.154323" atv="0.005484" />
+</hotspot>
+
+<hotspot name="lot_A5_17" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-17" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.167996" atv="-0.022290" />
+  <point ath="-0.148056" atv="-0.000071" />
+  <point ath="-0.154180" atv="0.005484" />
+  <point ath="-0.174120" atv="-0.016736" />
+</hotspot>
+
+<hotspot name="lot_A5_18" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-18" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.154180" atv="0.005484" />
+  <point ath="-0.160447" atv="0.011038" />
+  <point ath="-0.180245" atv="-0.011038" />
+  <point ath="-0.173978" atv="-0.016593" />
+</hotspot>
+
+<hotspot name="lot_A5_19" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-19" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.160447" atv="0.011181" />
+  <point ath="-0.166572" atv="0.016593" />
+  <point ath="-0.186512" atv="-0.005626" />
+  <point ath="-0.180387" atv="-0.011181" />
+</hotspot>
+
+<hotspot name="lot_A5_20" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-20" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.166714" atv="0.016736" />
+  <point ath="-0.172981" atv="0.022290" />
+  <point ath="-0.192636" atv="-0.000071" />
+  <point ath="-0.186512" atv="-0.005626" />
+</hotspot>
+
+<hotspot name="lot_A11_01" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A11-01" lotarea="147" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.165005" atv="-0.257015" />
+  <point ath="-0.172269" atv="-0.250748" />
+  <point ath="-0.160447" atv="-0.232944" />
+  <point ath="-0.151901" atv="-0.237929" />
+</hotspot>
+
+<hotspot name="lot_A11_02" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A11-02" lotarea="123" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.160447" atv="-0.232944" />
+  <point ath="-0.167284" atv="-0.228529" />
+  <point ath="-0.178678" atv="-0.245478" />
+  <point ath="-0.171984" atv="-0.250748" />
+</hotspot>
+
+<hotspot name="lot_A11_03" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A11-03" lotarea="121" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.167141" atv="-0.228671" />
+  <point ath="-0.174405" atv="-0.223829" />
+  <point ath="-0.186085" atv="-0.241490" />
+  <point ath="-0.178678" atv="-0.245620" />
+</hotspot>
+
+<hotspot name="lot_A11_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A11-04" lotarea="128" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.174120" atv="-0.224114" />
+  <point ath="-0.181100" atv="-0.219271" />
+  <point ath="-0.193776" atv="-0.237787" />
+  <point ath="-0.186227" atv="-0.241490" />
+</hotspot>
+
+<hotspot name="lot_A11_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A11-05" lotarea="135" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.181100" atv="-0.219128" />
+  <point ath="-0.188221" atv="-0.214428" />
+  <point ath="-0.201467" atv="-0.234368" />
+  <point ath="-0.193633" atv="-0.237929" />
+</hotspot>
+
+<hotspot name="lot_A2_01" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-01" lotarea="146" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.147913" atv="0.123273" />
+  <point ath="-0.147059" atv="0.124413" />
+  <point ath="-0.148341" atv="0.134098" />
+  <point ath="-0.161444" atv="0.145919" />
+  <point ath="-0.168566" atv="0.137516" />
+</hotspot>
+
+<hotspot name="lot_A2_02" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-02" lotarea="108" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.151474" atv="0.118431" />
+  <point ath="-0.148056" atv="0.123131" />
+  <point ath="-0.168708" atv="0.137943" />
+  <point ath="-0.172696" atv="0.133243" />
+</hotspot>
+
+<hotspot name="lot_A2_03" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-03" lotarea="111" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.151474" atv="0.118431" />
+  <point ath="-0.154892" atv="0.113588" />
+  <point ath="-0.176684" atv="0.129255" />
+  <point ath="-0.172554" atv="0.133243" />
+</hotspot>
+
+<hotspot name="lot_A2_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-04" lotarea="113" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.158311" atv="0.108745" />
+  <point ath="-0.154750" atv="0.113445" />
+  <point ath="-0.176684" atv="0.129113" />
+  <point ath="-0.180672" atv="0.124555" />
+</hotspot>
+
+<hotspot name="lot_A2_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-05" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.158168" atv="0.108745" />
+  <point ath="-0.161587" atv="0.103618" />
+  <point ath="-0.184518" atv="0.119997" />
+  <point ath="-0.180815" atv="0.124128" />
+</hotspot>
+
+<hotspot name="lot_A2_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-06" lotarea="118" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.161872" atv="0.103760" />
+  <point ath="-0.165290" atv="0.099060" />
+  <point ath="-0.187794" atv="0.115012" />
+  <point ath="-0.184660" atv="0.119855" />
+</hotspot>
+
+<hotspot name="lot_A2_07" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-07" lotarea="117" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.165290" atv="0.099060" />
+  <point ath="-0.168423" atv="0.094217" />
+  <point ath="-0.191070" atv="0.110027" />
+  <point ath="-0.188221" atv="0.114727" />
+</hotspot>
+
+<hotspot name="lot_A2_08" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-08" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.168423" atv="0.094217" />
+  <point ath="-0.171842" atv="0.089232" />
+  <point ath="-0.194203" atv="0.104757" />
+  <point ath="-0.191212" atv="0.109742" />
+</hotspot>
+
+<hotspot name="lot_A2_09" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-09" lotarea="115" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.171984" atv="0.089517" />
+  <point ath="-0.175545" atv="0.084532" />
+  <point ath="-0.198049" atv="0.100057" />
+  <point ath="-0.194346" atv="0.104757" />
+</hotspot>
+
+<hotspot name="lot_A2_10" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-10" lotarea="115" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.175545" atv="0.084390" />
+  <point ath="-0.178821" atv="0.079547" />
+  <point ath="-0.201325" atv="0.095214" />
+  <point ath="-0.197479" atv="0.100342" />
+</hotspot>
+
+<hotspot name="lot_A2_11" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-11" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.178821" atv="0.079690" />
+  <point ath="-0.182239" atv="0.074847" />
+  <point ath="-0.205028" atv="0.090372" />
+  <point ath="-0.201040" atv="0.095214" />
+</hotspot>
+
+<hotspot name="lot_A2_12" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-12" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.182097" atv="0.074847" />
+  <point ath="-0.185515" atv="0.070004" />
+  <point ath="-0.208304" atv="0.085529" />
+  <point ath="-0.204743" atv="0.090372" />
+</hotspot>
+
+<hotspot name="lot_A2_13" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-13" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.185800" atv="0.069719" />
+  <point ath="-0.189218" atv="0.064734" />
+  <point ath="-0.211722" atv="0.080687" />
+  <point ath="-0.208589" atv="0.085529" />
+</hotspot>
+
+<hotspot name="lot_A2_14" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-14" lotarea="116" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.189218" atv="0.065162" />
+  <point ath="-0.192636" atv="0.060177" />
+  <point ath="-0.215425" atv="0.075986" />
+  <point ath="-0.211722" atv="0.080402" />
+</hotspot>
+
+<hotspot name="lot_A2_15" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-15" lotarea="117" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.192636" atv="0.060177" />
+  <point ath="-0.195770" atv="0.055049" />
+  <point ath="-0.218843" atv="0.071144" />
+  <point ath="-0.214855" atv="0.075986" />
+</hotspot>
+
+<hotspot name="lot_A2_16" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-16" lotarea="117" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.196197" atv="0.055192" />
+  <point ath="-0.199188" atv="0.050207" />
+  <point ath="-0.222262" atv="0.066444" />
+  <point ath="-0.218701" atv="0.071001" />
+</hotspot>
+
+<hotspot name="lot_A2_17" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-17" lotarea="117" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.199615" atv="0.050349" />
+  <point ath="-0.203034" atv="0.045364" />
+  <point ath="-0.225253" atv="0.061316" />
+  <point ath="-0.221834" atv="0.065731" />
+</hotspot>
+
+<hotspot name="lot_A2_18" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-18" lotarea="113" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.203034" atv="0.045506" />
+  <point ath="-0.206167" atv="0.040664" />
+  <point ath="-0.227817" atv="0.055904" />
+  <point ath="-0.225253" atv="0.060889" />
+</hotspot>
+
+<hotspot name="lot_A2_19" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A2-19" lotarea="107" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.206310" atv="0.040806" />
+  <point ath="-0.209586" atv="0.035964" />
+  <point ath="-0.229953" atv="0.049779" />
+  <point ath="-0.227674" atv="0.055619" />
+</hotspot>
+
+<hotspot name="lot_A3_01" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-01" lotarea="249" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.123985" atv="0.112591" />
+  <point ath="-0.128685" atv="0.116721" />
+  <point ath="-0.140080" atv="0.115582" />
+  <point ath="-0.152471" atv="0.098348" />
+  <point ath="-0.144068" atv="0.090799" />
+</hotspot>
+
+<hotspot name="lot_A3_02" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-02" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.123843" atv="0.112448" />
+  <point ath="-0.117718" atv="0.106751" />
+  <point ath="-0.137943" atv="0.085102" />
+  <point ath="-0.144068" atv="0.090799" />
+</hotspot>
+
+<hotspot name="lot_A3_03" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-03" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.118003" atv="0.106751" />
+  <point ath="-0.111879" atv="0.101339" />
+  <point ath="-0.131534" atv="0.079547" />
+  <point ath="-0.138086" atv="0.085387" />
+</hotspot>
+
+<hotspot name="lot_A3_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-04" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.111879" atv="0.101481" />
+  <point ath="-0.105469" atv="0.095927" />
+  <point ath="-0.125552" atv="0.074277" />
+  <point ath="-0.131534" atv="0.079547" />
+</hotspot>
+
+<hotspot name="lot_A3_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-05" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.105469" atv="0.095784" />
+  <point ath="-0.099202" atv="0.090372" />
+  <point ath="-0.119143" atv="0.068438" />
+  <point ath="-0.125694" atv="0.073850" />
+</hotspot>
+
+<hotspot name="lot_A3_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-06" lotarea="175" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.099060" atv="0.090372" />
+  <point ath="-0.092935" atv="0.084817" />
+  <point ath="-0.113018" atv="0.062883" />
+  <point ath="-0.119285" atv="0.068580" />
+</hotspot>
+
+<hotspot name="lot_A3_07" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-07" lotarea="218" lotdir="Đông Nam" lotprice="" lotstatus="con">
+  <point ath="-0.093220" atv="0.084817" />
+  <point ath="-0.089517" atv="0.081826" />
+  <point ath="-0.089802" atv="0.071713" />
+  <point ath="-0.104757" atv="0.055476" />
+  <point ath="-0.113018" atv="0.062883" />
+</hotspot>
+
+<hotspot name="lot_A3_08" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-08" lotarea="179" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.104757" atv="0.055476" />
+  <point ath="-0.119712" atv="0.038955" />
+  <point ath="-0.130537" atv="0.038527" />
+  <point ath="-0.131819" atv="0.039809" />
+  <point ath="-0.112164" atv="0.061601" />
+</hotspot>
+
+<hotspot name="lot_A3_09" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-09" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.112164" atv="0.061743" />
+  <point ath="-0.118003" atv="0.067156" />
+  <point ath="-0.138228" atv="0.045364" />
+  <point ath="-0.131819" atv="0.039524" />
+</hotspot>
+
+<hotspot name="lot_A3_10" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-10" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.118146" atv="0.067156" />
+  <point ath="-0.124412" atv="0.072710" />
+  <point ath="-0.144495" atv="0.050919" />
+  <point ath="-0.138228" atv="0.045364" />
+</hotspot>
+
+<hotspot name="lot_A3_11" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-11" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.124412" atv="0.072568" />
+  <point ath="-0.130822" atv="0.078265" />
+  <point ath="-0.150620" atv="0.056616" />
+  <point ath="-0.144495" atv="0.051346" />
+</hotspot>
+
+<hotspot name="lot_A3_12" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-12" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.130537" atv="0.078265" />
+  <point ath="-0.136519" atv="0.083962" />
+  <point ath="-0.156602" atv="0.062171" />
+  <point ath="-0.150620" atv="0.056616" />
+</hotspot>
+
+<hotspot name="lot_A3_13" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-13" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.136661" atv="0.083962" />
+  <point ath="-0.142928" atv="0.089517" />
+  <point ath="-0.163296" atv="0.067583" />
+  <point ath="-0.156744" atv="0.061886" />
+</hotspot>
+
+<hotspot name="lot_A3_14" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A3-14" lotarea="215" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.143071" atv="0.089802" />
+  <point ath="-0.152614" atv="0.098205" />
+  <point ath="-0.165717" atv="0.079547" />
+  <point ath="-0.164578" atv="0.068865" />
+  <point ath="-0.163296" atv="0.068153" />
+  <point ath="-0.163296" atv="0.068153" />
+</hotspot>
+
+<hotspot name="lot_A4_01" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-01" lotarea="185" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.048213" atv="0.061459" />
+  <point ath="-0.068010" atv="0.079405" />
+  <point ath="-0.060034" atv="0.087808" />
+  <point ath="-0.058183" atv="0.087808" />
+  <point ath="-0.043940" atv="0.067725" />
+</hotspot>
+
+<hotspot name="lot_A4_02" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-02" lotarea="112" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.048355" atv="0.061886" />
+  <point ath="-0.051916" atv="0.056758" />
+  <point ath="-0.071429" atv="0.074989" />
+  <point ath="-0.068010" atv="0.079262" />
+</hotspot>
+
+<hotspot name="lot_A4_03" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-03" lotarea="115" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.051916" atv="0.056901" />
+  <point ath="-0.071429" atv="0.074989" />
+  <point ath="-0.075844" atv="0.070716" />
+  <point ath="-0.055192" atv="0.052058" />
+</hotspot>
+
+<hotspot name="lot_A4_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-04" lotarea="117" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.055334" atv="0.052485" />
+  <point ath="-0.058752" atv="0.046931" />
+  <point ath="-0.079832" atv="0.066301" />
+  <point ath="-0.075559" atv="0.070716" />
+</hotspot>
+
+<hotspot name="lot_A4_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-05" lotarea="119" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.059037" atv="0.047500" />
+  <point ath="-0.062740" atv="0.042658" />
+  <point ath="-0.083820" atv="0.062028" />
+  <point ath="-0.079405" atv="0.066586" />
+</hotspot>
+
+<hotspot name="lot_A4_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-06" lotarea="121" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.062740" atv="0.042800" />
+  <point ath="-0.066159" atv="0.037958" />
+  <point ath="-0.087808" atv="0.057613" />
+  <point ath="-0.083820" atv="0.062028" />
+</hotspot>
+
+<hotspot name="lot_A4_07" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A4-07" lotarea="124" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.066159" atv="0.038385" />
+  <point ath="-0.070004" atv="0.033400" />
+  <point ath="-0.091796" atv="0.053340" />
+  <point ath="-0.087666" atv="0.057755" />
+</hotspot>
+
+<hotspot name="lot_A8_11" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-11" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.154750" atv="-0.147629" />
+  <point ath="-0.158453" atv="-0.152186" />
+  <point ath="-0.176827" atv="-0.136804" />
+  <point ath="-0.172981" atv="-0.132104" />
+</hotspot>
+
+<hotspot name="lot_A8_12" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-12" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.158453" atv="-0.152044" />
+  <point ath="-0.162441" atv="-0.156744" />
+  <point ath="-0.180530" atv="-0.141219" />
+  <point ath="-0.176684" atv="-0.136804" />
+</hotspot>
+
+<hotspot name="lot_A8_13" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-13" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.162441" atv="-0.156602" />
+  <point ath="-0.166287" atv="-0.161159" />
+  <point ath="-0.184375" atv="-0.145919" />
+  <point ath="-0.180387" atv="-0.141219" />
+</hotspot>
+
+<hotspot name="lot_A9_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A9-04" lotarea="204" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.105042" atv="-0.142928" />
+  <point ath="-0.112448" atv="-0.152471" />
+  <point ath="-0.131249" atv="-0.136519" />
+  <point ath="-0.123415" atv="-0.127404" />
+</hotspot>
+
+<hotspot name="lot_A9_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A9-05" lotarea="209" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.112306" atv="-0.152329" />
+  <point ath="-0.119855" atv="-0.162014" />
+  <point ath="-0.138940" atv="-0.145635" />
+  <point ath="-0.131107" atv="-0.136804" />
+</hotspot>
+
+<hotspot name="lot_A9_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A9-06" lotarea="213" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.119855" atv="-0.161729" />
+  <point ath="-0.126976" atv="-0.171130" />
+  <point ath="-0.146632" atv="-0.154750" />
+  <point ath="-0.138798" atv="-0.145919" />
+</hotspot>
+
+<hotspot name="lot_A8_14" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-14" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.166144" atv="-0.161159" />
+  <point ath="-0.169990" atv="-0.165860" />
+  <point ath="-0.188079" atv="-0.150335" />
+  <point ath="-0.184375" atv="-0.146062" />
+</hotspot>
+
+<hotspot name="lot_A8_15" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-15" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.169848" atv="-0.165860" />
+  <point ath="-0.173693" atv="-0.170275" />
+  <point ath="-0.192067" atv="-0.155035" />
+  <point ath="-0.187936" atv="-0.150477" />
+</hotspot>
+
+<hotspot name="lot_A8_16" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-16" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.173836" atv="-0.169990" />
+  <point ath="-0.177681" atv="-0.174975" />
+  <point ath="-0.195770" atv="-0.159450" />
+  <point ath="-0.191924" atv="-0.155177" />
+</hotspot>
+
+<hotspot name="lot_A8_17" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-17" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.177824" atv="-0.174833" />
+  <point ath="-0.181527" atv="-0.179391" />
+  <point ath="-0.199758" atv="-0.164151" />
+  <point ath="-0.195770" atv="-0.159593" />
+</hotspot>
+
+<hotspot name="lot_A8_18" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-18" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.181527" atv="-0.179248" />
+  <point ath="-0.185372" atv="-0.183948" />
+  <point ath="-0.203461" atv="-0.168851" />
+  <point ath="-0.199758" atv="-0.164151" />
+</hotspot>
+
+<hotspot name="lot_A8_19" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-19" lotarea="99" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.185657" atv="-0.183806" />
+  <point ath="-0.189076" atv="-0.188506" />
+  <point ath="-0.207449" atv="-0.173124" />
+  <point ath="-0.203461" atv="-0.168851" />
+</hotspot>
+
+<hotspot name="lot_A8_20" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-20" lotarea="179" lotdir="Đông Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.189076" atv="-0.188221" />
+  <point ath="-0.191212" atv="-0.191355" />
+  <point ath="-0.201182" atv="-0.192637" />
+  <point ath="-0.215710" atv="-0.182951" />
+  <point ath="-0.207164" atv="-0.173124" />
+</hotspot>
+
+<hotspot name="lot_A8_38" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-38" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.144495" atv="-0.098775" />
+  <point ath="-0.140649" atv="-0.094075" />
+  <point ath="-0.158738" atv="-0.078977" />
+  <point ath="-0.162584" atv="-0.083250" />
+</hotspot>
+
+<hotspot name="lot_A8_39" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-39" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.140507" atv="-0.094217" />
+  <point ath="-0.158881" atv="-0.078977" />
+  <point ath="-0.154892" atv="-0.074135" />
+  <point ath="-0.136519" atv="-0.089802" />
+</hotspot>
+
+<hotspot name="lot_A8_40" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A8-40" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="-0.136804" atv="-0.089660" />
+  <point ath="-0.132958" atv="-0.085102" />
+  <point ath="-0.150762" atv="-0.069719" />
+  <point ath="-0.154750" atv="-0.074562" />
+</hotspot>
+
+<hotspot name="lot_B4_16" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-16" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.289204" atv="0.142786" />
+  <point ath="0.295328" atv="0.142501" />
+  <point ath="0.296610" atv="0.166145" />
+  <point ath="0.290771" atv="0.166429" />
+</hotspot>
+
+<hotspot name="lot_B4_17" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-17" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.301310" atv="0.141931" />
+  <point ath="0.295328" atv="0.142359" />
+  <point ath="0.296753" atv="0.166002" />
+  <point ath="0.302735" atv="0.165575" />
+</hotspot>
+
+<hotspot name="lot_B4_18" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-18" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.301168" atv="0.141931" />
+  <point ath="0.307008" atv="0.141789" />
+  <point ath="0.308859" atv="0.165432" />
+  <point ath="0.302735" atv="0.166002" />
+</hotspot>
+
+<hotspot name="lot_B4_19" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-19" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.313274" atv="0.141362" />
+  <point ath="0.307150" atv="0.141789" />
+  <point ath="0.308574" atv="0.165432" />
+  <point ath="0.314556" atv="0.165290" />
+</hotspot>
+
+<hotspot name="lot_B4_20" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-20" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.313132" atv="0.141504" />
+  <point ath="0.319114" atv="0.140934" />
+  <point ath="0.320538" atv="0.164720" />
+  <point ath="0.314414" atv="0.165148" />
+</hotspot>
+
+<hotspot name="lot_B4_21" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-21" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.319114" atv="0.141077" />
+  <point ath="0.325096" atv="0.140650" />
+  <point ath="0.326520" atv="0.164293" />
+  <point ath="0.320396" atv="0.164720" />
+</hotspot>
+
+<hotspot name="lot_B4_22" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-22" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.324954" atv="0.140650" />
+  <point ath="0.331078" atv="0.140222" />
+  <point ath="0.332502" atv="0.164008" />
+  <point ath="0.326520" atv="0.164293" />
+</hotspot>
+
+<hotspot name="lot_B4_23" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-23" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.330936" atv="0.140365" />
+  <point ath="0.336918" atv="0.139937" />
+  <point ath="0.338342" atv="0.163723" />
+  <point ath="0.332360" atv="0.164008" />
+</hotspot>
+
+<hotspot name="lot_B4_03" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-03" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.209728" atv="0.147771" />
+  <point ath="0.215710" atv="0.147486" />
+  <point ath="0.217277" atv="0.171130" />
+  <point ath="0.211152" atv="0.171699" />
+</hotspot>
+
+<hotspot name="lot_B4_04" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-04" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.215710" atv="0.147486" />
+  <point ath="0.221692" atv="0.147059" />
+  <point ath="0.223259" atv="0.170845" />
+  <point ath="0.217277" atv="0.171130" />
+</hotspot>
+
+<hotspot name="lot_B4_05" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-05" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.221692" atv="0.147059" />
+  <point ath="0.227674" atv="0.146774" />
+  <point ath="0.229098" atv="0.170560" />
+  <point ath="0.223116" atv="0.170845" />
+</hotspot>
+
+<hotspot name="lot_B4_06" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-06" lotarea="100" lotdir="Bắc" lotprice="" lotstatus="con">
+  <point ath="0.227532" atv="0.146632" />
+  <point ath="0.233656" atv="0.146347" />
+  <point ath="0.235080" atv="0.170133" />
+  <point ath="0.228956" atv="0.170417" />
+</hotspot>
+
+<hotspot name="lot_B4_36" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-36" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.246760" atv="0.169420" />
+  <point ath="0.252884" atv="0.168993" />
+  <point ath="0.254309" atv="0.192637" />
+  <point ath="0.248326" atv="0.193206" />
+</hotspot>
+
+<hotspot name="lot_B4_37" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-37" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.252742" atv="0.168993" />
+  <point ath="0.258724" atv="0.168566" />
+  <point ath="0.260291" atv="0.192352" />
+  <point ath="0.254309" atv="0.192637" />
+</hotspot>
+
+<hotspot name="lot_B4_38" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-38" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.258724" atv="0.168566" />
+  <point ath="0.264706" atv="0.168281" />
+  <point ath="0.266273" atv="0.192067" />
+  <point ath="0.260148" atv="0.192352" />
+</hotspot>
+
+<hotspot name="lot_B4_39" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-39" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.264563" atv="0.168281" />
+  <point ath="0.270546" atv="0.167996" />
+  <point ath="0.272112" atv="0.191640" />
+  <point ath="0.266273" atv="0.192067" />
+</hotspot>
+
+<hotspot name="lot_B4_40" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-40" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.270546" atv="0.167996" />
+  <point ath="0.276528" atv="0.167569" />
+  <point ath="0.278094" atv="0.191212" />
+  <point ath="0.272112" atv="0.191640" />
+</hotspot>
+
+<hotspot name="lot_B4_48" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-48" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.320538" atv="0.164720" />
+  <point ath="0.321963" atv="0.188506" />
+  <point ath="0.327945" atv="0.188221" />
+  <point ath="0.326378" atv="0.164435" />
+</hotspot>
+
+<hotspot name="lot_B4_49" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-49" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.326378" atv="0.164435" />
+  <point ath="0.332502" atv="0.164008" />
+  <point ath="0.333927" atv="0.187794" />
+  <point ath="0.327802" atv="0.188221" />
+</hotspot>
+
+<hotspot name="lot_B4_50" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-50" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.332360" atv="0.164151" />
+  <point ath="0.338200" atv="0.163723" />
+  <point ath="0.339909" atv="0.187367" />
+  <point ath="0.333927" atv="0.187794" />
+</hotspot>
+
+<hotspot name="lot_B4_51" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-51" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.338200" atv="0.163723" />
+  <point ath="0.344324" atv="0.163154" />
+  <point ath="0.345748" atv="0.187082" />
+  <point ath="0.339766" atv="0.187367" />
+</hotspot>
+
+<hotspot name="lot_B4_52" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-52" lotarea="100" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.344182" atv="0.163296" />
+  <point ath="0.350164" atv="0.162869" />
+  <point ath="0.351731" atv="0.186797" />
+  <point ath="0.345606" atv="0.186939" />
+</hotspot>
+
+<hotspot name="lot_B4_53" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B4-53" lotarea="200" lotdir="Nam" lotprice="" lotstatus="con">
+  <point ath="0.350164" atv="0.163011" />
+  <point ath="0.363125" atv="0.162014" />
+  <point ath="0.362982" atv="0.182382" />
+  <point ath="0.359279" atv="0.186227" />
+  <point ath="0.351588" atv="0.186654" />
+</hotspot>
+
+<hotspot name="lot_B3_08" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B3-08" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="0.126122" atv="0.116009" />
+  <point ath="0.137943" atv="0.095357" />
+  <point ath="0.143071" atv="0.098063" />
+  <point ath="0.131392" atv="0.118858" />
+</hotspot>
+
+<hotspot name="lot_B3_09" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B3-09" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="0.142928" atv="0.097921" />
+  <point ath="0.148341" atv="0.101054" />
+  <point ath="0.136519" atv="0.121849" />
+  <point ath="0.131392" atv="0.118715" />
+</hotspot>
+
+<hotspot name="lot_B3_10" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B3-10" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="0.148198" atv="0.101054" />
+  <point ath="0.153611" atv="0.104045" />
+  <point ath="0.141789" atv="0.124840" />
+  <point ath="0.136519" atv="0.121849" />
+</hotspot>
+
+<hotspot name="lot_B3_11" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B3-11" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="0.153611" atv="0.104045" />
+  <point ath="0.158596" atv="0.107036" />
+  <point ath="0.146916" atv="0.127546" />
+  <point ath="0.141789" atv="0.124840" />
+</hotspot>
+
+<hotspot name="lot_B3_12" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="B3-12" lotarea="100" lotdir="Tây Nam" lotprice="" lotstatus="con">
+  <point ath="0.158596" atv="0.107179" />
+  <point ath="0.163723" atv="0.110027" />
+  <point ath="0.151901" atv="0.130679" />
+  <point ath="0.146774" atv="0.127546" />
+</hotspot>
+
+
+<!-- bo sung 2 lo thieu trong ban xuat 11/08.
+     Hinh KHONG lay tu ban cu (ban cu sinh bang phep xoay uoc luong -> lech).
+     Dung dung polygon A5-17 cua Anh Tony tinh tien theo buoc hang (0.006230,-0.005560):
+     A5-16 = A5-17 + 1 buoc, A5-15 = A5-17 + 2 buoc. -->
+<hotspot name="lot_A5_15" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-15" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.135596" atv="-0.011191" />
+  <point ath="-0.141720" atv="-0.005636" />
+  <point ath="-0.161660" atv="-0.027856" />
+  <point ath="-0.155540" atv="-0.033410" />
+</hotspot>
+
+<hotspot name="lot_A5_16" style="LOT" fillcolor="0x41B3E0" bordercolor="0x41B3E0"
+         lotcode="A5-16" lotarea="175" lotdir="Tây Bắc" lotprice="" lotstatus="con">
+  <point ath="-0.141826" atv="-0.005631" />
+  <point ath="-0.147950" atv="-0.000076" />
+  <point ath="-0.167890" atv="-0.022296" />
+  <point ath="-0.161770" atv="-0.027850" />
+</hotspot>
+
+</krpano>

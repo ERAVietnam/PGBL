@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Tiện ích nội khu — ELC_PV_02 | ERA VIETNAM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#C8102E;--navy:#0C0C44;--green:#6DA544;--dgreen:#14361c;--soft:#F5F5F5;--mid:#EEE;--f:'Inter',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--f);background:var(--soft);color:#111;display:flex;flex-direction:column}
+#wrap{flex:1;display:flex;min-height:0}
+#pano{flex:1;position:relative;min-width:0;background:#e9ede6}
+#side{width:312px;min-width:312px;background:#fff;border-left:1px solid var(--mid);overflow-y:auto;display:flex;flex-direction:column}
+.sh{padding:13px 16px 9px;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--navy);border-bottom:1px solid var(--mid);position:sticky;top:0;background:#fff;z-index:2}
+.sh small{display:block;font-weight:600;letter-spacing:0;text-transform:none;color:#888;margin-top:2px;font-size:11px}
+.trow{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;border-bottom:1px solid #f4f4f4}
+.trow:hover{background:#F4FAEF}
+.trow img{width:26px;height:33px;object-fit:contain;flex-shrink:0}
+.trow .nm{font-size:12.5px;font-weight:600;line-height:1.25}
+.trow .np{margin-left:auto;font-size:9px;font-weight:800;color:#2c7a2c;background:#eef7ea;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.trow .no{margin-left:auto;font-size:9px;font-weight:800;color:#C8102E;background:#fdeaed;border-radius:5px;padding:2px 6px;white-space:nowrap}
+/* hover info box */
+#ib{position:absolute;z-index:20;width:260px;background:#fff;border-radius:12px;box-shadow:0 12px 34px rgba(12,12,68,.28);
+   border:1px solid #e5e5e5;overflow:hidden;display:none;pointer-events:none}
+#ib .hd{display:flex;align-items:center;gap:11px;padding:12px 14px 8px}
+#ib .hd img{width:38px;height:48px;object-fit:contain}
+#ib .zn{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+#ib h3{font-size:15.5px;font-weight:800;color:var(--navy);line-height:1.15;margin-top:2px}
+#ib p{font-size:12px;line-height:1.55;color:#555;padding:0 14px 13px}
+/* ==== TOOL CHAM VI TRI ==== */
+#tool{position:absolute;right:14px;bottom:14px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+#tool button{font-family:var(--f);font-size:12px;font-weight:700;border:0;border-radius:9px;padding:9px 14px;cursor:pointer;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.22)}
+#tBase{background:var(--navy)}
+#tBase.on{background:var(--red)}
+#tAdd{background:#1565C0}#tDel{background:#8A1020}#tWipe{background:#5A5A5A}#tExp{background:#1B9E5A}
+.thide{display:none!important}
+#tMsg{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:40;background:rgba(12,12,68,.92);color:#fff;
+  font-size:12.5px;padding:9px 16px;border-radius:9px;display:none;white-space:nowrap}
+/* cua so chon tien ich + xuat xml */
+.md{position:fixed;z-index:9999;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;
+  box-shadow:0 16px 50px rgba(12,12,68,.4);padding:16px;font-family:var(--f);display:none}
+#mdPick{width:min(420px,94vw);max-height:78vh;flex-direction:column}
+#mdPick input{width:100%;padding:10px;border:1px solid #ddd;border-radius:9px;font-size:13px;font-family:inherit;outline:none}
+#pkList{margin-top:10px;overflow:auto;flex:1}
+.pk{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer}
+.pk:hover{background:#F4FAEF}
+.pk img{width:24px;height:30px;object-fit:contain}
+.pk b{font-size:12.5px;font-weight:600}
+.pk .dc{margin-left:auto;font-size:10px;font-weight:700;color:var(--green)}
+#mdExp{width:min(660px,94vw)}
+#mdExp textarea{width:100%;height:240px;font-family:Consolas,monospace;font-size:11.5px;border:1px solid #ddd;border-radius:9px;padding:10px;resize:vertical}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="pano">
+    <div id="ib"><div class="hd"><img id="ibIc"><div><div class="zn" id="ibZ"></div><h3 id="ibN"></h3></div></div><p id="ibD"></p></div>
+    <div id="tMsg"></div>
+    <div id="tool">
+      <button id="tExp"  class="thide">XUẤT XML</button>
+      <button id="tWipe" class="thide">XOÁ HẾT GIM</button>
+      <button id="tDel"  class="thide">XOÁ GIM VỪA ĐẶT</button>
+      <button id="tAdd"  class="thide">+ CHẤM ĐIỂM</button>
+      <button id="tBase">CHẤM VỊ TRÍ (V)</button>
+    </div>
+  </div>
+  <div id="side"><div class="sh">Danh sách tiện ích <small>30 tiện ích · rê chuột gim / bấm 1 dòng → nổi bảng thông tin</small></div><div id="list"></div></div>
+</div>
+<script src="pano.js"></script>
+<script>
+const TI={"1":{"n":"Cafe Đôi Dép Phú Gia","d":"Quán cafe biểu tượng của khu, không gian gặp gỡ giữa cảnh quan xanh."},"2":{"n":"Sales Gallery","d":"Nhà mẫu & trung tâm giao dịch, nơi tiếp đón và tư vấn khách hàng."},"3":{"n":"Bãi đậu xe","d":"Bãi đậu xe nội khu, thuận tiện cho cư dân và khách tham quan."},"4":{"n":"Trạm sạc","d":"Trạm sạc xe điện phục vụ nhu cầu di chuyển xanh của cư dân."},"5":{"n":"Cupid garden","d":"Vườn chủ đề tình yêu, điểm check-in lãng mạn giữa khu đô thị."},"6":{"n":"Khu BBQ","d":"Khu tiệc nướng ngoài trời cho gia đình và nhóm bạn."},"7":{"n":"Khu vui chơi trẻ em","d":"Sân chơi an toàn với nhiều trò vận động cho trẻ nhỏ."},"8":{"n":"Khu mê cung","d":"Mê cung cây xanh, không gian khám phá thú vị cho mọi lứa tuổi."},"9":{"n":"Cánh cổng thời gian","d":"Tiểu cảnh cổng biểu tượng — điểm nhấn nghệ thuật để check-in."},"10":{"n":"Tiểu cảnh tượng Cupid & Psyche","d":"Cụm tượng nghệ thuật Cupid & Psyche giữa vườn cảnh quan."},"11":{"n":"Trường mẫu giáo","d":"Trường mầm non nội khu, thuận tiện cho cư dân có con nhỏ."},"12":{"n":"Vườn cây đặc hữu","d":"Vườn sưu tập cây bản địa Bảo Lộc, giữ mảng xanh đặc trưng cao nguyên."},"13":{"n":"Khu vườn ánh sáng bồ công anh","d":"Vườn nghệ thuật ánh sáng chủ đề bồ công anh, lung linh về đêm."},"14":{"n":"Khu vực để xe đạp","d":"Trạm gửi và thuê xe đạp phục vụ di chuyển xanh trong nội khu."},"15":{"n":"Khu thể thao - Pickleball","d":"Sân Pickleball tiêu chuẩn, môn thể thao đang được ưa chuộng."},"16":{"n":"Khu tiện ích công cộng","d":"Cụm tiện ích công cộng phục vụ sinh hoạt hằng ngày của cư dân."},"17":{"n":"Trung tâm chăm sóc sức khoẻ","d":"Trung tâm chăm sóc sức khoẻ và làm đẹp cho cư dân nội khu."},"18":{"n":"Eden Garden","d":"Vườn Eden xanh mát, không gian thư giãn giữa thiên nhiên."},"19":{"n":"Cầu Firenzi","d":"Cây cầu biểu tượng phong cách Firenzi bắc qua cảnh quan."},"20":{"n":"Minerva Garden","d":"Vườn Minerva chủ đề nữ thần trí tuệ — điểm nhấn cảnh quan."},"21":{"n":"Japanese Garden","d":"Vườn Nhật với hồ cá Koi, tiểu cảnh đá và cây cắt tỉa tinh tế."},"22":{"n":"Sân bóng rổ","d":"Sân bóng rổ tiêu chuẩn phục vụ thể thao cộng đồng."},"23":{"n":"Nhà vệ sinh công cộng","d":"Nhà vệ sinh công cộng bố trí tại các khu cảnh quan chính."},"24":{"n":"Quảng trường / Rạp chiếu phim ngoài trời","d":"Quảng trường trung tâm kết hợp rạp chiếu phim ngoài trời cho cộng đồng."},"25":{"n":"Tháp nghiêng Pisa","d":"Biểu tượng tháp nghiêng Pisa — điểm check-in nổi bật của khu."},"26":{"n":"Lamb Cà phê","d":"Quán cà phê thứ hai trong khu, phục vụ cư dân phía Gia An."},"27":{"n":"Eden Dream","d":"Vườn mơ Eden — tiểu cảnh nghệ thuật lãng mạn."},"28":{"n":"Apolo Garden","d":"Vườn Apollo chủ đề thần mặt trời, quảng trường cây xanh."},"29":{"n":"Vườn rau","d":"Vườn rau cộng đồng, cư dân tự trồng và thu hoạch rau sạch."},"30":{"n":"An ninh 24/7","d":"Chốt an ninh trực 24/7 tại cổng và các nút giao, đảm bảo an toàn."}};
+const NTI=30, LKEY='eratienich_elc_v2';   /* doi key -> bo han ban nhap lech cu */
+let kp=null, lastX=140, lastY=120, hideT=null, editOn=false, addMode=false, order=[];
+const g=id=>document.getElementById(id);
+const pano=g('pano'), ib=g('ib');
+const pinSrc=id=>'pins30/pin-ti-'+id+'.png';
+pano.addEventListener('mousemove',e=>{const r=pano.getBoundingClientRect();lastX=e.clientX-r.left;lastY=e.clientY-r.top;});
+
+/* ================= DANH SACH BEN PHAI ================= */
+function buildList(){
+  let h='';
+  for(let i=1;i<=NTI;i++){
+    const t=TI[i]; const chua=(t.ath===undefined);
+    h+='<div class="trow" onmouseenter="tiOver('+i+')" onmouseleave="tiOut()" onclick="flyTo('+i+')">'
+      +'<img src="'+pinSrc(i)+'"><div class="nm">'+i+'. '+t.n+'</div>'
+      +(chua?'<span class="no">chưa chấm</span>'
+             :(t.np>1?'<span class="np">'+t.np+' điểm</span>':''))+'</div>';
+  }
+  g('list').innerHTML=h;
+}
+function placeBox(){const pr=pano.getBoundingClientRect();let x=lastX+16,y=lastY-40;
+  x=Math.min(x,pr.width-272);x=Math.max(8,x);y=Math.min(y,pr.height-150);y=Math.max(8,y);
+  ib.style.left=x+'px';ib.style.top=y+'px';}
+function fill(id){const t=TI[id];g('ibIc').src=pinSrc(id);g('ibZ').textContent='Tiện ích nội khu';
+  g('ibN').textContent=id+'. '+t.n;g('ibD').textContent=t.d;}
+function tiOver(id){if(editOn)return;clearTimeout(hideT);fill(id);placeBox();ib.style.display='block';}
+function tiOut(){hideT=setTimeout(()=>ib.style.display='none',120);}
+function tiClick(id){flyTo(id);}
+/* ================================================================
+   BẤM 1 TIỆN ÍCH  ->  GIM CỦA NÓ PHÓNG TO + NHẢY  (Anh Tony chốt 11/08)
+   ================================================================
+   🔴 VÌ SAO KHÔNG BAY/ZOOM NỮA — bản cũ `lookto(...,0.42,...)`:
+   (a) fov 0.42 nhỏ hơn giới hạn zoom thật của krpano
+       ( fov_min = bề_rộng_khung / (ảnh_rộng_px × maxpixelzoom)
+         = 2248 / (3456 × 1.2) = 0.542 ),
+   (b) `lookto` là blocking action, gọi lúc trang vừa nạp là krpano
+       NGỪNG VẼ luôn.
+   Cả hai đều làm CẢ KHUNG 360 TRẮNG BỆCH và krpano KHÔNG báo lỗi gì.
+   Bỏ hẳn việc đổi tầm nhìn thì né sạch cả nhóm lỗi này.
+   Ảnh nền vẫn vừa khung ở fov mặc định nên không cần bay tới đâu cả.
+   ================================================================ */
+/* 🔴 DÙNG setInterval, KHÔNG dùng requestAnimationFrame:
+   rAF bị trình duyệt DỪNG HẲN khi tab không nằm ở trước (đo được: 0 khung
+   trong 500ms). Tab chạy nền / cửa sổ bị che là hiệu ứng đứng im luôn. */
+const TICK=16;
+let firstPainted=false, paintT=0;
+function eraFirstPaint(){
+  if(!kp) return;
+  const f0=parseFloat(kp.get('view.fov')); if(!isFinite(f0)) return;
+  const f1=f0*0.995, t0=Date.now(), DUR=600;
+  clearInterval(paintT);
+  paintT=setInterval(()=>{
+    let p=(Date.now()-t0)/DUR; if(p>1)p=1;
+    kp.set('view.fov', f0+(f1-f0)*p);
+    if(p>=1) clearInterval(paintT);
+  },TICK);
+}
+
+let hopT=0, hopHS=[];
+function eraStopHop(){
+  clearInterval(hopT); hopT=0;
+  hopHS.forEach(n=>{ try{ kp.set('hotspot['+n+'].scale', kp.get('ti_sc'));
+                          kp.set('hotspot['+n+'].oy', 0); }catch(e){} });
+  hopHS=[];
+}
+/* 1 tiện ích có thể có nhiều gim (vd Cupid garden 3 điểm) -> nhảy hết */
+function hotspotsOf(id){
+  const out=[]; if(!kp) return out;
+  const n=parseInt(kp.get('hotspot.count'))||0;
+  for(let i=0;i<n;i++){
+    const nm=kp.get('hotspot['+i+'].name');
+    if(String(kp.get('hotspot['+i+'].tid'))===String(id) && nm) out.push(nm);
+  }
+  return out;
+}
+function eraHop(id){
+  if(!kp) return;
+  eraStopHop();
+  hopHS=hotspotsOf(id);
+  if(!hopHS.length) return;
+  const base=parseFloat(kp.get('ti_sc'))||0.17;
+  const DUR=1500, BOUNCES=3, UP=26;      /* nhảy 3 cái trong 1,5 giây */
+  const t0=Date.now();
+  hopT=setInterval(()=>{
+    let p=(Date.now()-t0)/DUR; if(p>1)p=1;
+    /* |sin| = nảy lên rồi rơi xuống, biên độ nhỏ dần cho tự nhiên */
+    const damp=1-p;
+    const hop=Math.abs(Math.sin(p*Math.PI*BOUNCES))*damp;
+    const sc=base*(1+0.45*(p<0.15 ? p/0.15 : damp*0.9+0.1));
+    hopHS.forEach(nm=>{
+      kp.set('hotspot['+nm+'].scale', sc);
+      kp.set('hotspot['+nm+'].oy', -UP*hop);
+    });
+    if(p>=1) eraStopHop();
+  },TICK);
+}
+
+function flyTo(id){const t=TI[id];
+  if(t.ath===undefined){msg('Tiện ích '+id+' chưa được chấm vị trí');return;}
+  eraHop(id);
+  clearTimeout(hideT);fill(id);
+  ib.style.left='50%';ib.style.top='16px';ib.style.transform='translateX(-50%)';ib.style.display='block';
+  setTimeout(()=>{ib.style.transform='';},1600);}
+
+/* ================= TOOL CHAM VI TRI ================= */
+function msg(s){const m=g('tMsg');m.textContent=s;m.style.display=s?'block':'none';}
+function doneCount(){let n=0;for(let i=1;i<=NTI;i++) if(TI[i].ath!==undefined) n++; return n;}
+function toolBtns(v){['tAdd','tDel','tWipe','tExp'].forEach(id=>g(id).classList.toggle('thide',!v));}
+
+function editToggle(){
+  editOn=!editOn; addMode=false;
+  if(kp) kp.set('ti_edit_on', editOn);
+  g('tBase').classList.toggle('on',editOn);
+  g('tBase').textContent = editOn ? 'XONG (V)' : 'CHẤM VỊ TRÍ (V)';
+  toolBtns(editOn);
+  ib.style.display='none';
+  if(editOn){ arm(); msg('CHẾ ĐỘ CHẤM ('+doneCount()+'/'+NTI+') · CLICK lên ảnh để chấm · kéo gim để chỉnh'); }
+  else msg('');
+}
+function arm(){ if(!editOn)return; addMode=true; if(kp) kp.set('ti_add_mode', true); msg('CLICK lên ảnh tại vị trí tiện ích (1 lần)'); }
+
+function hname(id){
+  let n='ti_'+id, k=0;
+  while(order.indexOf(n)>=0){ k++; n='ti_'+id+String.fromCharCode(97+k); }
+  return n;
+}
+function addPin(ath,atv,id,name){
+  if(!kp) return;
+  name = name || hname(id);
+  kp.call('ti_add('+ath+','+atv+','+id+','+name+')');
+  if(order.indexOf(name)<0) order.push(name);
+  TI[id].ath=parseFloat(ath); TI[id].atv=parseFloat(atv);
+}
+
+/* krpano goi nguoc ve day sau khi gom xong toa do */
+function tiCollectedSave(data){ tiCollected('save', data); }
+function tiCollectedExport(data){ tiCollected('export', data); }
+function tiCollected(mode,data){
+  const rows=[];
+  String(data||'').split('###').forEach(l=>{ if(!l)return; const p=l.split('|'); if(p.length<4)return;
+    rows.push({id:p[0],ath:p[1],atv:p[2],name:p[3]}); });
+  order = rows.map(r=>r.name);
+  for(let i=1;i<=NTI;i++) TI[i].np=0;
+  rows.forEach(r=>{ if(TI[r.id]){ TI[r.id].ath=parseFloat(r.ath); TI[r.id].atv=parseFloat(r.atv); TI[r.id].np=(TI[r.id].np||0)+1; } });
+  if(mode==='save'){
+    try{ localStorage.setItem(LKEY, rows.map(r=>[r.id,r.ath,r.atv,r.name].join('|')).join('###')); }catch(e){}
+    buildList();
+    /* 🔴 VẼ KHUNG HÌNH ĐẦU TIÊN.
+       krpano 1.19 chỉ vẽ lại màn khi có đổi tầm nhìn. Lúc mới nạp, nếu
+       không ai chạm vào thì nó vẽ đúng 1 khung — khung đó thường rơi vào
+       lúc 30 ảnh gim chưa về kịp => nền có mà gim thì trống trơn, phải rê
+       chuột mới hiện (đã đo, nạp lại 3 lần ra 3 kiểu).
+       Đây là mốc chắc ăn nhất: krpano vừa trả đủ toạ độ => 30 gim đã đăng
+       ký xong. Nhích fov 0,5% trong 0,6s (mắt không thấy) để krpano vẽ
+       liên tục vài chục khung. Chạy đúng 1 lần lúc nạp trang. */
+    if(!firstPainted){ firstPainted=true; setTimeout(eraFirstPaint,250); }
+    if(editOn) msg('Đã lưu · tổng '+rows.length+' gim · kéo gim để chỉnh');
+  }else{
+    const xml=rows.map(r=>'  <hotspot name="'+r.name+'" style="ti_pin" url="pins30/pin-ti-'+r.id
+      +'.png" tid="'+r.id+'" ath="'+r.ath+'" atv="'+r.atv+'" zorder="30" />').join('\n');
+    g('expTa').value=xml;
+    g('mdExp').style.display='block';
+    g('expTa').select();
+  }
+}
+function tiSaveDraft(){ if(kp) kp.call("ti_collect_save()"); }
+function tiExport(){ if(kp) kp.call("ti_collect_export()"); }
+
+function tiRestore(){
+  let s=''; try{ s=localStorage.getItem(LKEY)||''; }catch(e){}
+  if(!s){ tiSaveDraft(); return; }          /* chua co nhap -> gom tu hotspot tinh trong tour.xml */
+  kp.call('ti_wipe()'); order=[];
+  s.split('###').forEach(l=>{ if(!l)return; const p=l.split('|'); if(p.length<4)return;
+    addPin(p[1],p[2],p[0],p[3]); });
+  tiSaveDraft();
+}
+function delLast(){
+  if(!order.length){ msg('Chưa có gim nào để xoá'); return; }
+  const n=order.pop();
+  kp.call('ti_remove('+n+')');
+}
+function wipeAll(){
+  if(!confirm('Xoá toàn bộ gim tiện ích để chấm lại từ đầu?')) return;
+  kp.call('ti_clear_all()'); order=[];
+  for(let i=1;i<=NTI;i++){ delete TI[i].ath; delete TI[i].atv; }
+  buildList(); msg('Đã xoá hết · bấm + CHẤM ĐIỂM để bắt đầu');
+}
+
+/* cua so chon tien ich sau khi click len anh */
+function tiPickPlace(ath,atv){
+  ath=Math.round(parseFloat(ath)*100000)/100000;
+  atv=Math.round(parseFloat(atv)*100000)/100000;
+  if(!isFinite(ath)||!isFinite(atv)){ alert('Chưa lấy được vị trí — bấm + CHẤM ĐIỂM rồi click lại.'); return; }
+  g('pkPos').textContent='vị trí ath '+ath+' · atv '+atv;
+  const draw=q=>{
+    q=(q||'').toLowerCase().trim(); let h='';
+    for(let i=1;i<=NTI;i++){
+      const t=TI[i]; if(q && (i+'. '+t.n).toLowerCase().indexOf(q)<0) continue;
+      h+='<div class="pk" data-id="'+i+'"><img src="'+pinSrc(i)+'"><b>'+i+'. '+t.n+'</b>'
+        +(t.ath!==undefined?'<span class="dc">đã có '+(t.np||1)+' điểm · thêm nữa</span>':'')+'</div>';
+    }
+    g('pkList').innerHTML=h||'<div style="color:#999;font-size:12px;padding:8px">Không tìm thấy</div>';
+    [].forEach.call(document.querySelectorAll('#pkList .pk'),el=>{
+      el.onclick=()=>{ const id=el.getAttribute('data-id');
+        addPin(ath,atv,id); tiSaveDraft();
+        g('mdPick').style.display='none';
+        /* CHAM LIEN TUC: tu bat lai che do cham de click tiep ngay,
+           khong phai bam "+ CHAM DIEM" lai 30 lan */
+        arm();
+        msg('Đã chấm '+id+'. '+TI[id].n+((TI[id].np||1)>1?' (điểm thứ '+TI[id].np+')':'')+'  ·  '+doneCount()+'/'+NTI
+            +' — CLICK tiếp lên ảnh để chấm mục sau (bấm XONG để dừng)'); };
+    });
+  };
+  draw(''); g('pkQ').value=''; g('mdPick').style.display='flex'; g('pkQ').focus();
+  g('pkQ').oninput=()=>draw(g('pkQ').value);
+}
+
+g('tBase').onclick=editToggle;
+g('tAdd').onclick=arm;
+g('tDel').onclick=delLast;
+g('tWipe').onclick=wipeAll;
+g('tExp').onclick=tiExport;
+document.addEventListener('keydown',e=>{ if(e.key==='v'||e.key==='V'){ if(!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) editToggle(); } });
+
+buildList();
+/* cache-buster: krpano tai tour.xml bang XHR nen Ctrl+Shift+R khong phai luc nao
+   cung bo duoc ban cu. Them ?v=... la chac chan lay ban vua sua. */
+embedpano({swf:"pano.swf", xml:"tour.xml?v="+Date.now(), target:"pano", html5:"only",
+  bgcolor:"#E9EDE6", mobilescale:1.0,
+  onready:function(k){ kp=k; k.set('ti_edit_on',false); k.set('ti_add_mode',false); setTimeout(tiRestore,300); },
+  onerror:function(err){
+    const b=document.createElement('div');
+    b.style.cssText='position:absolute;left:16px;top:60px;right:16px;z-index:60;background:#C8102E;color:#fff;'
+      +'font:12.5px/1.5 Consolas,monospace;padding:12px 14px;border-radius:9px;white-space:pre-wrap';
+    b.textContent='LỖI krpano — ảnh nền không hiện được:\n\n'+err;
+    pano.appendChild(b);
+  }});
+</script>
+
+<!-- cua so chon tien ich -->
+<div class="md" id="mdPick">
+  <div style="font-size:15px;font-weight:800;color:#0C0C44">Chọn tiện ích cho điểm vừa bấm</div>
+  <div id="pkPos" style="font-size:11px;color:#888;margin:4px 0 11px"></div>
+  <input id="pkQ" placeholder="Gõ tên tiện ích, vd: bbq / pickleball / rau">
+  <div id="pkList"></div>
+  <button onclick="document.getElementById('mdPick').style.display='none';arm();"
+    style="margin-top:12px;background:#eee;border:0;border-radius:9px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Bỏ điểm này, chấm lại</button>
+</div>
+
+<!-- cua so xuat xml -->
+<div class="md" id="mdExp">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <b style="font-size:14px;color:#0C0C44">Toạ độ gim đã chốt</b>
+    <span style="cursor:pointer;font-size:22px;line-height:1;padding:0 6px"
+      onclick="document.getElementById('mdExp').style.display='none'">&times;</span>
+  </div>
+  <div style="font-size:11px;color:#888;margin:4px 0 10px">Dán khối này thay cho khối &lt;hotspot&gt; ở cuối file <b>tour.xml</b> rồi lưu file.</div>
+  <textarea id="expTa"></textarea>
+  <button onclick="var t=document.getElementById('expTa');t.select();document.execCommand('copy');this.innerText='ĐÃ COPY';"
+    style="margin-top:10px;background:#1B9E5A;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit">COPY</button>
+</div>
+
+<script src="/pgbl/assets/eranav.js" data-active="tienich"></script>
+</body>
+</html>

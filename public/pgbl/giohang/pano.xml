@@ -1,0 +1,29 @@
+﻿<krpano bgcolor="0x000000">
+
+	<!-- the skin and the flat pano viewing and controlling setup -->
+	<include url="skin/defaultskin.xml" />
+	<include url="skin/flatpano_setup.xml" />
+	
+	<!-- preview pano image -->
+	<preview url="MB_PhuGiaBaoLoc_7021px.tiles/preview.jpg" />
+
+	<!-- pano image -->
+	<image type="CYLINDER" hfov="1.00" vfov="0.706595" voffset="0.00" multires="true" tilesize="512">
+		<level tiledimagewidth="6912" tiledimageheight="4884">
+			<cylinder url="MB_PhuGiaBaoLoc_7021px.tiles/l5/%0v/l5_%0v_%0h.jpg" />
+		</level>
+		<level tiledimagewidth="3584" tiledimageheight="2534">
+			<cylinder url="MB_PhuGiaBaoLoc_7021px.tiles/l4/%0v/l4_%0v_%0h.jpg" />
+		</level>
+		<level tiledimagewidth="1792" tiledimageheight="1266">
+			<cylinder url="MB_PhuGiaBaoLoc_7021px.tiles/l3/%0v/l3_%0v_%0h.jpg" />
+		</level>
+		<level tiledimagewidth="768" tiledimageheight="544">
+			<cylinder url="MB_PhuGiaBaoLoc_7021px.tiles/l2/%0v/l2_%0v_%0h.jpg" />
+		</level>
+		<level tiledimagewidth="512" tiledimageheight="364">
+			<cylinder url="MB_PhuGiaBaoLoc_7021px.tiles/l1/%0v/l1_%0v_%0h.jpg" />
+		</level>
+	</image>
+
+</krpano>

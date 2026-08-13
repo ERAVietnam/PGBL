@@ -1,0 +1,1001 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>krpano - 03-view-nui</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta http-equiv="x-ua-compatible" content="IE=edge" />
+	<style>
+		@-ms-viewport { width:device-width; }
+		@media only screen and (min-device-width:800px) { html { overflow:hidden; } }
+		html { height:100%; }
+		body { height:100%; overflow:hidden; margin:0; padding:0; font-family:Arial, Helvetica, sans-serif; font-size:16px; color:#FFFFFF; background-color:#000000; }
+	</style>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/light/style.css" />
+</head>
+<body>
+
+<!-- ERA: ep trinh duyet tai Phosphor Light + Inter truoc khi krpano ve layer (tranh tofu) -->
+<div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none;">
+	<span style="font-family:'Phosphor-Light';">&#xe7ae;&#xe316;&#xe464;&#xe2c4;&#xe6a2;&#xe834;&#xe0e6;&#xe2ce;&#xe44a;&#xe45a;&#xe0a2;&#xe4f6;&#xe138;&#xe13a;</span>
+	<span style="font-family:'Inter';font-weight:800;">ERA</span>
+</div>
+
+<script src="tour.js"></script>
+<div id="pano" style="width:100%;height:100%;">
+	<noscript><table style="width:100%;height:100%;"><tr style="vertical-align:middle;"><td><div style="text-align:center;">ERROR:<br/><br/>Javascript not activated<br/><br/></div></td></tr></table></noscript>
+	<script>
+		embedpano({swf:"tour.swf", xml:"tour.xml?nc="+Date.now(), target:"pano", html5:"auto", mobilescale:1.0, passQueryParameters:true});
+	</script>
+</div>
+
+<!-- ERA POI · luu/khoi phuc diem tu localStorage (khong mat khi reload) -->
+<script>
+// 🔴 MOC PHIEN BAN DATA FILE. Moi lan DAN CODE MOI vao era_poi_data_* -> DOI SO NAY.
+// Nhap cu (luu truoc moc nay) se bi bo qua -> tour lay data trong XML.
+window.ERA_POI_DATA_VER = '20260811-7';
+/* ============================================================
+   ICON PHOSPHOR cho the icon tron
+   Codepoint tra tu chinh file font (unpkg @phosphor-icons/web@2.1.1
+   src/light/style.css) — KHONG doan. Font da nap trong <head> tour.html.
+   ============================================================ */
+window.ERA_ICONS = [
+	['truong-hoc','Trường học', ['truong','mam non','tieu hoc','thcs','thpt','quoc te','dai hoc','cao dang','mau giao','nu hong']],
+	['benh-vien','Bệnh viện',   ['benh vien','phong kham','y te','tram y te','nha thuoc','clinic']],
+	['sieu-thi','Siêu thị',     ['sieu thi','co.opmart','coopmart','vinmart','winmart','bach hoa','cho ']],
+	['tttm','TTTM',             ['vincom','trung tam thuong mai','tttm','plaza','mall']],
+	['nha-tho','Nhà thờ',       ['nha tho','giao xu','chua','thanh duong','dinh ']],
+	['san-bay','Sân bay',       ['san bay','lien khuong','airport']],
+	['ngan-hang','Ngân hàng',   ['ngan hang','bank','atm','agribank','vietcombank','bidv']],
+	['ca-phe','Cà phê',         ['ca phe','cafe','coffee','lamb']],
+	['cong-vien','Công viên',   ['cong vien','vuon','cay xanh','ho ','rung','thong']],
+	['nui-deo','Núi / đèo',     ['nui','deo','doi','dai binh']],
+	['cay-xang','Cây xăng',     ['xang','petrol','gas']],
+	['nha-hang','Nhà hàng',     ['nha hang','quan an','am thuc','food','buffet']],
+	['the-thao','Thể thao',     ['the thao','gym','san ','pickleball','bong','tennis','ho boi','lalapool','vui choi']],
+	['ben-xe','Bến xe',         ['ben xe','xe bus','xe khach','tram xe']],
+	['nha-mau','Nhà mẫu',       ['nha mau','sales gallery','nha dieu hanh','khu ']],
+	['mac-dinh','Mặc định',     []]
+];
+function eraNoDau(s){
+	return String(s||'').toLowerCase()
+		.replace(/[àáạảãâầấậẩẫăằắặẳẵ]/g,'a').replace(/[èéẹẻẽêềếệểễ]/g,'e')
+		.replace(/[ìíịỉĩ]/g,'i').replace(/[òóọỏõôồốộổỗơờớợởỡ]/g,'o')
+		.replace(/[ùúụủũưừứựửữ]/g,'u').replace(/[ỳýỵỷỹ]/g,'y').replace(/đ/g,'d');
+}
+window.eraIconFor = function(name){
+	var t = eraNoDau(name);
+	for(var i=0;i<window.ERA_ICONS.length;i++){
+		var kw = window.ERA_ICONS[i][2];
+		for(var j=0;j<kw.length;j++){ if(t.indexOf(kw[j])>=0) return window.ERA_ICONS[i][0]; }
+	}
+	return 'mac-dinh';
+};
+
+window.eraPoiSave = function(scene, data){ try{ localStorage.setItem('erapoi_'+scene, data||''); localStorage.setItem('erapoiver_'+scene, window.ERA_POI_DATA_VER); }catch(e){} };
+window.eraPoiClearDraft = function(scene){ try{ localStorage.removeItem('erapoi_'+scene); }catch(e){} };
+window.eraPoiRestore = function(scene){
+	var k=document.getElementById('krpanoSWFObject'); if(!k) return;
+	var s=''; try{ s=localStorage.getItem('erapoi_'+scene)||''; }catch(e){}
+	// nhap cu hon data file -> vut di, dung data trong XML
+	try{ if(s && localStorage.getItem('erapoiver_'+scene) !== window.ERA_POI_DATA_VER){
+			localStorage.removeItem('erapoi_'+scene); localStorage.removeItem('erapoiver_'+scene); s='';
+			console.log('[ERA POI] Bo nhap cu, nap data file cho', scene);
+	} }catch(e){}
+	if(s){
+		var cnt=0;
+		s.split('###').forEach(function(line){
+			if(!line) return; var p=line.split('|'); if(p.length<5) return;
+			// p[5] = loai ('h' ngang | 'v' doc)  ·  p[6] = cao coc px
+			// draft cu chi co 5 truong -> mac dinh ngang, coc default
+			var kind = ('vrpc'.indexOf(p[5])>=0 && p[5]) ? p[5] : 'h';
+			var pole = parseInt(p[6],10); if(!isFinite(pole)||pole<20) pole = (kind==='v'?110:44);
+			// p[7]=rotate2D · p[8]=rx · p[9]=ry · p[10]=rz · p[11]=co chu (scale)
+			function nm(i,d){ var v=parseFloat(p[i]); return isFinite(v)?v:d; }
+			var rot=nm(7,0), rx=nm(8,0), ry=nm(9,0), rz=nm(10,0), sc=nm(11,1);
+			if(sc<0.4||sc>4) sc=1;
+			// p[12]=mau chu '#RRGGBB' · p[13]=mau nen 0xRRGGBB · p[14]=do mo nen · p[15]=mau cham
+			// LUU Y: bg/dot truyen dang literal 0xRRGGBB KHONG co nhay -> krpano tu parse ra so
+			var fg  = /^#[0-9a-fA-F]{6}$/.test(p[12]||'') ? p[12] : '#FFFFFF';
+			// 11/08: nhan duong doi sang kieu E (chip do + bien navy) -> nen navy DAC
+			var bg  = /^0x[0-9a-fA-F]{6}$/.test(p[13]||'') ? p[13] : '0x0C0C44';
+			var bga = nm(14, kind==='r'?1:(kind==='v'?0.85:0.80));
+			var dot = /^0x[0-9a-fA-F]{6}$/.test(p[15]||'') ? p[15] : '0xC8102E';
+			// 17..21 = icon | w | w2 | gc | bear
+			var ico = (p[17]&&p[17].length>2) ? p[17] : (kind==='h' ? window.eraIconFor(p[2]) : 'mac-dinh');
+			var w   = nm(18, kind==='p'?210:0), w2 = nm(19,70), gc = nm(20, kind==='r'?26:24), bear = nm(21, parseFloat(p[0])||0);
+			// loai 'r' DUNG LAI truong sub (p[3]) lam chu trong CHIP DO — khong them truong nhap moi
+			var chip = (p[3]||'').trim() || 'Đường';
+			// distorted=true lam MAT CHU voi text hotspot (krpano 1.19) -> luon ep false
+			if(kind==='v')      k.call("add_poi_v("+p[0]+","+p[1]+",'"+p[2]+"',"+pole+","+sc+",'"+fg+"',"+bg+","+bga+","+dot+")");
+			else if(kind==='r') k.call("add_poi_r("+p[0]+","+p[1]+",'"+p[2]+"',"+rot+",0,0,0,"+sc+",'"+fg+"',"+bg+","+bga+","+dot+",false,"+w+","+gc+",'"+chip+"')");
+			else if(kind==='p') k.call("add_poi_p("+p[0]+","+p[1]+",'"+p[2]+"','"+p[4]+"',"+pole+","+sc+",'"+fg+"',"+bg+","+bga+","+dot+","+w+","+w2+")");
+			else if(kind==='c') k.call("add_poi_c("+p[0]+","+p[1]+",'"+p[2]+"','"+p[3]+"','"+p[4]+"',"+bear+","+pole+","+sc+",'"+fg+"',"+bg+","+bga+","+dot+")");
+			else                k.call("add_poi("+p[0]+","+p[1]+",'"+p[2]+"','"+p[3]+"','"+p[4]+"',"+pole+","+sc+",'"+fg+"',"+bg+","+bga+","+dot+",'"+ico+"',"+w+")");
+			cnt++;
+		});
+		k.set('poi_count', cnt);
+	} else {
+		if(scene==='scene_01-tong-the') k.call('era_poi_data_01()');
+		else if(scene==='scene_02-toan-canh') k.call('era_poi_data_02()');
+		else if(scene==='scene_03-view-nui') k.call('era_poi_data_03()');
+		// 11/08 (toi): bat POI cho scene "Ma lo tren flycam" — 24 diem chep tu
+		// data_02 lam moc, con phai xoay theo do lech (xem chu thich trong XML).
+		else if(scene==='scene_matbang_flycam') k.call('era_poi_data_04()');
+	}
+	// tat chu "loading..." cua skin (pr16 khong ban onloadcomplete de tu tat)
+	setTimeout(window.eraHideLoading, 2500);
+	setTimeout(window.eraHideLoading, 7000);
+};
+
+/* ============================================================
+   TAT CHU "loading..." KET GIUA TROI   (11/08 — da tim ra goc)
+   Trieu chung: 1 chu "loading..." Arial in nghieng 22px dung yen giua
+   khung hinh, khong bam duoc, Ctrl+Shift+R cung khong het.
+   🔴 GOC: KHONG phai hotspot POI, ma la layer 'skin_loadingtext' cua
+      skin/vtourskin.xml (dong 369). Skin BAT no o onnewpano va chi TAT o
+      onloadcomplete — ma krpano 1.19-pr16 KHONG BAN onloadcomplete
+      (chinh la ly do man intro 3D phai co hard fallback 7s tu 07/08).
+      Khong bao gio tat -> chu ket vinh vien.
+   Sua ADDITIVE: tu tat layer do sau khi nap xong. KHONG sua vtourskin.xml
+   (quy tac cung so 3 trong CLAUDE.md).
+   ============================================================ */
+window.eraHideLoading = function(){
+	var k=document.getElementById('krpanoSWFObject'); if(!k) return false;
+	try{
+		if(k.get('layer[skin_loadingtext].visible') === false) return false;
+		k.set('layer[skin_loadingtext].visible', false);
+		console.log('[ERA] Da tat skin_loadingtext (krpano pr16 khong ban onloadcomplete)');
+		return true;
+	}catch(e){ return false; }
+};
+
+/* ============================================================
+   BANG BAT/TAT LOP CHI BAO — hen gio ap lai trang thai
+   Goi tu era-layers-360.xml:  js( eraLayersKick() )
+   ------------------------------------------------------------
+   🔴 12/08 — TAI SAO PHAI HEN GIO BANG JS CHU KHONG DUNG delayedcall:
+   Trong krpano 1.19-pr16, `era_layers_apply()` chay TU delayedcall thi
+   VONG LAP `for(... i LT hotspot.count ...)` KHONG CHAY LAN NAO —
+   `hotspot.count` doc ra rong trong pham vi cua delayedcall, nen bo dem
+   dung nguyen o 0. Goi thang thi dung (dem ra 35). Dang 3 tham so
+   `delayedcall(id, giay, lenh)` con te hon: khong bao gio ban.
+   Ca hai deu IM LANG, khong console do. => Hen gio bang setTimeout ben JS,
+   giong cach eraHideLoading da lam o tren.
+
+   Vi sao can 3 moc: nhan POI va gim lo duoc dung LAI sau moi lan doi scene,
+   mot so nhan ve muon (eraPoiRestore co moc 2.5s va 7s). Ap 1 lan la khong du —
+   nhan ve sau se hien lai du Anh Tony da tat lop do.
+   ============================================================ */
+window.eraLayersKick = function(){
+	[900, 3200, 7800].forEach(function(ms){
+		setTimeout(function(){
+			var k = document.getElementById('krpanoSWFObject'); if(!k) return;
+			try{ k.call('era_layers_apply()'); }catch(e){}
+		}, ms);
+	});
+	// 🔴 krpano 1.19 chi VE LAI MAN khi co doi tam nhin. Nguoi xem chua cham
+	// chuot thi bang nay dung do khong hien (da chup man kiem chung: bang co
+	// that, visible=true, nhung khong duoc ve). Nhich fov 0,5% roi tra ve
+	// nguyen gia tri -> ep ve 1 khung. Nhich 0,01% thi krpano lo di.
+	// Cung cach da dung o trang tien ich (eraFirstPaint), xem nhat ky 11/08 toi-5.
+	// 🔴 CHI CHAY 1 LAN. eraLayersKick duoc goi 2 lan (onxmlcomplete + onnewpano);
+	// khong khoa lai thi 2 cu nhich chong len nhau, cu sau chup phai gia tri da
+	// bi nhich cua cu truoc -> fov tra ve 99.0 thay vi 100 (do that: 100 -> 99.0025).
+	if(!window._eraLayPaintDone){
+		window._eraLayPaintDone = true;
+		setTimeout(function(){
+			var k = document.getElementById('krpanoSWFObject'); if(!k) return;
+			try{
+				var f = parseFloat(k.get('view.fov'));
+				if(!isFinite(f) || f <= 0) return;
+				k.set('view.fov', f * 0.995);
+				setTimeout(function(){ try{ k.set('view.fov', f); }catch(e){} }, 300);
+			}catch(e){}
+		}, 1300);
+	}
+};
+
+// form nhap diem (goi tu era-poi-360.xml khi click dat diem)
+window.eraPoiPin = function(ath, atv, kind){
+	kind = (kind==='v'||kind==='r'||kind==='p'||kind==='c') ? kind : 'h';   // 'h' ngang · 'v' doc · 'r' nhan duong
+	ath = Math.round(parseFloat(ath)*10)/10; atv = Math.round(parseFloat(atv)*10)/10;
+	if(!isFinite(ath)||!isFinite(atv)){ alert('Chưa lấy được vị trí — bấm THÊM ĐIỂM rồi click lại lên ảnh.'); return; }
+	function esc(s){ return String(s||'').replace(/['",]/g,' ').trim(); }
+	var box = document.getElementById('era-poi-input');
+	if(!box){ box=document.createElement('div'); box.id='era-poi-input'; document.body.appendChild(box); }
+	box.style.cssText='position:fixed;z-index:99999;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,92vw);background:#0C0C44;color:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:18px;font-family:Arial;';
+	var isV = (kind==='v'), isR = (kind==='r'), isP = (kind==='p'), isC = (kind==='c');
+	var inpCss = "width:100%;box-sizing:border-box;margin-bottom:8px;padding:9px;border-radius:8px;border:0;font-size:13px;";
+	var head = isR ? "Thêm BIỂN TÊN ĐƯỜNG"
+	         : isV ? "Thêm nhãn DỌC (núi / cầu)"
+	         : isP ? "Thêm CHIP SỐ (mốc xa)"
+	         : isC ? "Thêm LA BÀN HƯỚNG"
+	         :       "Thêm THẺ TIỆN ÍCH (icon tròn)";
+	var ph   = isR ? "Tên tuyến, KHÔNG kèm chữ Đường (vd: Xuân Diệu)"
+	         : isV ? "Tên (vd: NÚI ĐẠI BÌNH)"
+	         : isP ? "Tên (vd: SÂN BAY LIÊN KHƯƠNG)"
+	         : isC ? "Tên mốc (vd: TP. BẢO LỘC)"
+	         :       "Tên (vd: Co.opmart Bảo Lộc)";
+	box.innerHTML =
+		"<div style='font-weight:bold;margin-bottom:4px;'>"+head+"</div>"
+		+"<div style='font-size:11px;color:#9fb0c4;margin-bottom:12px;'>vị trí ath "+ath+" · atv "+atv+"</div>"
+		+"<input id='epi-title' placeholder='"+ph+"' style='"+inpCss+"'/>"
+		+ (isR ? "<input id='epi-sub' value='Đường' placeholder='Chữ trong chip đỏ (vd: QL20)' style='"+inpCss+"'/>" : "")
+		+ (isP ? "<input id='epi-dist' placeholder='Số hiện trong chip (vd: 58 km)' style='"+inpCss+"'/>" : "")
+		+ (isC ? "<input id='epi-sub' placeholder='Hướng (vd: Tây Nam)' style='"+inpCss+"'/>"
+				+"<input id='epi-dist' placeholder='Khoảng cách (vd: 9 km)' style='"+inpCss+"'/>" : "")
+		+ ((isV||isR||isP||isC) ? "" :
+			 "<input id='epi-sub' placeholder='Mô tả (vd: Siêu thị)' style='"+inpCss+"'/>"
+			+"<input id='epi-dist' placeholder='Khoảng cách (vd: 5 KM)' style='"+inpCss+"'/>")
+		+ ((isP||isC) ? "" : isR
+			? "<input id='epi-rot' type='number' min='-180' max='180' step='5' value='0' "
+				+"placeholder='Góc xoay (độ)' style='"+inpCss+"margin-bottom:6px;'/>"
+			 +"<div style='font-size:11px;color:#9fb0c4;margin-bottom:12px;'>Góc xoay — 0 là nằm ngang. "
+				+"Đường chạy xuống bên phải thì góc DƯƠNG, chạy lên bên phải thì góc ÂM. "
+				+"Cứ để 0 rồi vào tour bấm XOAY +/− canh cho khớp mặt đường.</div>"
+			: "<input id='epi-pole' type='number' min='20' max='400' step='6' value='"+(isV?110:44)+"' "
+				+"placeholder='Cao cọc (px)' style='"+inpCss+"margin-bottom:6px;'/>"
+			 +"<div style='font-size:11px;color:#9fb0c4;margin-bottom:12px;'>Cao cọc — 2 bảng gần nhau thì cho "
+				+"cái cọc cao, cái cọc thấp là hết đè. Sau vẫn sửa được bằng nút COC +/− trong tour.</div>")
+		+"<div style='display:flex;gap:8px;'>"
+		+"<button id='epi-ok' style='flex:1;background:#1B9E5A;color:#fff;border:0;border-radius:8px;padding:11px;font-weight:bold;cursor:pointer;'>"
+			+ (isR ? "Thêm nhãn đường" : isV ? "Thêm nhãn dọc" : isP ? "Thêm chip số" : isC ? "Thêm la bàn" : "Thêm thẻ") + "</button>"
+		+"<button id='epi-cancel' style='flex:0 0 84px;background:#555;color:#fff;border:0;border-radius:8px;padding:11px;cursor:pointer;'>Huỷ</button>"
+		+"</div>";
+	box.style.display='block';
+	var ti=document.getElementById('epi-title'); ti.focus();
+	function val(id){ var e=document.getElementById(id); return e ? e.value : ''; }
+	function submit(){
+		var title=esc(val('epi-title'))||'DIEM MOI';
+		var k=document.getElementById('krpanoSWFObject');
+		if(isR){
+			var rot=parseFloat(val('epi-rot')); if(!isFinite(rot)) rot=0;
+			if(rot>180) rot=180; if(rot<-180) rot=-180;
+			var chip = esc(val('epi-sub')) || 'Đường';
+			k.call("add_poi_r("+ath+","+atv+",'"+title+"',"+rot+",0,0,0,1,'#FFFFFF',0x0C0C44,1,0xC8102E,false,200,26,'"+chip+"')");
+		} else if(isP){
+			k.call("add_poi_p("+ath+","+atv+",'"+title+"','"+esc(val('epi-dist'))+"',52,1,'#FFFFFF',0x0C0C44,0.85,0xC8102E,210,70)");
+		} else if(isC){
+			// huong mac dinh = ath cua diem Anh vua click (click ve phia moc)
+			k.call("add_poi_c("+ath+","+atv+",'"+title+"','"+esc(val('epi-sub'))+"','"+esc(val('epi-dist'))+"',"+ath+",44,1,'#FFFFFF',0x0C0C44,0,0xC8102E)");
+		} else {
+			var pole=parseInt(val('epi-pole'),10); if(!isFinite(pole)||pole<20) pole=(isV?110:44);
+			if(pole>400) pole=400;
+			if(isV){
+				k.call("add_poi_v("+ath+","+atv+",'"+title+"',"+pole+")");
+			} else {
+				var sub=esc(val('epi-sub')), dist=esc(val('epi-dist'));
+				// icon TU CHON theo tu khoa trong ten (truong / benh vien / sieu thi / nha tho ...)
+				var ico = window.eraIconFor(title);
+				k.call("add_poi("+ath+","+atv+",'"+title+"','"+sub+"','"+dist+"',"+pole+",1,'#FFFFFF',0x0C0C44,0.85,0xC8102E,'"+ico+"',230)");
+			}
+		}
+		k.call("poi_save_draft()");
+		box.style.display='none';
+		// mo ngay BANG DIEU KHIEN cho nhan vua them
+		var ni = parseInt(k.get('poi_count'),10) - 1;
+		if(isFinite(ni) && ni>=0) setTimeout(function(){ eraPoiPanel(ni); }, 60);
+	}
+	document.getElementById('epi-ok').onclick=submit;
+	var lastInp = document.getElementById(isR ? 'epi-rot' : (isP||isC) ? 'epi-dist' : 'epi-pole');
+	if(lastInp) lastInp.onkeydown=function(e){ if(e.key==='Enter') submit(); };
+	document.getElementById('epi-cancel').onclick=function(){ box.style.display='none'; };
+};
+/* ============================================================
+   BANG DIEU KHIEN NHAN POI — chinh REALTIME
+   Mo khi: (a) vua them nhan moi  (b) bam vao 1 nhan cu
+   Moi thao tac set thang vao krpano -> chu doi ngay tren anh.
+   Luu nhap co debounce 400ms de khong ghi localStorage lien tuc.
+   ============================================================ */
+window.__eraPoiIdx = -1;
+window.__eraPoiSaveTimer = null;
+
+function eraK(){ return document.getElementById('krpanoSWFObject'); }
+function eraHS(i){ return "hotspot[poi_board_"+i+"]"; }
+function eraGet(i,p){ var k=eraK(); return k ? k.get(eraHS(i)+"."+p) : null; }
+function eraSet(i,p,v){ var k=eraK(); if(k) k.set(eraHS(i)+"."+p, v); }
+function eraNum(v,d){ var n=parseFloat(v); return isFinite(n)?n:d; }
+
+function eraPoiSaveSoon(){
+	clearTimeout(window.__eraPoiSaveTimer);
+	window.__eraPoiSaveTimer = setTimeout(function(){
+		var k=eraK(); if(k) k.call("poi_save_draft()");
+	}, 400);
+}
+
+window.eraPoiPanelClose = function(){
+	var b=document.getElementById('era-poi-panel'); if(b) b.style.display='none';
+	window.__eraPoiIdx = -1;
+};
+
+window.eraPoiPanel = function(idx){
+	idx = parseInt(idx,10); if(!isFinite(idx)||idx<0) return;
+	var k=eraK(); if(!k) return;
+	window.__eraPoiIdx = idx;
+
+	var type  = String(eraGet(idx,'p_type')||'h');
+	var title = String(eraGet(idx,'p_title')||'');
+	var sub   = String(eraGet(idx,'p_sub')||'');
+	var dist  = String(eraGet(idx,'p_dist')||'');
+	var pole  = eraNum(eraGet(idx,'p_pole'), type==='v'?110:44);
+	var scale = eraNum(eraGet(idx,'p_scale'), 1);
+	var rot   = eraNum(eraGet(idx,'p_rot'), type==='v'?-90:0);
+	var rx    = eraNum(eraGet(idx,'p_rx'), 0);
+	var ry    = eraNum(eraGet(idx,'p_ry'), 0);
+	var rz    = eraNum(eraGet(idx,'p_rz'), 0);
+
+	var icon  = String(eraGet(idx,'p_icon')||'');
+	var w     = eraNum(eraGet(idx,'p_w'), 0);
+	var w2    = eraNum(eraGet(idx,'p_w2'), 70);
+	var gc    = eraNum(eraGet(idx,'p_gc'), 56);
+	var bear  = eraNum(eraGet(idx,'p_bear'), 0);
+	var isR=(type==='r'), isV=(type==='v'), isP=(type==='p'), isC=(type==='c');
+	var tenLoai = isR ? 'BIỂN TÊN ĐƯỜNG · chip đỏ'
+	            : isV ? 'NHÃN DỌC'
+	            : isP ? 'CHIP SỐ · mốc xa'
+	            : isC ? 'LA BÀN HƯỚNG'
+	            :       'THẺ TIỆN ÍCH · icon tròn';
+
+	var box=document.getElementById('era-poi-panel');
+	if(!box){ box=document.createElement('div'); box.id='era-poi-panel'; document.body.appendChild(box); }
+	box.style.cssText='position:fixed;z-index:99997;left:14px;top:104px;width:302px;'
+		+'max-height:74vh;overflow-y:auto;background:rgba(12,12,68,.94);color:#fff;'
+		+'border:1px solid rgba(255,255,255,.22);border-radius:12px;'
+		+'box-shadow:0 10px 34px rgba(0,0,0,.55);padding:13px 14px;'
+		+'font-family:Arial,sans-serif;font-size:12px;';
+
+	function row(id,label,min,max,step,val,unit){
+		return "<div style='margin-bottom:9px;'>"
+		 +"<div style='display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;'>"
+		 +"<span style='color:#BAD8C3;'>"+label+"</span>"
+		 +"<b id='"+id+"-v' style='color:#7ADD8B;'>"+val+(unit||"")+"</b></div>"
+		 +"<input id='"+id+"' type='range' min='"+min+"' max='"+max+"' step='"+step+"' value='"+val+"' "
+		 +"style='width:100%;margin:0;'/></div>";
+	}
+/* ---- bang mau: 6 preset + 3 picker + do mo nen ---- */
+	/* ---- luoi chon ICON (chi the tien ich) ---- */
+	function iconUI(){
+		var out = "<div style='margin-bottom:9px;'><div style='color:#BAD8C3;margin-bottom:5px;'>Icon — bấm 1 ô là đổi ngay</div>"
+			+"<div style='display:flex;flex-wrap:wrap;gap:5px;'>";
+		for(var i=0;i<window.ERA_ICONS.length;i++){
+			var id=window.ERA_ICONS[i][0], ten=window.ERA_ICONS[i][1], on=(id===icon);
+			out += "<button class='ep-ic' data-id='"+id+"' title='"+ten+"' "
+				+"style='flex:0 0 auto;width:38px;height:38px;padding:3px;cursor:pointer;"
+				+"background:"+(on?'rgba(122,221,139,.22)':'transparent')+";"
+				+"border:1px solid "+(on?'#7ADD8B':'rgba(255,255,255,.28)')+";border-radius:8px;'>"
+				+"<img src='poi-icons/"+id+".png' style='width:100%;height:100%;display:block;'/></button>";
+		}
+		return out+"</div></div>";
+	}
+
+	function sw(fg,bg,a,ten){
+		return "<button class='ep-pre' data-fg='"+fg+"' data-bg='"+bg+"' data-a='"+a+"' title='"+ten+"' "
+		 +"style='flex:1 1 30%;min-width:0;background:"+(a>0?bg:'transparent')+";color:"+fg+";"
+		 +"border:1px solid rgba(255,255,255,.28);border-radius:6px;padding:7px 2px;cursor:pointer;"
+		 +"font-family:inherit;font-size:10px;font-weight:bold;white-space:nowrap;overflow:hidden;'>"+ten+"</button>";
+	}
+	function pick(id,label,val){
+		return "<div style='flex:1;min-width:0;'><div style='color:#BAD8C3;font-size:10px;margin-bottom:3px;'>"+label+"</div>"
+		 +"<input id='"+id+"' type='color' value='"+val+"' style='width:100%;height:28px;padding:0;border:0;border-radius:5px;background:none;cursor:pointer;'/></div>";
+	}
+	function mauUI(){
+		var bgHex = '#' + String(eraGet(idx,'p_bg')||'0x0C0C44').replace(/^0x/i,'');
+		var dtHex = '#' + String(eraGet(idx,'p_dot')||'0xC8102E').replace(/^0x/i,'');
+		var bga   = eraNum(eraGet(idx,'p_bga'), isR?0:0.8);
+		var fgHex = String(eraGet(idx,'p_fg')||'#FFFFFF');
+		return "<div style='border-top:1px solid rgba(255,255,255,.16);margin:11px 0 9px;padding-top:10px;'>"
+		 +"<div style='color:#BAD8C3;margin-bottom:6px;'>Bảng màu — bấm 1 ô là ăn ngay</div>"
+		 +"<div style='display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px;'>"
+		 + sw('#F2D57E','#1B6E3C',0.92,'Lá đậm')
+		 + sw('#FFFFFF','#0C0C44',0.85,'Navy ERA')
+		 + sw('#FFFFFF','#C8102E',0.90,'Đỏ ERA')
+		 + sw('#0C0C44','#FFFFFF',0.92,'Trắng')
+		 + sw('#FFFFFF','#D6249F',0.90,'Magenta')
+		 + sw('#FFFFFF','#000000',0.00,'Không nền')
+		 +"</div>"
+		 +"<div style='display:flex;gap:7px;margin-bottom:9px;'>"
+		 + pick('ep-fg','Chữ', fgHex) + pick('ep-bg','Nền', bgHex)
+		 + pick('ep-dot', isR ? 'Chip đỏ/cột' : 'Chấm/cọc', dtHex)
+		 +"</div>"
+		 +"<div style='display:flex;justify-content:space-between;margin-bottom:3px;'>"
+		 +"<span style='color:#BAD8C3;'>Độ mờ nền</span><b id='ep-bga-v' style='color:#7ADD8B;'>"+bga+"</b></div>"
+		 +"<input id='ep-bga' type='range' min='0' max='1' step='0.05' value='"+bga+"' style='width:100%;margin:0;'/>"
+		 +"</div>";
+	}
+
+	function txt(id,label,val,ph){
+		return "<div style='margin-bottom:9px;'>"
+		 +"<div style='color:#BAD8C3;margin-bottom:3px;'>"+label+"</div>"
+		 +"<input id='"+id+"' type='text' value=\""+String(val).replace(/"/g,'&quot;')+"\" placeholder='"+(ph||"")+"' "
+		 +"style='width:100%;box-sizing:border-box;padding:7px;border:0;border-radius:6px;font-size:12px;'/></div>";
+	}
+
+	box.innerHTML =
+		"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;'>"
+		 +"<b style='font-size:13px;'>"+tenLoai+" #"+idx+"</b>"
+		 +"<span style='cursor:pointer;font-size:20px;line-height:1;padding:0 4px;' onclick='eraPoiPanelClose()'>&times;</span></div>"
+		+"<div style='color:#8fa3b8;font-size:10px;margin-bottom:11px;'>Kéo slider — chữ đổi ngay trên ảnh</div>"
+
+		+ txt('ep-title','Tên', title, 'Tên nhãn')
+		+ (isR ? txt('ep-sub','Chữ trong chip đỏ', sub, 'vd: QL20 / Đường') : "")
+		+ (isP ? txt('ep-dist','Số trong chip', dist, 'vd: 58 km') : "")
+		+ (isC ? txt('ep-sub','Hướng', sub, 'vd: Tây Nam') + txt('ep-dist','Khoảng cách', dist, 'vd: 9 km') : "")
+		+ (isR||isV||isP||isC ? "" : txt('ep-sub','Mô tả', sub, 'vd: Siêu thị') + txt('ep-dist','Khoảng cách', dist, 'vd: 5 KM'))
+
+		+ (type==='h' ? iconUI() : "")
+		
+
+		+ row('ep-scale','Cỡ chữ', 0.4, 4, 0.05, scale, 'x')
+		+ (isR
+			? row('ep-rot','Xoay phẳng — canh theo hướng đường', -180, 180, 1, rot, '°')
+			 +row('ep-gc','Cao cột biển', 0, 220, 2, gc, 'px')
+			: isC
+			? row('ep-bear','Hướng kim (0 = Bắc)', -180, 180, 1, bear, '°')
+			 +row('ep-pole','Cao cọc', 20, 400, 2, pole, 'px')
+			: isP
+			? row('ep-w','Rộng tối đa pill tên', 80, 460, 4, w, 'px')
+			 +row('ep-w2','Rộng chip số', 40, 200, 2, w2, 'px')
+			 +row('ep-pole','Cao cọc', 20, 400, 2, pole, 'px')
+			: type==='h'
+			? row('ep-w','Rộng tối đa (0 = tự co theo chữ)', 0, 460, 10, w, 'px')
+			 +row('ep-pole','Cao cọc', 20, 400, 2, pole, 'px')
+			: row('ep-pole','Cao cọc', 20, 400, 2, pole, 'px'))
+
+		+ mauUI()
+		+"<div style='display:flex;gap:7px;margin-top:12px;'>"
+		 +"<button id='ep-reset' style='flex:1;background:#3a3a6b;color:#fff;border:0;border-radius:7px;padding:9px;cursor:pointer;font-family:inherit;font-size:11px;'>Về mặc định</button>"
+		 +"<button id='ep-del' style='flex:1;background:#8A1020;color:#fff;border:0;border-radius:7px;padding:9px;cursor:pointer;font-family:inherit;font-size:11px;font-weight:bold;'>Xoá nhãn này</button>"
+		+"</div>";
+	box.style.display='block';
+
+	/* ---- ap thay doi ngay lap tuc ---- */
+	// dong bo o color picker + 6 preset
+	var epC = document.getElementById('ep-fg'), epB = document.getElementById('ep-bg'),
+	    epD = document.getElementById('ep-dot'), epA = document.getElementById('ep-bga');
+	function applyFg(hex){
+		var kk=eraK(); if(!kk) return;
+		kk.call("poi_set_fg("+idx+",'"+hex+"')");  // css chu: dinh nghia 1 cho trong XML
+		// hotspot phu (icon / chip / kim) doi mau chu theo — css dung font rieng nen set thang
+		if(type==='h') kk.set("hotspot[poi_a_"+idx+"].css", 'color:'+hex+'; font-family:"Phosphor-Light"; font-size:19px; text-align:center;');
+		if(type==='p') kk.set("hotspot[poi_a_"+idx+"].css", 'color:'+hex+'; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:700; text-align:center;');
+		// 🔴 type 'c': KHONG set css cho poi_b_ — no la hotspot ANH (mui-ten.png).
+		// Set css se bien no thanh text hotspot va mat hinh kim.
+		eraPoiSaveSoon();
+	}
+	function applyBg(hex, alpha){
+		eraSet(idx,'bgcolor', parseInt(hex.slice(1),16));
+		eraSet(idx,'p_bg', '0x'+hex.slice(1).toUpperCase());
+		if(alpha!==undefined){ eraSet(idx,'bgalpha', alpha); eraSet(idx,'p_bga', alpha); }
+		eraPoiSaveSoon();
+	}
+	function applyDot(hex){
+		var kk=eraK(); if(!kk) return;
+		var n=parseInt(hex.slice(1),16);
+		kk.set("hotspot[poi_dot_"+idx+"].bgcolor", n);
+		kk.set("hotspot[poi_pole_"+idx+"].bgcolor", n);
+		// loai 'r': mau nay dieu khien CHIP DO + cot bien + cham neo
+		if(type==='r'){
+			kk.set("hotspot[poi_a_"+idx+"].bgcolor", n);
+			kk.set("hotspot[poi_b_"+idx+"].bgcolor", n);
+		}
+		eraSet(idx,'p_dot', '0x'+hex.slice(1).toUpperCase());
+		eraPoiSaveSoon();
+	}
+	if(epC) epC.oninput=function(){ applyFg(epC.value); };
+	if(epB) epB.oninput=function(){ applyBg(epB.value); };
+	if(epD) epD.oninput=function(){ applyDot(epD.value); };
+	if(epA) epA.oninput=function(){
+		var v=parseFloat(epA.value);
+		document.getElementById('ep-bga-v').innerText = v;
+		eraSet(idx,'bgalpha', v); eraSet(idx,'p_bga', v); eraPoiSaveSoon();
+	};
+	Array.prototype.forEach.call(document.querySelectorAll('#era-poi-panel .ep-pre'), function(b){
+		b.onclick=function(){
+			var fg=b.getAttribute('data-fg'), bg=b.getAttribute('data-bg'), a=parseFloat(b.getAttribute('data-a'));
+			if(epC) epC.value=fg;  applyFg(fg);
+			if(epB) epB.value=bg;
+			if(epA){ epA.value=a; document.getElementById('ep-bga-v').innerText=a; }
+			applyBg(bg, a);
+		};
+	});
+
+	function setHtml(){
+		var t=document.getElementById('ep-title').value;
+		eraSet(idx,'p_title', t);
+		if(isR){
+			// loai 'r': o "Chữ trong chip đỏ" ghi vao p_sub va vao html cua poi_a_
+			eraSet(idx,'html', t);
+			var es=document.getElementById('ep-sub');
+			var c=(es ? es.value : '').trim() || 'Đường';
+			eraSet(idx,'p_sub', c);
+			var kc=eraK(); if(kc) kc.set("hotspot[poi_a_"+idx+"].html", c);
+		}
+		else if(isV){ eraSet(idx,'html', t); }
+		else {
+			var s=document.getElementById('ep-sub').value, d=document.getElementById('ep-dist').value;
+			eraSet(idx,'p_sub', s); eraSet(idx,'p_dist', d);
+			eraSet(idx,'html', '[b]'+t+'[/b][br]'+s+'  [b]'+d+'[/b]');
+		}
+		eraPoiSaveSoon();
+	}
+	['ep-title','ep-sub','ep-dist'].forEach(function(id){
+		var e=document.getElementById(id); if(e) e.oninput=setHtml;
+	});
+
+	function bind(id, unit, apply){
+		var e=document.getElementById(id); if(!e) return;
+		e.oninput=function(){
+			var v=parseFloat(e.value);
+			document.getElementById(id+'-v').innerText = v+(unit||'');
+			apply(v); eraPoiSaveSoon();
+		};
+	}
+	bind('ep-scale','x', function(v){
+		eraSet(idx,'scale',v); eraSet(idx,'p_scale',v);
+		var kk=eraK(); if(!kk) return;
+		kk.set("hotspot[poi_a_"+idx+"].scale", v);
+		kk.set("hotspot[poi_b_"+idx+"].scale", v);
+	});
+	// luoi icon
+	Array.prototype.forEach.call(document.querySelectorAll('#era-poi-panel .ep-ic'), function(b){
+		b.onclick=function(){
+			var id=b.getAttribute('data-id');
+			var kk=eraK(); if(kk) kk.set("hotspot[poi_a_"+idx+"].url", "poi-icons/"+id+".png");
+			eraSet(idx,'p_icon', id);
+			eraPoiSaveSoon(); eraPoiPanel(idx);
+		};
+	});
+	// be rong the / gach / pill ten
+	// LUU Y: voi the icon / chip so, `width` chi la BE RONG TOI DA de wrap chu.
+	// Vi tri cac manh phu neo theo canh (bottomleft / bottomright) nen KHONG phu thuoc width.
+	bind('ep-w','px', function(v){
+		var kk=eraK(); if(!kk) return;
+		eraSet(idx,'p_w', v);
+		if(type==='h' || type==='p') eraSet(idx,'width', v>60 ? v : null);
+		else if(type==='r')          kk.set("hotspot[poi_a_"+idx+"].width", v);
+	});
+	bind('ep-w2','px', function(v){
+		var kk=eraK(); if(!kk) return;
+		eraSet(idx,'p_w2', v);
+		kk.set("hotspot[poi_a_"+idx+"].width", v);
+	});
+	// cao cot bien (loai 'r'): bien navy + chip do cung day len -v, cot cao dung v
+	bind('ep-gc','px', function(v){
+		var kk=eraK(); if(!kk) return;
+		eraSet(idx,'p_gc', v);
+		eraSet(idx,'oy', -v);
+		kk.set("hotspot[poi_a_"+idx+"].oy", -v);
+		kk.set("hotspot[poi_b_"+idx+"].height", v);
+		kk.set("hotspot[poi_b_"+idx+"].visible", v>2);
+	});
+	// huong kim la ban
+	bind('ep-bear','°', function(v){ eraSet(idx,'p_bear', v); var kk=eraK(); if(kk) kk.call('era_poi_needles()'); });
+	bind('ep-rot','°',   function(v){
+		eraSet(idx,'rotate',v); eraSet(idx,'p_rot',v);
+		// chip do phai xoay CUNG goc voi bien ten, khong thi mach noi banh ra
+		var kk=eraK(); if(kk && type==='r') kk.set("hotspot[poi_a_"+idx+"].rotate", v);
+	});
+	bind('ep-rx','°',    function(v){ eraSet(idx,'rx',v); eraSet(idx,'p_rx',v); });
+	bind('ep-ry','°',    function(v){ eraSet(idx,'ry',v); eraSet(idx,'p_ry',v); });
+	bind('ep-rz','°',    function(v){ eraSet(idx,'rz',v); eraSet(idx,'p_rz',v); });
+	bind('ep-pole','px', function(v){
+		var kk=eraK(); if(kk) kk.set("hotspot[poi_pole_"+idx+"].height", v);
+		// nhan DOC day bang ox (offset bi xoay theo rotate), cac loai khac day bang oy
+		if(isV){ eraSet(idx,'ox', v); eraSet(idx,'oy', 0); }
+		else   { eraSet(idx,'oy', -v); }
+		if(kk && type==='h') kk.set("hotspot[poi_a_"+idx+"].oy", -v - 5);
+		if(kk && type==='p') kk.set("hotspot[poi_a_"+idx+"].oy", -v);
+		if(kk && type==='c'){
+			kk.set("hotspot[poi_a_"+idx+"].oy", -v - 88);
+			kk.set("hotspot[poi_b_"+idx+"].oy", -v - 88);
+		}
+		eraSet(idx,'p_pole', v);
+	});
+
+	document.getElementById('ep-reset').onclick=function(){
+		var d = isR ? {scale:1,rot:0,rx:0,ry:0,rz:0} : {scale:1,pole:(isV?110:44)};
+		if(isR){
+			eraSet(idx,'scale',1); eraSet(idx,'p_scale',1);
+			['rotate','rx','ry','rz'].forEach(function(p){ eraSet(idx,p,0); });
+			eraSet(idx,'p_rot',0); eraSet(idx,'p_rx',0); eraSet(idx,'p_ry',0); eraSet(idx,'p_rz',0);
+			eraSet(idx,'distorted', false); eraSet(idx,'p_d3d', false);
+		} else {
+			eraSet(idx,'scale',1); eraSet(idx,'p_scale',1);
+			var kk=eraK(); if(kk) kk.set("hotspot[poi_pole_"+idx+"].height", d.pole);
+			if(isV){ eraSet(idx,'ox', d.pole); eraSet(idx,'oy',0); } else { eraSet(idx,'oy', -d.pole); }
+			eraSet(idx,'p_pole', d.pole);
+		}
+		var kk2=eraK(); if(kk2) kk2.call("poi_save_draft()");
+		eraPoiPanel(idx);
+	};
+
+	document.getElementById('ep-del').onclick=function(){
+		if(!confirm('Xoá nhãn "'+title+'" ?')) return;
+		var kk=eraK(); if(!kk) return;
+		eraPoiPanelClose();
+		kk.call("poi_save_draft()");
+		eraPoiDelete(kk.get('xml.scene'), idx);
+	};
+};
+
+/* xoa 1 nhan BAT KY: bo dong thu idx trong nhap roi nap lai ca scene
+   -> khong de lo trong day so hotspot (poi_board_0,1,2...) */
+window.eraPoiDelete = function(scene, idx){
+	idx=parseInt(idx,10);
+	var s=''; try{ s=localStorage.getItem('erapoi_'+scene)||''; }catch(e){}
+	var arr = s.split('###').filter(function(x){ return x && x.length; });
+	if(idx<0 || idx>=arr.length){ alert('Không tìm thấy nhãn để xoá (nháp có '+arr.length+' mục).'); return; }
+	arr.splice(idx,1);
+	var out = arr.length ? arr.join('###')+'###' : '';
+	try{ localStorage.setItem('erapoi_'+scene, out); }catch(e){}
+	var k=eraK();
+	if(out===''){ // het nhap -> tranh bi nap lai data goc trong file
+		try{ localStorage.setItem('erapoi_'+scene, ' '); }catch(e){}
+	}
+	if(k) k.call("era_poi_clear(); era_poi_build();");
+};
+
+window.eraPoiExport = function(code){
+	code = String(code).split('###').join('\n');
+	var box = document.getElementById('era-poi-export');
+	if(!box){
+		box = document.createElement('div');
+		box.id = 'era-poi-export';
+		box.style.cssText = 'position:fixed;z-index:99999;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,92vw);background:#0C0C44;color:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:16px;font-family:Arial;';
+		document.body.appendChild(box);
+	}
+	box.innerHTML =
+		'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
+		+ '<b style="font-size:14px;">Toa do POI da chot &mdash; copy dan vao era-poi-360.xml</b>'
+		+ '<span style="cursor:pointer;font-size:20px;padding:0 6px;" onclick="document.getElementById(\'era-poi-export\').style.display=\'none\'">&times;</span></div>'
+		+ '<textarea id="era-poi-code" style="width:100%;height:190px;box-sizing:border-box;font-family:Consolas,monospace;font-size:12px;border-radius:8px;border:0;padding:10px;resize:vertical;">'
+		+ code + '</textarea>'
+		+ '<button onclick="var t=document.getElementById(\'era-poi-code\');t.select();document.execCommand(\'copy\');this.innerText=\'DA COPY!\';" '
+		+ 'style="margin-top:10px;background:#1B9E5A;color:#fff;border:0;border-radius:8px;padding:9px 16px;font-weight:bold;cursor:pointer;">COPY</button>';
+	box.style.display = 'block';
+	var t = document.getElementById('era-poi-code'); if(t){ t.focus(); t.select(); }
+};
+</script>
+
+
+<!-- ==================================================================
+     ERA · MA LO TREN FLYCAM 360
+     Cap doi voi era-lots-flycam.xml. Gom 3 phan:
+       (1) Box thong tin hien khi re chuot vao gim lo
+       (2) Cua so chon ma lo khi dat gim  +  luu nhap localStorage
+       (3) Goi y tu dong: tu vai lo Anh da dat, suy ra vi tri cac lo con lai
+     ================================================================== -->
+<script src="lots-era-100.js?nc=20260812093000"></script>
+<script>
+(function(){
+	var LKEY = 'eralots_flycam';
+	var BYMA = {}, i;
+	for(i=0;i<LOTS_ERA100.length;i++){ BYMA[LOTS_ERA100[i].c] = LOTS_ERA100[i]; }
+
+	function K(){ return document.getElementById('krpanoSWFObject'); }
+	function hn(ma){ return 'lot_' + String(ma).split('-').join('_'); }
+	function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+	/* thu tu cac gim da dat - de nut XOA LO VUA DAT biet xoa cai nao */
+	var order = [];
+
+	/* ============ (1) BOX THONG TIN ============ */
+	var mx = 0, my = 0, pinned = false;
+	document.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; }, true);
+
+	function boxEl(){
+		var b = document.getElementById('era-lot-box');
+		if(!b){
+			b = document.createElement('div');
+			b.id = 'era-lot-box';
+			b.style.cssText = 'position:fixed;z-index:99998;display:none;pointer-events:none;'
+				+ 'min-width:216px;background:rgba(13,38,32,.94);border:1px solid rgba(203,240,214,.22);'
+				+ 'border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);padding:12px 14px;'
+				+ "font-family:Inter,Arial,sans-serif;color:#EDF8EF;";
+			document.body.appendChild(b);
+		}
+		return b;
+	}
+
+	/* 12/08 - Anh Tony chot: ma A = KHU PHU GIA, ma B = KHU GIA AN */
+	function khuCua(ma){
+		var c = String(ma || '').charAt(0).toUpperCase();
+		return c === 'B' ? 'KHU GIA AN' : 'KHU PHÚ GIA';
+	}
+
+	function rowHtml(k, v, unit){
+		if(v === '' || v == null) return '';
+		return '<div style="display:flex;justify-content:space-between;gap:18px;padding:3px 0;font-size:12px;">'
+			+ '<span style="color:#83A08D;">' + k + '</span>'
+			+ '<span style="color:#EDF8EF;font-weight:600;">' + esc(v) + (unit || '') + '</span></div>';
+	}
+
+	function render(ma){
+		var l = BYMA[ma];
+		var b = boxEl();
+		if(!l){
+			b.innerHTML = '<div style="font-size:14px;font-weight:700;">' + esc(ma) + '</div>'
+				+ '<div style="font-size:11px;color:#83A08D;margin-top:4px;">Chưa có dữ liệu cho lô này</div>';
+			return b;
+		}
+		b.innerHTML =
+			'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;">'
+			+ '<span style="font-size:17px;font-weight:800;letter-spacing:.4px;">' + esc(l.c) + '</span>'
+			+ '<span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#7ADD8B;">' + esc(khuCua(l.c)) + '</span>'
+			+ '</div>'
+			+ '<div style="height:1px;background:rgba(203,240,214,.16);margin:9px 0 5px;"></div>'
+			+ rowHtml('Diện tích đất', l.a,  ' m²')
+			+ rowHtml('Hướng',        l.h)
+			+ rowHtml('Lộ giới',      l.lg, ' m')
+			+ rowHtml('Loại hình',    l.l)
+			+ (pinned ? '<div style="font-size:10px;color:#83A08D;margin-top:7px;">Bấm ra ngoài để đóng</div>' : '');
+		return b;
+	}
+
+	function place(b){
+		b.style.display = 'block';
+		var w = b.offsetWidth, h = b.offsetHeight;
+		var x = mx + 18, y = my - h - 14;
+		if(x + w > window.innerWidth - 10)  x = mx - w - 18;
+		if(y < 10) y = my + 22;
+		if(x < 10) x = 10;
+		b.style.left = x + 'px';
+		b.style.top  = y + 'px';
+	}
+
+	window.lotHover = function(ma){ if(pinned) return; place(render(ma)); };
+	window.lotOut   = function(){ if(pinned) return; var b = document.getElementById('era-lot-box'); if(b) b.style.display = 'none'; };
+	window.lotClick = function(ma){
+		var k = K();
+		if(k && String(k.get('lots_edit_on')) === 'true') return;   /* dang sua thi khong ghim box */
+		pinned = true; place(render(ma));
+		setTimeout(function(){
+			document.addEventListener('mousedown', function un(){
+				pinned = false;
+				var b = document.getElementById('era-lot-box'); if(b) b.style.display = 'none';
+				document.removeEventListener('mousedown', un, true);
+			}, true);
+		}, 0);
+	};
+
+	/* ============ (2) DAT GIM ============ */
+	window.eraLotSave = function(s){ try{ localStorage.setItem(LKEY, s || ''); }catch(e){} };
+
+	function addPin(ath, atv, ma){
+		var k = K(); if(!k) return;
+		var name = hn(ma);
+		k.call("era_lot(" + ath + "," + atv + ",'" + ma + "'," + name + ")");
+		var p = order.indexOf(ma); if(p >= 0) order.splice(p, 1);
+		order.push(ma);
+	}
+
+	window.eraLotRestore = function(){
+		var k = K(); if(!k) return;
+		var s = ''; try{ s = localStorage.getItem(LKEY) || ''; }catch(e){}
+		order = [];
+		/* 🔴 11/08: loc RAC trong nhap cu. Truoc day era_lots_save_draft loc bang
+		   "malo != null" nen ghi ca hotspot POI/skin vao nhap voi ma = 'null'
+		   -> restore de ra 1 gim ma "null" va dem sai so lo. Chi nhan ma co that. */
+		if(s){
+			var ban = 0;
+			s.split('###').forEach(function(line){
+				if(!line) return;
+				var p = line.split('|'); if(p.length < 3) return;
+				if(!BYMA[p[2]]){ ban++; return; }
+				addPin(p[0], p[1], p[2]);
+			});
+			if(ban > 0){ K().call('era_lots_save_draft()'); }   /* ghi lai nhap da sach */
+		}else{
+			k.call('era_lots_data()');
+		}
+	};
+
+	window.eraLotDelLast = function(){
+		var k = K(); if(!k) return;
+		if(!order.length){ k.set('layer[lots_readout].html', 'Chưa có gim nào để xoá'); return; }
+		var ma = order.pop();
+		k.call('era_lot_remove(' + hn(ma) + ')');
+		k.set('layer[lots_readout].html', 'Đã xoá ' + ma + ' · còn ' + order.length + ' lô');
+	};
+
+	window.eraLotPick = function(ath, atv){
+		ath = Math.round(parseFloat(ath) * 100) / 100;
+		atv = Math.round(parseFloat(atv) * 100) / 100;
+		if(!isFinite(ath) || !isFinite(atv)){ alert('Chưa lấy được vị trí — bấm ĐẶT LÔ MỚI rồi click lại lên ảnh.'); return; }
+
+		var box = document.getElementById('era-lot-pick');
+		if(!box){ box = document.createElement('div'); box.id = 'era-lot-pick'; document.body.appendChild(box); }
+		box.style.cssText = 'position:fixed;z-index:99999;left:50%;top:50%;transform:translate(-50%,-50%);'
+			+ 'width:min(420px,94vw);max-height:78vh;display:flex;flex-direction:column;background:#0D2620;color:#EDF8EF;'
+			+ 'border:1px solid rgba(203,240,214,.22);border-radius:14px;box-shadow:0 14px 44px rgba(0,0,0,.55);'
+			+ 'padding:16px;font-family:Inter,Arial,sans-serif;';
+		box.innerHTML =
+			'<div style="font-size:15px;font-weight:800;">Chọn mã lô cho điểm vừa bấm</div>'
+			+ '<div style="font-size:11px;color:#83A08D;margin:4px 0 12px;">vị trí ath ' + ath + ' · atv ' + atv + '</div>'
+			+ '<input id="elp-q" placeholder="Gõ mã lô hoặc phân khu, vd A11 hoặc B4-03" '
+			+ 'style="width:100%;box-sizing:border-box;padding:10px;border-radius:9px;border:1px solid rgba(203,240,214,.2);'
+			+ 'background:#0E2821;color:#EDF8EF;font-size:13px;outline:none;"/>'
+			+ '<div id="elp-list" style="margin-top:10px;overflow:auto;flex:1;"></div>'
+			+ '<button id="elp-cancel" style="margin-top:12px;background:#2A4A3E;color:#EDF8EF;border:0;border-radius:9px;'
+			+ 'padding:10px;font-weight:700;cursor:pointer;font-family:inherit;">Huỷ</button>';
+
+		var placed = {};
+		order.forEach(function(m){ placed[m] = 1; });
+
+		function draw(q){
+			q = (q || '').toUpperCase().trim();
+			var list = LOTS_ERA100.filter(function(l){ return !q || l.c.toUpperCase().indexOf(q) >= 0 || l.z.toUpperCase().indexOf(q) >= 0; });
+			var html = list.map(function(l){
+				var done = placed[l.c];
+				return '<div class="elp-it" data-ma="' + l.c + '" style="display:flex;justify-content:space-between;align-items:center;'
+					+ 'gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;margin-bottom:4px;'
+					+ 'background:' + (done ? 'rgba(122,221,139,.10)' : 'rgba(255,255,255,.04)') + ';">'
+					+ '<span style="font-weight:700;font-size:13px;color:' + (done ? '#7ADD8B' : '#EDF8EF') + ';">' + l.c + '</span>'
+					+ '<span style="font-size:11px;color:#83A08D;">' + (done ? 'đã đặt · đặt lại' : esc(l.l) + ' · ' + l.a + 'm²') + '</span>'
+					+ '</div>';
+			}).join('');
+			document.getElementById('elp-list').innerHTML = html || '<div style="color:#83A08D;font-size:12px;padding:8px;">Không tìm thấy lô nào</div>';
+			Array.prototype.forEach.call(document.querySelectorAll('#elp-list .elp-it'), function(el){
+				el.onclick = function(){
+					var ma = el.getAttribute('data-ma');
+					addPin(ath, atv, ma);
+					K().call('era_lots_save_draft()');
+					K().set('layer[lots_readout].html', 'Đã gim ' + ma + ' · tổng ' + order.length + ' lô · kéo gim để chỉnh');
+					box.style.display = 'none';
+				};
+			});
+		}
+		draw('');
+		var q = document.getElementById('elp-q');
+		q.oninput = function(){ draw(q.value); };
+		q.focus();
+		document.getElementById('elp-cancel').onclick = function(){
+			box.style.display = 'none';
+			K().set('layer[lots_readout].html', 'CHẾ ĐỘ ĐẶT · bấm ĐẶT LÔ MỚI rồi click lên ảnh · kéo gim để chỉnh');
+		};
+		box.style.display = 'flex';
+	};
+
+	window.eraLotExport = function(code){
+		code = String(code).split('###').join('\n');
+		var box = document.getElementById('era-lot-export');
+		if(!box){ box = document.createElement('div'); box.id = 'era-lot-export'; document.body.appendChild(box); }
+		box.style.cssText = 'position:fixed;z-index:99999;left:50%;top:50%;transform:translate(-50%,-50%);width:min(620px,94vw);'
+			+ 'background:#0D2620;color:#EDF8EF;border:1px solid rgba(203,240,214,.22);border-radius:14px;'
+			+ 'box-shadow:0 14px 44px rgba(0,0,0,.55);padding:16px;font-family:Inter,Arial,sans-serif;';
+		box.innerHTML =
+			'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'
+			+ '<b style="font-size:14px;">Toạ độ gim lô đã chốt</b>'
+			+ '<span style="cursor:pointer;font-size:22px;line-height:1;padding:0 6px;" '
+			+ "onclick=\"document.getElementById('era-lot-export').style.display='none'\">&times;</span></div>"
+			+ '<div style="font-size:11px;color:#83A08D;margin-bottom:10px;">Dán khối này vào mục DU LIEU cuối file <b>era-lots-flycam.xml</b> (trong action era_lots_data) rồi lưu file.</div>'
+			+ '<textarea id="era-lot-code" style="width:100%;height:230px;box-sizing:border-box;font-family:Consolas,monospace;'
+			+ 'font-size:12px;border-radius:9px;border:1px solid rgba(203,240,214,.2);background:#0E2821;color:#EDF8EF;padding:10px;resize:vertical;">'
+			+ code + '</textarea>'
+			+ '<button onclick="var t=document.getElementById(\'era-lot-code\');t.select();document.execCommand(\'copy\');this.innerText=\'ĐÃ COPY\';" '
+			+ 'style="margin-top:10px;background:#1B9E5A;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit;">COPY</button>';
+		box.style.display = 'block';
+		var t = document.getElementById('era-lot-code'); if(t){ t.focus(); t.select(); }
+	};
+
+	/* ============ (3) GOI Y TU DONG ============
+	   Cac lo nam tren mat dat phang, may bay chup tu tren cao => phep chieu
+	   tu toa do mat bang (px,py) sang huong nhin 360 la 1 ma tran 3x3.
+	   Anh dat >= 4 lo rai deu => giai ma tran => bung not cac lo con lai.
+	   Dat cang nhieu moc va cang trai deu thi cang chuan.                */
+
+	function dirOf(athDeg, atvDeg){
+		var a = athDeg * Math.PI / 180, v = atvDeg * Math.PI / 180;
+		return [Math.sin(a) * Math.cos(v), -Math.sin(v), Math.cos(a) * Math.cos(v)];
+	}
+
+	function jacobi(A, n){
+		var V = [], a = [], p, q, k, r, c;
+		for(r=0;r<n;r++){ V.push([]); a.push(A[r].slice()); for(c=0;c<n;c++) V[r].push(r===c?1:0); }
+		for(var sweep=0; sweep<80; sweep++){
+			var off = 0;
+			for(p=0;p<n;p++) for(q=p+1;q<n;q++) off += a[p][q]*a[p][q];
+			if(off < 1e-22) break;
+			for(p=0;p<n-1;p++) for(q=p+1;q<n;q++){
+				if(Math.abs(a[p][q]) < 1e-24) continue;
+				var th = (a[q][q]-a[p][p]) / (2*a[p][q]);
+				var sg = th >= 0 ? 1 : -1;
+				var t  = sg / (Math.abs(th) + Math.sqrt(th*th+1));
+				var cc = 1/Math.sqrt(t*t+1), ss = t*cc;
+				for(k=0;k<n;k++){ var akp=a[k][p], akq=a[k][q]; a[k][p]=cc*akp-ss*akq; a[k][q]=ss*akp+cc*akq; }
+				for(k=0;k<n;k++){ var apk=a[p][k], aqk=a[q][k]; a[p][k]=cc*apk-ss*aqk; a[q][k]=ss*apk+cc*aqk; }
+				for(k=0;k<n;k++){ var vkp=V[k][p], vkq=V[k][q]; V[k][p]=cc*vkp-ss*vkq; V[k][q]=ss*vkp+cc*vkq; }
+			}
+		}
+		var d = []; for(r=0;r<n;r++) d.push(a[r][r]);
+		return { V:V, d:d };
+	}
+
+	function solveH(pairs){
+		var n = pairs.length, i, j;
+		var mx0 = 0, my0 = 0;
+		for(i=0;i<n;i++){ mx0 += pairs[i].u; my0 += pairs[i].v; }
+		mx0 /= n; my0 /= n;
+		var sc = 0;
+		for(i=0;i<n;i++) sc += Math.hypot(pairs[i].u-mx0, pairs[i].v-my0);
+		sc = sc > 0 ? (n * Math.SQRT2 / sc) : 1;
+		var norm = function(u, v){ return [(u-mx0)*sc, (v-my0)*sc]; };
+
+		var rows = [];
+		for(i=0;i<n;i++){
+			var p = norm(pairs[i].u, pairs[i].v), d = pairs[i].d;
+			var P = [p[0], p[1], 1];
+			rows.push([ 0,0,0, -d[2]*P[0],-d[2]*P[1],-d[2]*P[2],  d[1]*P[0], d[1]*P[1], d[1]*P[2] ]);
+			rows.push([ d[2]*P[0], d[2]*P[1], d[2]*P[2], 0,0,0, -d[0]*P[0],-d[0]*P[1],-d[0]*P[2] ]);
+			rows.push([ -d[1]*P[0],-d[1]*P[1],-d[1]*P[2], d[0]*P[0], d[0]*P[1], d[0]*P[2], 0,0,0 ]);
+		}
+		var M = [];
+		for(i=0;i<9;i++){ M.push([]); for(j=0;j<9;j++) M[i].push(0); }
+		rows.forEach(function(r){ for(i=0;i<9;i++) for(j=0;j<9;j++) M[i][j] += r[i]*r[j]; });
+
+		var e = jacobi(M, 9);
+		var best = 0;
+		for(i=1;i<9;i++) if(e.d[i] < e.d[best]) best = i;
+		var h = []; for(i=0;i<9;i++) h.push(e.V[i][best]);
+
+		return function(u, v){
+			var p = norm(u, v);
+			var x = h[0]*p[0] + h[1]*p[1] + h[2];
+			var y = h[3]*p[0] + h[4]*p[1] + h[5];
+			var z = h[6]*p[0] + h[7]*p[1] + h[8];
+			if(y > 0){ x = -x; y = -y; z = -z; }        /* mat dat luon nam duoi tam nhin */
+			var ath = Math.atan2(x, z) * 180 / Math.PI;
+			var atv = -Math.atan2(y, Math.hypot(x, z)) * 180 / Math.PI;
+			return [ath, atv];
+		};
+	}
+
+	window.eraLotAuto = function(){
+		var k = K(); if(!k) return;
+		var pairs = [];
+		order.forEach(function(ma){
+			var l = BYMA[ma]; if(!l) return;
+			var ath = parseFloat(k.get('hotspot[' + hn(ma) + '].ath'));
+			var atv = parseFloat(k.get('hotspot[' + hn(ma) + '].atv'));
+			if(isFinite(ath) && isFinite(atv)) pairs.push({ u:l.px, v:l.py, d:dirOf(ath, atv), ma:ma });
+		});
+		if(pairs.length < 4){
+			alert('Cần đặt tay ít nhất 4 lô (nên rải đều 2 đầu khu đất) rồi mới bấm GỢI Ý TỰ ĐỘNG.\nHiện mới có ' + pairs.length + ' lô.');
+			return;
+		}
+		var f = solveH(pairs);
+
+		/* sai so tren chinh cac lo Anh da dat - de biet co tin duoc khong */
+		var se = 0;
+		pairs.forEach(function(p){
+			var r = f(p.u, p.v);
+			var a0 = parseFloat(k.get('hotspot[' + hn(p.ma) + '].ath'));
+			var v0 = parseFloat(k.get('hotspot[' + hn(p.ma) + '].atv'));
+			var da = ((r[0] - a0 + 540) % 360) - 180;
+			se += da*da + (r[1]-v0)*(r[1]-v0);
+		});
+		var rms = Math.sqrt(se / pairs.length);
+
+		var added = 0;
+		LOTS_ERA100.forEach(function(l){
+			if(order.indexOf(l.c) >= 0) return;
+			var r = f(l.px, l.py);
+			if(!isFinite(r[0]) || !isFinite(r[1])) return;
+			addPin(Math.round(r[0]*100)/100, Math.round(r[1]*100)/100, l.c);
+			added++;
+		});
+		k.call('era_lots_save_draft()');
+		k.set('layer[lots_readout].html', 'Đã bung ' + added + ' lô · sai số trên ' + pairs.length
+			+ ' mốc ≈ ' + (Math.round(rms*100)/100) + '° · kéo chỉnh lô nào lệch');
+	};
+})();
+</script>
+
+</body>
+</html>

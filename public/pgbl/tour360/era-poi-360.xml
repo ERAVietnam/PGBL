@@ -1,0 +1,1683 @@
+<krpano>
+
+<!-- ==================================================================
+     ERA VIETNAM · POI 360  (style "GLASS" kinh mo trang toi gian)
+     Bang mo ta gan phia trong pano (giong SkySOLIS, dep hon).
+
+     LUONG LAM VIEC (Tony):
+       1) Em dat san cac bang o vi tri gan dung (muc DU LIEU POI cuoi file)
+       2) Trong tour: bam phim P  (hoac nut "DAT POI") -> vao che do sua
+       3) KEO tung bang toi dung diem  (dot + coc di theo)
+       4) Bam "XAC NHAN -> XUAT CODE"  -> hien o textarea co the copy
+       5) Dan khoi do de lai muc DU LIEU POI ben duoi -> luu file -> xong.
+
+     Ky thuat: build bang addhotspot+set (an toan krpano 1.19-pr16),
+     tu nap POI theo tung scene qua su kien onnewpano.
+     ================================================================== -->
+
+
+<!-- ============ 1 POI = DOT + POLE + BOARD =========================
+     add_poi( ath , atv , 'TIEU DE' , 'MO TA' , 'KHOANG CACH' ) -->
+<action name="add_poi">
+  set(n, get(poi_count));
+  <!-- %6 = cao coc (tuy chon). Khong truyen -> 44. ifnot(GT 0) an toan voi null. -->
+  set(ph, %6);
+  ifnot(ph GT 0, set(ph, 44); );
+  set(vsc, %7);
+  ifnot(vsc GT 0, set(vsc, 1.0); );
+  <!-- %12 = ky tu icon trong vong tron ben trai (1 ky tu). Khong truyen -> chu cai
+       dau cua ten, chac chan hien duoc, khong bao gio ra o vuong tofu.
+       %13 = be rong the (px). The icon tron BUOC PHAI co width cung, vi con phai
+       tinh vi tri vong icon = -(width/2) + 27; text hotspot tu co thi khong biet
+       be rong nen khong dat icon dung cho duoc. -->
+  <!-- %12 = 1 KY TU icon Phosphor. Khong truyen -> map-pin.
+       🔴 TRUOC DAY de mac dinh = ten nhan -> vong tron in ca chu "Co.o Bao", sai.
+       Codepoint tra tu chinh file font: unpkg @phosphor-icons/web@2.1.1 light/style.css
+         truong hoc  &#xe62c;  benh vien  &#xe56e;  sieu thi   &#xe964;
+         TTTM        &#xe102;  nha tho    &#xecea;  san bay    &#xe5d6;
+         ngan hang   &#xe0b4;  ca phe     &#xe1c2;  cong vien  &#xecb2;
+         nui/deo     &#xe7ae;  cay xang   &#xe768;  nha hang   &#xe262;
+         the thao    &#xe0b6;  ben xe     &#xe106;  nha mau    &#xe2c4;
+         mac dinh    &#xe316;  (map-pin) -->
+  <!-- %12 = TEN FILE icon trong poi-icons/ (khong duoi .png). Khong truyen -> mac-dinh.
+       🔴 CHUYEN TU GLYPH FONT SANG ANH PNG (Anh Tony chot 10/08). Ly do:
+          - glyph Phosphor khong render trong hotspot (kim la ban ra vong tron rong)
+          - hotspot ANH co imagewidth/imageheight THAT -> dat duoc chinh xac,
+            khong nhu text hotspot chi co width/height la "gioi han toi da"
+       Bo icon: 17 file 120x120 PNG nen trong, tong 92 KB, tu ve bang cairosvg
+       (script trong 2026-08-10.md). Icon da ve san CA VONG TRON bao quanh
+       -> chi can 1 hotspot, khong phai ghep vong + glyph nhu truoc. -->
+  set(vic, %12);
+  ifnot(vic, set(vic, 'mac-dinh'); );
+  <!-- %13 = be rong toi da. Mac dinh 0 = KHONG ap  ->  pill TU CO theo do dai chu,
+       khong con thua cho ben phai. Keo slider trong bang dieu khien moi ap de wrap
+       nhung ten qua dai. -->
+  set(vw, %13);
+  ifnot(vw GT 60, set(vw, 0); );
+  set(vfg, %8);   ifnot(vfg, set(vfg, '#FFFFFF'); );
+  set(vbg, %9);   ifnot(vbg GE 0, set(vbg, 0x0C0C44); );
+  set(vbga, %10); ifnot(vbga GE 0, set(vbga, 0.80); );
+  set(vdot, %11); ifnot(vdot GE 0, set(vdot, 0xC8102E); );
+
+  <!-- (a) DOT — cham tron do tai dung diem thuc -->
+  addhotspot(calc('poi_dot_' + n));
+  set(hotspot[calc('poi_dot_' + n)].type, text);
+  set(hotspot[calc('poi_dot_' + n)].ath, %1);
+  set(hotspot[calc('poi_dot_' + n)].atv, %2);
+  set(hotspot[calc('poi_dot_' + n)].edge, center);
+  set(hotspot[calc('poi_dot_' + n)].distorted, false);
+  set(hotspot[calc('poi_dot_' + n)].width, 12);
+  set(hotspot[calc('poi_dot_' + n)].height, 12);
+  set(hotspot[calc('poi_dot_' + n)].bg, true);
+  set(hotspot[calc('poi_dot_' + n)].bgcolor, get(vdot));
+  set(hotspot[calc('poi_dot_' + n)].bgroundedge, 12);
+  set(hotspot[calc('poi_dot_' + n)].bgborder, '2 0xFFFFFF 0.95');
+  set(hotspot[calc('poi_dot_' + n)].bgshadow, '0 1 4 0x000000 0.4');
+  set(hotspot[calc('poi_dot_' + n)].enabled, false);
+  set(hotspot[calc('poi_dot_' + n)].zorder, 20);
+
+  <!-- (b) POLE — coc manh noi tu diem len bang -->
+  addhotspot(calc('poi_pole_' + n));
+  set(hotspot[calc('poi_pole_' + n)].type, text);
+  set(hotspot[calc('poi_pole_' + n)].ath, %1);
+  set(hotspot[calc('poi_pole_' + n)].atv, %2);
+  set(hotspot[calc('poi_pole_' + n)].edge, bottom);
+  set(hotspot[calc('poi_pole_' + n)].distorted, false);
+  set(hotspot[calc('poi_pole_' + n)].width, 2);
+  set(hotspot[calc('poi_pole_' + n)].height, get(ph));
+  set(hotspot[calc('poi_pole_' + n)].bg, true);
+  set(hotspot[calc('poi_pole_' + n)].bgcolor, 0xC8102E);
+  set(hotspot[calc('poi_pole_' + n)].bgalpha, 0.9);
+  set(hotspot[calc('poi_pole_' + n)].enabled, false);
+  set(hotspot[calc('poi_pole_' + n)].zorder, 21);
+
+  <!-- (c) BOARD — bang kinh mo trang, chu navy + khoang cach do -->
+  addhotspot(calc('poi_board_' + n));
+  set(hotspot[calc('poi_board_' + n)].type, text);
+  set(hotspot[calc('poi_board_' + n)].ath, %1);
+  set(hotspot[calc('poi_board_' + n)].atv, %2);
+  <!-- 🔴 TEN GIA TRI edge cua krpano la  leftbottom / rightbottom / lefttop / righttop
+       — KHONG phai bottomleft/bottomright. Viet sai thi krpano BO QUA am tham va dung
+       gia tri mac dinh (theo align) -> manh phu lech, khong bao loi gi.
+       Danh sach dung (docu/xml.html): lefttop, left, leftbottom, top, center, bottom,
+       righttop, right, rightbottom -->
+  <!-- 🔴 Ca 2 khoi neo TAM DOC (edge=left / edge=right) voi CUNG mot oy.
+       Neo theo DAY (leftbottom/rightbottom) thi 2 khoi cao khac nhau se lech nhau
+       theo chieu doc — va `height` cung chi la goi y nen khong tinh bu duoc.
+       Neo tam doc thi luon thang hang, bat ke khoi cao bao nhieu. -->
+  <!-- 🔴 BO VONG ICON (Anh Tony chot 10/08: "bo icon luon, lech qua").
+       Da thu 4 cach dat vong icon (tinh theo width -> neo canh -> neo tam doc) van khong
+       on dinh, vi krpano coi width/height cua text hotspot chi la GIOI HAN TOI DA nen
+       khong the biet be rong/cao thuc de canh khoi ben canh.
+       Nay the tien ich = 1 pill chu duy nhat, coc o GIUA pill — don gian, khong the lech.
+       Tham so %12 (icon) va truong p_icon VAN GIU trong file de khong pha data cu. -->
+  set(hotspot[calc('poi_board_' + n)].edge, left);
+  set(hotspot[calc('poi_board_' + n)].ox, 6);
+  set(hotspot[calc('poi_board_' + n)].oy, calc(0 - ph - 23));
+  set(hotspot[calc('poi_board_' + n)].distorted, false);
+  set(hotspot[calc('poi_board_' + n)].bg, true);
+  set(hotspot[calc('poi_board_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_board_' + n)].bgalpha, get(vbga));
+  <!-- HINH DANG 03 "The icon tron": pill bo tron han + chua 52px ben trai cho vong icon.
+       🔴 NEO THEO CANH TRAI (edge=bottomleft), KHONG tinh theo width.
+       Ly do: krpano coi `width` cua text hotspot la BE RONG TOI DA de wrap chu,
+       con hotspot van CO LAI theo noi dung thuc. Chu ngan -> pill hep hon width
+       -> cong thuc ox = -(width/2)+27 lam vong icon chom RA NGOAI mep trai.
+       Voi edge=bottomleft thi ox chinh la mep trai, dat vong = mep_trai + 9 la luon dung. -->
+  if(vw GT 60, set(hotspot[calc('poi_board_' + n)].width, get(vw)); );
+  set(hotspot[calc('poi_board_' + n)].bgroundedge, 23);
+  set(hotspot[calc('poi_board_' + n)].bgborder, '1 0xFFFFFF 0.35');
+  set(hotspot[calc('poi_board_' + n)].bgshadow, '0 6 22 0x000000 0.5');
+  set(hotspot[calc('poi_board_' + n)].padding, '9 18 10 18');
+  set(hotspot[calc('poi_board_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_fg, get(vfg));
+  set(hotspot[calc('poi_board_' + n)].html, '');
+  <!-- dong 1 = ten · dong 2 = mo ta + khoang cach (bo qua neu trong) -->
+  txtadd(hotspot[calc('poi_board_' + n)].html, '[b]', %3, '[/b][br]', %4, ' ', %5);
+  set(hotspot[calc('poi_board_' + n)].zorder, 22);
+  <!-- luu lai noi dung de XUAT CODE -->
+  set(hotspot[calc('poi_board_' + n)].p_title, %3);
+  set(hotspot[calc('poi_board_' + n)].p_sub,   %4);
+  set(hotspot[calc('poi_board_' + n)].p_dist,  %5);
+  set(hotspot[calc('poi_board_' + n)].p_type,  'h');
+  set(hotspot[calc('poi_board_' + n)].p_pole,  get(ph));
+  set(hotspot[calc('poi_board_' + n)].p_rot,   0);
+  set(hotspot[calc('poi_board_' + n)].p_rx,    0);
+  set(hotspot[calc('poi_board_' + n)].p_ry,    0);
+  set(hotspot[calc('poi_board_' + n)].p_rz,    0);
+  set(hotspot[calc('poi_board_' + n)].p_scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_bg,  get(vbg));
+  set(hotspot[calc('poi_board_' + n)].p_bga, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].p_dot, get(vdot));
+  set(hotspot[calc('poi_board_' + n)].p_d3d, false);
+  set(hotspot[calc('poi_board_' + n)].p_icon, get(vic));
+  set(hotspot[calc('poi_board_' + n)].p_w, get(vw));
+  poi_build_css(get(n));
+
+
+  <!-- KHONG dat hover tween(scale): no keo scale ve 1.0 -> mat co chu da chinh -->
+  set(hotspot[calc('poi_board_' + n)].onmousedown, calc("poi_drag(" + n + ")") );
+
+  <!-- (d) ICON — hotspot ANH, khoi RIENG ben trai pill.
+       Ca 2 khoi neo TAM DOC voi CUNG oy -> luon thang hang (quy tac da chot). -->
+  <!-- 🔴 DUNG txtadd DE DUNG URL, KHONG dung calc():
+          calc('poi-icons/' + vic + '.png') co dau '-' trong 'poi-icons' va trong ten file
+          ('truong-hoc') -> krpano de hieu '-' la PHEP TRU trong bieu thuc calc.
+       ⚠️ KHONG dung %CURRENTXML%: include cua minh co '?nc=<moc>' nen %CURRENTXML%
+          co the sinh duong dan hong kieu 'tour360?nc=123/poi-icons/x.png'.
+          Dung duong dan TUONG DOI don gian — tour.xml va era-poi-360.xml cung thu muc
+          voi poi-icons/ nen 'poi-icons/x.png' la dung. -->
+  set(uic, '');
+  txtadd(uic, 'poi-icons/', get(vic), '.png');
+  addhotspot(calc('poi_a_' + n));
+  set(hotspot[calc('poi_a_' + n)].type, image);
+  set(hotspot[calc('poi_a_' + n)].url, get(uic));
+  set(hotspot[calc('poi_a_' + n)].preload, true);
+  set(hotspot[calc('poi_a_' + n)].ath, %1);
+  set(hotspot[calc('poi_a_' + n)].atv, %2);
+  set(hotspot[calc('poi_a_' + n)].edge, right);
+  set(hotspot[calc('poi_a_' + n)].distorted, false);
+  set(hotspot[calc('poi_a_' + n)].ox, -6);
+  set(hotspot[calc('poi_a_' + n)].oy, calc(0 - ph - 23));
+  set(hotspot[calc('poi_a_' + n)].width, 44);
+  set(hotspot[calc('poi_a_' + n)].height, 44);
+  set(hotspot[calc('poi_a_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_a_' + n)].enabled, false);
+  set(hotspot[calc('poi_a_' + n)].zorder, 23);
+
+  inc(poi_count);
+</action>
+
+
+<!-- ============ NHAN DOC (moc XA / huong) =========================
+     add_poi_v( ath , atv , 'TEN' )     1 dong ten, chu xoay dung
+     Dung cho: huong thanh pho, nui, ho, cau, song  (nhieu moc chen nhau
+     o duong chan troi -> xoay doc chi ton ~26px be ngang, khong de nhau).
+
+     === BANG MAU / KICH THUOC — SUA O DAY ===
+       coc  : height 110   (doi ca 2 cho: pole height VA board oy = -110)
+       mau  : 0xC8102E (dot + coc)   ·   0x0C0C44 (nen bang)
+       chu  : font-size 12px
+     === DA NGHIEM THU 10/08 · HE TOA DO SAU KHI XOAY ===
+       rotate=-90 + edge=left  ->  nhan dung dung, chu doc tu duoi len,
+       DAY nhan nam tai diem neo, nhan moc LEN TREN.  (DUNG)
+       krpano xoay CA offset:  oy -> dich ngang  ·  ox -> dich doc (len tren)
+       => day nhan len dinh coc phai dung  ox = +ph  va  oy = 0.
+       Neu doi cao coc, sua CA HAI: pole.height  VA  board.ox
+     ================================================================ -->
+<action name="add_poi_v">
+  set(n, get(poi_count));
+  <!-- %4 = cao coc (tuy chon). Khong truyen -> 110. -->
+  set(ph, %4);
+  ifnot(ph GT 0, set(ph, 110); );
+  set(vsc, %5);
+  ifnot(vsc GT 0, set(vsc, 1.0); );
+  set(vfg, %6);  ifnot(vfg, set(vfg, '#FFFFFF'); );
+  set(vbg, %7);  ifnot(vbg GE 0, set(vbg, 0x0C0C44); );
+  set(vbga, %8); ifnot(vbga GE 0, set(vbga, 0.85); );
+  set(vdot, %9); ifnot(vdot GE 0, set(vdot, 0xC8102E); );
+
+  <!-- (a) DOT — cham tron tai dung diem thuc -->
+  addhotspot(calc('poi_dot_' + n));
+  set(hotspot[calc('poi_dot_' + n)].type, text);
+  set(hotspot[calc('poi_dot_' + n)].ath, %1);
+  set(hotspot[calc('poi_dot_' + n)].atv, %2);
+  set(hotspot[calc('poi_dot_' + n)].edge, center);
+  set(hotspot[calc('poi_dot_' + n)].distorted, false);
+  set(hotspot[calc('poi_dot_' + n)].width, 10);
+  set(hotspot[calc('poi_dot_' + n)].height, 10);
+  set(hotspot[calc('poi_dot_' + n)].bg, true);
+  set(hotspot[calc('poi_dot_' + n)].bgcolor, get(vdot));
+  set(hotspot[calc('poi_dot_' + n)].bgroundedge, 10);
+  set(hotspot[calc('poi_dot_' + n)].bgborder, '2 0xFFFFFF 0.95');
+  set(hotspot[calc('poi_dot_' + n)].bgshadow, '0 1 4 0x000000 0.4');
+  set(hotspot[calc('poi_dot_' + n)].enabled, false);
+  set(hotspot[calc('poi_dot_' + n)].zorder, 20);
+
+  <!-- (b) POLE — coc DAI 110px day nhan len troi -->
+  addhotspot(calc('poi_pole_' + n));
+  set(hotspot[calc('poi_pole_' + n)].type, text);
+  set(hotspot[calc('poi_pole_' + n)].ath, %1);
+  set(hotspot[calc('poi_pole_' + n)].atv, %2);
+  set(hotspot[calc('poi_pole_' + n)].edge, bottom);
+  set(hotspot[calc('poi_pole_' + n)].distorted, false);
+  set(hotspot[calc('poi_pole_' + n)].width, 2);
+  set(hotspot[calc('poi_pole_' + n)].height, get(ph));
+  set(hotspot[calc('poi_pole_' + n)].bg, true);
+  set(hotspot[calc('poi_pole_' + n)].bgcolor, 0xC8102E);
+  set(hotspot[calc('poi_pole_' + n)].bgalpha, 0.85);
+  set(hotspot[calc('poi_pole_' + n)].enabled, false);
+  set(hotspot[calc('poi_pole_' + n)].zorder, 21);
+
+  <!-- (c) BOARD DOC — edge=left + rotate=-90 => canh trai thanh DAY nhan,
+       chu doc tu duoi len. oy la offset man hinh, khong bi rotate anh huong. -->
+  addhotspot(calc('poi_board_' + n));
+  set(hotspot[calc('poi_board_' + n)].type, text);
+  set(hotspot[calc('poi_board_' + n)].ath, %1);
+  set(hotspot[calc('poi_board_' + n)].atv, %2);
+  set(hotspot[calc('poi_board_' + n)].edge, left);
+  <!-- 🔴 DUNG ox, KHONG dung oy: krpano xoay ca offset theo rotate.
+       rotate=-90  =>  oy sinh ra dich NGANG, ox sinh ra dich DOC (len tren).
+       ox = +ph  =>  nhan len dung dinh coc.  (oy=-ph se lam nhan lech trai) -->
+  set(hotspot[calc('poi_board_' + n)].ox, get(ph));
+  set(hotspot[calc('poi_board_' + n)].oy, 0);
+  set(hotspot[calc('poi_board_' + n)].rotate, -90);
+  set(hotspot[calc('poi_board_' + n)].distorted, false);
+  set(hotspot[calc('poi_board_' + n)].bg, true);
+  set(hotspot[calc('poi_board_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_board_' + n)].bgalpha, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].bgroundedge, 12);
+  set(hotspot[calc('poi_board_' + n)].bgborder, '1 0xFFFFFF 0.35');
+  set(hotspot[calc('poi_board_' + n)].bgshadow, '0 4 16 0x000000 0.45');
+  set(hotspot[calc('poi_board_' + n)].padding, '6 13 7 13');
+  set(hotspot[calc('poi_board_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_fg, get(vfg));
+  set(hotspot[calc('poi_board_' + n)].html, %3);
+  <!-- luu lai de XUAT CODE / luu nhap -->
+  set(hotspot[calc('poi_board_' + n)].p_title, %3);
+  set(hotspot[calc('poi_board_' + n)].p_sub,   '');
+  set(hotspot[calc('poi_board_' + n)].p_dist,  '');
+  set(hotspot[calc('poi_board_' + n)].p_type,  'v');
+  set(hotspot[calc('poi_board_' + n)].p_pole,  get(ph));
+  set(hotspot[calc('poi_board_' + n)].p_rot,   -90);
+  set(hotspot[calc('poi_board_' + n)].p_rx,    0);
+  set(hotspot[calc('poi_board_' + n)].p_ry,    0);
+  set(hotspot[calc('poi_board_' + n)].p_rz,    0);
+  set(hotspot[calc('poi_board_' + n)].p_scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_bg,  get(vbg));
+  set(hotspot[calc('poi_board_' + n)].p_bga, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].p_dot, get(vdot));
+  set(hotspot[calc('poi_board_' + n)].p_d3d, false);
+  poi_build_css(get(n));
+  set(hotspot[calc('poi_board_' + n)].onmousedown, calc("poi_drag(" + n + ")") );
+  set(hotspot[calc('poi_board_' + n)].zorder, 22);
+
+  inc(poi_count);
+</action>
+
+
+<!-- ============ NHAN DUONG (chu danh NGAY TREN mat duong) =========
+     add_poi_r( ath , atv , 'TEN TUYEN' , [goc] )
+
+     Dung cho tuyen duong GAN, nhin thay ro mat duong trong anh:
+     Quoc lo 20, duong noi vao du an, duong noi bo...
+     Chu nam thang tren mat duong, xoay dung do nghieng cua doan duong do
+     -> nhin giong ten duong tren Google Maps.
+
+     KHONG co dot, KHONG co coc (van tao 2 hotspot do nhung an, de cac action
+     chung poi_drag / poi_del_last / era_poi_clear chay dong nhat, khong phai
+     viet ngoai le -> it bug nhat).
+
+     krpano KHONG uon duoc chu theo duong cong (khong co text-on-path).
+     Duong cong  ->  cat 2-3 doan, moi doan 1 nhan voi goc rieng.
+
+     Goc: 0 = nam ngang. Duong cham xuong phai -> goc DUONG. Len phai -> goc AM.
+     Trong tour bam nut XOAY +/- (buoc 5 do) de canh cho khop mat duong.
+     ================================================================ -->
+<action name="add_poi_r">
+  set(n, get(poi_count));
+  set(rg, %4);
+  ifnot(rg GE -180, set(rg, 0); );
+  <!-- %5 %6 %7 = xoay 3D quanh truc X / Y / Z. Khong truyen -> 0.
+       PHAI khoi tao 0 (khong de null) vi calc(null + 5) khong chac ra 5. -->
+  set(vrx, %5);  ifnot(vrx GE -180, set(vrx, 0); );
+  set(vry, %6);  ifnot(vry GE -180, set(vry, 0); );
+  set(vrz, %7);  ifnot(vrz GE -180, set(vrz, 0); );
+  <!-- %8 = co chu (scale). Khong truyen -> 1.0 -->
+  set(vsc, %8);  ifnot(vsc GT 0, set(vsc, 1.0); );
+  set(vfg, %9);   ifnot(vfg, set(vfg, '#FFFFFF'); );
+  set(vbg, %10);  ifnot(vbg GE 0, set(vbg, 0x0C0C44); );
+  set(vbga, %11); ifnot(vbga GE 0, set(vbga, 1); );
+  <!-- 🔴 THU TU THAM SO add_poi_r (phai KHOP voi poi_export, da tung lech 1 vi tri):
+       %1 ath  %2 atv  %3 ten  %4 rot  %5 rx  %6 ry  %7 rz  %8 scale
+       %9 fg   %10 bg  %11 bga  %12 dot(= mau CHIP + duong dan + cham)  %13 d3d(vo hieu)
+       %14 (khong con dung — giu cho khoi lech vi tri)  %15 cao duong dan
+       %16 CHU TRONG CHIP DO  (vd 'QL20' / 'Duong' / 'DT725'). Bo trong -> 'Đường'
+       ==== 11/08 Anh Tony chot kieu E: CHIP DO so hieu  +  BIEN NAVY ten ====
+       poi_a_ = chip do   (neo rightbottom -> mep PHAI cham diem neo)
+       poi_board_ = bien navy ten (neo leftbottom -> mep TRAI cham diem neo)
+       => 2 khoi ap sat nhau, mach noi nam ngay tren dau duong dan. Vi ca hai
+          cung dang ky tai MOT diem neo nen xoay bao nhieu cung KHONG the lech.
+       🔴 Dung 'leftbottom'/'rightbottom' (truc ngang truoc, truc doc sau).
+          Viet 'bottomleft' la SAI — krpano im lang bo qua. -->
+  set(vdot, %12); ifnot(vdot GE 0, set(vdot, 0xFFFFFF); );
+  <!-- %15 = cao duong dan cheo (px). Gach ngang nam ngay tren dinh duong dan.
+       Mac dinh 24 — Anh Tony chot 10/08: nhan tuyen duong phai NAM GAN MAT DUONG,
+       khong duoc bay cao nhu nhan tien ich. -->
+  set(vgc, %15);
+  ifnot(vgc GT 6, set(vgc, 26); );
+  set(vfg2, get(vdot));
+  <!-- %16 = chu trong chip do. 🔴 KHONG viet if(%16, ...) — tham so CHUOI luon FALSE.
+       Phai do qua bien trung gian bang txtadd roi moi so sanh (bay da dinh 11/08). -->
+  set(vch, '');
+  txtadd(vch, %16);
+  if(vch == '', set(vch, 'Đường'); );
+  <!-- %12 = bat che do 3D (distorted). krpano CHI cho dung rx/ry/rz khi distorted=true.
+       Mac dinh TAT de chu chac chan hien; bat bang cong tac trong BANG DIEU KHIEN. -->
+  <!-- 🔴 %12 (bat 3D) DA VO HIEU HOA — nghiem thu 10/08: distorted=true lam
+       MAT HAN chu voi text hotspot. Ly do: distorted can width/height tuong minh
+       (moc 1000px = 90 do FOV), ma text hotspot tu co theo noi dung nen khong co
+       -> ra 0 -> khong ve gi. Muon chu nam bet that thi phai render chu thanh
+       anh PNG (canvas) roi dat lam hotspot ANH distorted. Xem 2026-08-10.md. -->
+  set(vd3d, false);
+  <!-- neu bat 3D ma chua truyen rx: TU TINH goc nam bet xuong dat.
+       Diem tren mat dat co atv duong; mat phang hotspot mac dinh vuong goc tia nhin,
+       nen can nga them (atv - 90) do la nam song song mat dat. -->
+  if(vd3d == true,
+    ifnot(%5 GE -180, set(vrx, calc(%2 - 90)); );
+  );
+
+  <!-- (a) DOT — cham neo hinh thoi ngay tren mat duong (11/08: bat HIEN) -->
+  addhotspot(calc('poi_dot_' + n));
+  set(hotspot[calc('poi_dot_' + n)].type, text);
+  set(hotspot[calc('poi_dot_' + n)].ath, %1);
+  set(hotspot[calc('poi_dot_' + n)].atv, %2);
+  set(hotspot[calc('poi_dot_' + n)].edge, center);
+  set(hotspot[calc('poi_dot_' + n)].distorted, false);
+  set(hotspot[calc('poi_dot_' + n)].width, 7);
+  set(hotspot[calc('poi_dot_' + n)].height, 7);
+  set(hotspot[calc('poi_dot_' + n)].bg, true);
+  set(hotspot[calc('poi_dot_' + n)].bgcolor, get(vfg2));
+  set(hotspot[calc('poi_dot_' + n)].bgalpha, 1.0);
+  set(hotspot[calc('poi_dot_' + n)].bgborder, '1.5 0xFFFFFF 0.9');
+  set(hotspot[calc('poi_dot_' + n)].rotate, 45);
+  set(hotspot[calc('poi_dot_' + n)].enabled, false);
+  set(hotspot[calc('poi_dot_' + n)].visible, true);
+  set(hotspot[calc('poi_dot_' + n)].zorder, 20);
+
+  <!-- (b) POLE an — hinh dang 06 khong dung coc doc, dung duong dan CHEO (poi_b_) -->
+  addhotspot(calc('poi_pole_' + n));
+  set(hotspot[calc('poi_pole_' + n)].type, text);
+  set(hotspot[calc('poi_pole_' + n)].ath, %1);
+  set(hotspot[calc('poi_pole_' + n)].atv, %2);
+  set(hotspot[calc('poi_pole_' + n)].edge, bottom);
+  set(hotspot[calc('poi_pole_' + n)].distorted, false);
+  set(hotspot[calc('poi_pole_' + n)].width, 1);
+  set(hotspot[calc('poi_pole_' + n)].height, 1);
+  set(hotspot[calc('poi_pole_' + n)].enabled, false);
+  set(hotspot[calc('poi_pole_' + n)].visible, false);
+  set(hotspot[calc('poi_pole_' + n)].zorder, 21);
+
+  <!-- (b2) CHIP DO so hieu — hotspot phu poi_a_
+       Neo 'rightbottom' = goc PHAI-DUOI cua chip nam dung diem neo (da day len vgc).
+       Bien ten neo 'leftbottom' cung diem do -> hai khoi ap sat, khong ho, khong lech.
+       🔴 Khong doan chieu cao chu: neo theo goc DUOI nen bo qua duoc bai toan height. -->
+  set(vw, %14);
+  ifnot(vw GT 40, set(vw, 200); );
+  addhotspot(calc('poi_a_' + n));
+  set(hotspot[calc('poi_a_' + n)].type, text);
+  set(hotspot[calc('poi_a_' + n)].ath, %1);
+  set(hotspot[calc('poi_a_' + n)].atv, %2);
+  set(hotspot[calc('poi_a_' + n)].edge, rightbottom);
+  set(hotspot[calc('poi_a_' + n)].distorted, false);
+  set(hotspot[calc('poi_a_' + n)].ox, 0);
+  set(hotspot[calc('poi_a_' + n)].oy, calc(0 - vgc));
+  set(hotspot[calc('poi_a_' + n)].rotate, get(rg));
+  set(hotspot[calc('poi_a_' + n)].bg, true);
+  set(hotspot[calc('poi_a_' + n)].bgcolor, get(vfg2));
+  set(hotspot[calc('poi_a_' + n)].bgalpha, 1.0);
+  set(hotspot[calc('poi_a_' + n)].bgroundedge, 0);
+  set(hotspot[calc('poi_a_' + n)].padding, '8 11 8 11');
+  set(hotspot[calc('poi_a_' + n)].css, 'color:#FFFFFF; font-family:Inter, Arial, sans-serif; font-size:15px; font-weight:800; letter-spacing:0.6px; text-align:center;');
+  set(hotspot[calc('poi_a_' + n)].html, get(vch));
+  set(hotspot[calc('poi_a_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_a_' + n)].enabled, false);
+  set(hotspot[calc('poi_a_' + n)].zorder, 23);
+
+  <!-- (b3) DUONG DAN DOC tu mach noi 2 khoi xuong cham neo — hotspot phu poi_b_
+       KHONG xoay theo rg: cot bien ngoai doi luon thang dung, xoay se thanh xieu veo. -->
+  addhotspot(calc('poi_b_' + n));
+  set(hotspot[calc('poi_b_' + n)].type, text);
+  set(hotspot[calc('poi_b_' + n)].ath, %1);
+  set(hotspot[calc('poi_b_' + n)].atv, %2);
+  set(hotspot[calc('poi_b_' + n)].edge, bottom);
+  set(hotspot[calc('poi_b_' + n)].distorted, false);
+  set(hotspot[calc('poi_b_' + n)].ox, 0);
+  set(hotspot[calc('poi_b_' + n)].oy, 0);
+  set(hotspot[calc('poi_b_' + n)].width, 2);
+  set(hotspot[calc('poi_b_' + n)].height, get(vgc));
+  set(hotspot[calc('poi_b_' + n)].bg, true);
+  set(hotspot[calc('poi_b_' + n)].bgcolor, get(vfg2));
+  set(hotspot[calc('poi_b_' + n)].bgalpha, 0.95);
+  set(hotspot[calc('poi_b_' + n)].enabled, false);
+  set(hotspot[calc('poi_b_' + n)].zorder, 21);
+
+  <!-- (c) CHU TEN DUONG — dat dung tam, khong offset (offset bi xoay theo rotate) -->
+  addhotspot(calc('poi_board_' + n));
+  set(hotspot[calc('poi_board_' + n)].type, text);
+  set(hotspot[calc('poi_board_' + n)].ath, %1);
+  set(hotspot[calc('poi_board_' + n)].atv, %2);
+  <!-- KIEU E "bien ten duong": khoi TEN neo goc TRAI-DUOI, ap sat chip do ben trai -->
+  set(hotspot[calc('poi_board_' + n)].edge, leftbottom);
+  set(hotspot[calc('poi_board_' + n)].ox, 0);
+  set(hotspot[calc('poi_board_' + n)].oy, calc(0 - vgc));
+  set(hotspot[calc('poi_board_' + n)].rotate, get(rg));
+  <!-- 3D: rx = nga truoc/sau (dan bet xuong mat duong) · ry = nga trai/phai · rz = xoay quanh truc nhin
+       ⚠️ rx/ry/rz cua krpano CHI chay o che do WebGL (Chrome mac dinh la WebGL nen OK). -->
+  set(hotspot[calc('poi_board_' + n)].rx, get(vrx));
+  set(hotspot[calc('poi_board_' + n)].ry, get(vry));
+  set(hotspot[calc('poi_board_' + n)].rz, get(vrz));
+  set(hotspot[calc('poi_board_' + n)].distorted, get(vd3d));
+  set(hotspot[calc('poi_board_' + n)].p_d3d, get(vd3d));
+  <!-- STYLE theo mau Anh Tony gui: chu TRANG IN NGHIENG, KHONG NEN,
+       co bong den de doc duoc ca tren mai nha sang va tren nhua duong toi.
+       >>> NEU CHU KHO DOC (krpano 1.19 khong an text-shadow):
+           doi bg thanh true, bgalpha 0.30  ->  co nen mo nhe do lai. -->
+  <!-- nen TAT mac dinh (bga=0). Neu chu kho doc tren nen sang thi bat
+       do mo nen len ~0.35 ngay trong BANG DIEU KHIEN. -->
+  set(hotspot[calc('poi_board_' + n)].bg, true);
+  set(hotspot[calc('poi_board_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_board_' + n)].bgalpha, get(vbga));
+  <!-- bgroundedge=0: chip do va bien navy la 2 hotspot RIENG, bo goc se de lo
+       2 vet khuyet o mach noi. De vuong -> hai khoi doc lien mach nhu 1 bien that. -->
+  set(hotspot[calc('poi_board_' + n)].bgroundedge, 0);
+  set(hotspot[calc('poi_board_' + n)].padding, '8 14 8 14');
+  set(hotspot[calc('poi_board_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_fg, get(vfg));
+  set(hotspot[calc('poi_board_' + n)].html, %3);
+  set(hotspot[calc('poi_board_' + n)].p_title, %3);
+  <!-- 🔴 loai 'r' DUNG LAI p_sub lam CHU TRONG CHIP — khong them truong moi vao nhap,
+       do vay poi_save_draft / eraPoiRestore giu nguyen 22 truong, khong phai dong bo them. -->
+  set(hotspot[calc('poi_board_' + n)].p_sub,   get(vch));
+  set(hotspot[calc('poi_board_' + n)].p_dist,  '');
+  set(hotspot[calc('poi_board_' + n)].p_type,  'r');
+  set(hotspot[calc('poi_board_' + n)].p_pole,  0);
+  set(hotspot[calc('poi_board_' + n)].p_rot,   get(rg));
+  set(hotspot[calc('poi_board_' + n)].p_rx,    get(vrx));
+  set(hotspot[calc('poi_board_' + n)].p_ry,    get(vry));
+  set(hotspot[calc('poi_board_' + n)].p_rz,    get(vrz));
+  set(hotspot[calc('poi_board_' + n)].p_scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_bg,  get(vbg));
+  set(hotspot[calc('poi_board_' + n)].p_bga, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].p_dot, get(vdot));
+  set(hotspot[calc('poi_board_' + n)].p_rx, get(vrx));
+  set(hotspot[calc('poi_board_' + n)].p_w, get(vw));
+  set(hotspot[calc('poi_board_' + n)].p_gc, get(vgc));
+  poi_build_css(get(n));
+  <!-- KHONG dat hover tween(scale) — no se keo scale ve 1.0 va lam mat co chu da chinh -->
+  set(hotspot[calc('poi_board_' + n)].onmousedown, calc("poi_drag(" + n + ")") );
+  set(hotspot[calc('poi_board_' + n)].zorder, 22);
+
+  inc(poi_count);
+</action>
+
+
+<!-- ============ XOAY nhan duong dang chon ========================= -->
+<action name="poi_rot_adj">
+  if(poi_edit_on == true,
+    if(poi_sel GE 0,
+      set(rbn, calc('poi_board_' + poi_sel));
+
+      <!-- 2D = xoay phang tren man hinh (thuoc tinh rotate)
+           🔴 11/08: trong calc(), ten bien trong [ ] PHAI boc get() — viet
+              calc(hotspot[rbn].rotate + %1) thi ra NaN, nut Xoay bam khong an gi
+              ma krpano KHONG bao loi. Phai tach 2 buoc: doc ra bien roi moi calc. -->
+      if(poi_axis == '2D',
+        set(rcur, get(hotspot[get(rbn)].rotate));
+        set(nr, calc(rcur + %1));  poi_wrap180();
+        set(hotspot[get(rbn)].rotate, get(nr));   set(hotspot[get(rbn)].p_rot, get(nr));
+        <!-- chip do phai xoay CUNG goc, khong thi mach noi banh ra -->
+        set(hotspot[calc('poi_a_' + poi_sel)].rotate, get(nr));
+      );
+      <!-- RX = nga truoc/sau  ->  dung cai nay de DAN BET chu xuong mat duong -->
+      if(poi_axis == 'RX',
+        set(nr, calc(hotspot[rbn].rx + %1));      poi_wrap180();
+        set(hotspot[get(rbn)].rx, get(nr));       set(hotspot[get(rbn)].p_rx, get(nr));
+      );
+      <!-- RY = nga trai/phai -->
+      if(poi_axis == 'RY',
+        set(nr, calc(hotspot[rbn].ry + %1));      poi_wrap180();
+        set(hotspot[get(rbn)].ry, get(nr));       set(hotspot[get(rbn)].p_ry, get(nr));
+      );
+      <!-- RZ = xoay quanh truc nhin (giong 2D nhung trong khong gian 3D) -->
+      if(poi_axis == 'RZ',
+        set(nr, calc(hotspot[rbn].rz + %1));      poi_wrap180();
+        set(hotspot[get(rbn)].rz, get(nr));       set(hotspot[get(rbn)].p_rz, get(nr));
+      );
+
+      poi_save_draft();
+      set(layer[poi_readout].html, '');
+      txtadd(layer[poi_readout].html, 'Nhan duong #', get(poi_sel), '  ·  truc ', get(poi_axis), ' = ', get(nr), ' do   |   2D ', get(hotspot[get(rbn)].p_rot), '  RX ', get(hotspot[get(rbn)].p_rx), '  RY ', get(hotspot[get(rbn)].p_ry), '  RZ ', get(hotspot[get(rbn)].p_rz));
+    );
+  );
+</action>
+
+<!-- ============ DOI CO CHU (scale) — dung cho MOI loai nhan ======= -->
+<action name="poi_size_adj">
+  if(poi_edit_on == true,
+    if(poi_sel GE 0,
+      set(sbn, calc('poi_board_' + poi_sel));
+      set(ns, calc(hotspot[sbn].scale + %1));
+      if(ns LT 0.4, set(ns, 0.4); );
+      if(ns GT 4.0, set(ns, 4.0); );
+      set(hotspot[get(sbn)].scale, get(ns));
+      set(hotspot[get(sbn)].p_scale, get(ns));
+      poi_save_draft();
+      set(layer[poi_readout].html, '');
+      txtadd(layer[poi_readout].html, 'Bang #', get(poi_sel), '  ·  co chu = ', get(ns), 'x   (0.4 .. 4.0)');
+    );
+  );
+</action>
+
+<!-- ep goc ve khoang -180..180 -->
+<action name="poi_wrap180">
+  if(nr GT 180,  set(nr, calc(nr - 360)); );
+  if(nr LT -180, set(nr, calc(nr + 360)); );
+</action>
+
+<!-- ============ DOI TRUC XOAY: 2D -> RX -> RY -> RZ -> 2D =========
+     Dung bien trung gian ax_next: neu set truc tiep vao poi_axis thi cac if
+     phia sau se doc gia tri MOI vua set -> nhay 2-3 buoc 1 lan bam.
+     ================================================================ -->
+<action name="poi_axis_cycle">
+  set(ax_next, '2D');
+  if(poi_axis == '2D', set(ax_next, 'RX'); );
+  if(poi_axis == 'RX', set(ax_next, 'RY'); );
+  if(poi_axis == 'RY', set(ax_next, 'RZ'); );
+  if(poi_axis == 'RZ', set(ax_next, 'SIZE'); );
+  if(poi_axis == 'SIZE', set(ax_next, '2D'); );
+  set(poi_axis, get(ax_next));
+  poi_axis_label();
+</action>
+
+<!-- nhan tren nut + 2 nut +/- doi theo truc dang chon -->
+<action name="poi_axis_label">
+  set(layer[poi_axis_btn].html, '');
+  txtadd(layer[poi_axis_btn].html, 'CHE DO: ', get(poi_axis), '  (bam de doi)');
+
+  <!-- bang dang chon co phai nhan DUONG khong -->
+  set(lb_r, false);
+  if(poi_sel GE 0,
+    if(hotspot[calc('poi_board_' + poi_sel)].p_type == 'r', set(lb_r, true); );
+  );
+
+  set(layer[poi_up_btn].html, '');
+  set(layer[poi_dn_btn].html, '');
+  <!-- SIZE ap cho MOI loai nhan -->
+  if(poi_axis == 'SIZE',
+    txtadd(layer[poi_up_btn].html, 'CO CHU &#43; (to hon)');
+    txtadd(layer[poi_dn_btn].html, 'CO CHU &#8722; (nho hon)');
+    set(layer[poi_readout].html, 'CO CHU: bam +/- doi buoc 0.1x  (0.4x .. 4.0x) — ap cho MOI loai nhan');
+  );
+  ifnot(poi_axis == 'SIZE',
+    <!-- nhan DUONG -> xoay theo truc · nhan NGANG/DOC -> nang ha coc -->
+    if(lb_r == true,
+      txtadd(layer[poi_up_btn].html, get(poi_axis), ' &#43;5&#176;');
+      txtadd(layer[poi_dn_btn].html, get(poi_axis), ' &#8722;5&#176;');
+      set(layer[poi_readout].html, '');
+      txtadd(layer[poi_readout].html, 'Truc ', get(poi_axis), '  ·  2D = xoay phang  ·  RX = NGA BET xuong mat duong  ·  RY = nga trai/phai  ·  RZ = xoay quanh truc nhin');
+    );
+    ifnot(lb_r == true,
+      txtadd(layer[poi_up_btn].html, 'COC &#43; (cao hon)');
+      txtadd(layer[poi_dn_btn].html, 'COC &#8722; (thap hon)');
+      set(layer[poi_readout].html, 'Bang NGANG/DOC: 2 nut nay nang ha coc. Muon doi CO CHU thi bam CHE DO cho tới SIZE.');
+    );
+  );
+</action>
+
+
+<!-- ============ 2 nut da nang: nhan duong -> XOAY, con lai -> COC == -->
+<action name="poi_adj_up">
+  if(poi_sel GE 0,
+    set(abn, calc('poi_board_' + poi_sel));
+    if(poi_axis == 'SIZE', poi_size_adj(0.1); );
+    ifnot(poi_axis == 'SIZE',
+      if(hotspot[get(abn)].p_type == 'r',  poi_rot_adj(5);   );
+      ifnot(hotspot[get(abn)].p_type == 'r', poi_pole_adj(12); );
+    );
+  );
+  ifnot(poi_sel GE 0, set(layer[poi_readout].html, 'Cham vao bang can sua truoc, roi bam nut nay'); );
+</action>
+
+<action name="poi_adj_down">
+  if(poi_sel GE 0,
+    set(abn, calc('poi_board_' + poi_sel));
+    if(poi_axis == 'SIZE', poi_size_adj(-0.1); );
+    ifnot(poi_axis == 'SIZE',
+      if(hotspot[get(abn)].p_type == 'r',  poi_rot_adj(-5);   );
+      ifnot(hotspot[get(abn)].p_type == 'r', poi_pole_adj(-12); );
+    );
+  );
+  ifnot(poi_sel GE 0, set(layer[poi_readout].html, 'Cham vao bang can sua truoc, roi bam nut nay'); );
+</action>
+
+
+<!-- ============ vao che do dat nhan DUONG ========================= -->
+<action name="arm_add_p">
+  if(poi_edit_on == true,
+    set(poi_add_mode, 'p');
+    set(layer[poi_readout].html, 'CHIP SO · CLICK len anh de dat diem (1 lan)');
+  );
+</action>
+
+<action name="arm_add_c">
+  if(poi_edit_on == true,
+    set(poi_add_mode, 'c');
+    set(layer[poi_readout].html, 'LA BAN · CLICK ve PHIA moc de dat (huong lay tu diem click)');
+  );
+</action>
+
+<action name="arm_add_r">
+  if(poi_edit_on == true,
+    set(poi_add_mode, 'r');
+    set(layer[poi_readout].html, 'NHAN DUONG · CLICK len mat duong de dat chu (1 lan)');
+  );
+</action>
+
+
+<!-- ============ MAU SAC ============================================
+     css cua chu chi duoc dinh nghia o DUNG 1 CHO (poi_build_css)
+     de JS va XML khong bao gio lech nhau. JS doi mau -> goi poi_set_fg.
+
+     p_fg  mau chu     '#RRGGBB'  (string, dung trong css)
+     p_bg  mau nen     0xRRGGBB   (so — krpano tu parse literal 0x...)
+     p_bga do mo nen   0..1       (0 = khong nen)
+     p_dot mau cham+coc 0xRRGGBB
+     ================================================================ -->
+<action name="poi_build_css">
+  set(cbn, calc('poi_board_' + %1));
+  set(cs, '');
+  txtadd(cs, 'color:', get(hotspot[get(cbn)].p_fg), ';');
+  if(hotspot[get(cbn)].p_type == 'r',
+    <!-- 11/08 kieu E: bien co NEN dac roi nen bo in nghieng + bo text-shadow.
+         Font size phai TRUNG voi css chip trong add_poi_r (15px) keo 2 khoi lech chieu cao. -->
+    txtadd(cs, get(cs), ' font-family:Inter, Arial, sans-serif; font-size:15px; font-weight:700; letter-spacing:0.2px; text-align:center;');
+  );
+  if(hotspot[get(cbn)].p_type == 'v',
+    txtadd(cs, get(cs), ' font-family:Arial; font-size:12px; font-weight:bold; text-align:center;');
+  );
+  <!-- 'h' = the tien ich: chu CAN GIUA (da bo vong icon ben trai) -->
+  if(hotspot[get(cbn)].p_type == 'h',
+    txtadd(cs, get(cs), ' font-family:Inter, Arial, sans-serif; font-size:13px; text-align:center;');
+  );
+  <!-- 'c' = la ban: 2 dong can giua -->
+  if(hotspot[get(cbn)].p_type == 'c',
+    <!-- 11/08: weight NEN = 400 de dong 1 ("Huong di") nhe, ten moc dam bang [b] o dong 2 -->
+    txtadd(cs, get(cs), ' font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:400; text-align:center; text-shadow:0 2px 7px rgba(0,0,0,0.85), 0 0 3px rgba(0,0,0,0.9);');
+  );
+  set(hotspot[get(cbn)].css, get(cs));
+</action>
+
+<action name="poi_set_fg">
+  set(fbn, calc('poi_board_' + %1));
+  set(hotspot[get(fbn)].p_fg, %2);
+  poi_build_css(%1);
+</action>
+
+
+<!-- ============ 17 VIEN THUOC + CHIP SO =========================
+     add_poi_p( ath, atv, 'TEN', 'SO', pole, scale, 'fg', bg, bga, dot, w, w2 )
+     Dung cho moc XA co khoang cach lon: "SAN BAY LIEN KHUONG" + "58 km".
+     2 pill canh nhau, canh giua tai diem neo:
+        pill ten : width w  , ox = -(w2+6)/2
+        pill so  : width w2 , ox = +(w +6)/2
+     Ca 2 PHAI co width cung, vi phai tinh ox theo be rong nhau.
+     ================================================================ -->
+<action name="add_poi_p">
+  set(n, get(poi_count));
+  set(ph, %5);   ifnot(ph GT 0, set(ph, 52); );
+  set(vsc, %6);  ifnot(vsc GT 0, set(vsc, 1.0); );
+  set(vfg, %7);  ifnot(vfg, set(vfg, '#FFFFFF'); );
+  set(vbg, %8);  ifnot(vbg GE 0, set(vbg, 0x0C0C44); );
+  set(vbga, %9); ifnot(vbga GE 0, set(vbga, 0.85); );
+  set(vdot, %10);ifnot(vdot GE 0, set(vdot, 0xC8102E); );
+  set(vw, %11);  ifnot(vw GT 60, set(vw, 210); );
+  set(vw2, %12); ifnot(vw2 GT 30, set(vw2, 70); );
+
+  addhotspot(calc('poi_dot_' + n));
+  set(hotspot[calc('poi_dot_' + n)].type, text);
+  set(hotspot[calc('poi_dot_' + n)].ath, %1);
+  set(hotspot[calc('poi_dot_' + n)].atv, %2);
+  set(hotspot[calc('poi_dot_' + n)].edge, center);
+  set(hotspot[calc('poi_dot_' + n)].distorted, false);
+  set(hotspot[calc('poi_dot_' + n)].width, 11);
+  set(hotspot[calc('poi_dot_' + n)].height, 11);
+  set(hotspot[calc('poi_dot_' + n)].bg, true);
+  set(hotspot[calc('poi_dot_' + n)].bgcolor, get(vdot));
+  set(hotspot[calc('poi_dot_' + n)].bgroundedge, 11);
+  set(hotspot[calc('poi_dot_' + n)].bgborder, '2 0xFFFFFF 0.95');
+  set(hotspot[calc('poi_dot_' + n)].enabled, false);
+  set(hotspot[calc('poi_dot_' + n)].zorder, 20);
+
+  addhotspot(calc('poi_pole_' + n));
+  set(hotspot[calc('poi_pole_' + n)].type, text);
+  set(hotspot[calc('poi_pole_' + n)].ath, %1);
+  set(hotspot[calc('poi_pole_' + n)].atv, %2);
+  set(hotspot[calc('poi_pole_' + n)].edge, bottom);
+  set(hotspot[calc('poi_pole_' + n)].distorted, false);
+  set(hotspot[calc('poi_pole_' + n)].width, 2);
+  set(hotspot[calc('poi_pole_' + n)].height, get(ph));
+  set(hotspot[calc('poi_pole_' + n)].bg, true);
+  set(hotspot[calc('poi_pole_' + n)].bgcolor, get(vdot));
+  set(hotspot[calc('poi_pole_' + n)].bgalpha, 0.9);
+  set(hotspot[calc('poi_pole_' + n)].enabled, false);
+  set(hotspot[calc('poi_pole_' + n)].zorder, 21);
+
+  <!-- pill TEN -->
+  addhotspot(calc('poi_board_' + n));
+  set(hotspot[calc('poi_board_' + n)].type, text);
+  set(hotspot[calc('poi_board_' + n)].ath, %1);
+  set(hotspot[calc('poi_board_' + n)].atv, %2);
+  <!-- 🔴 pill TEN neo canh PHAI, pill SO neo canh TRAI -> 2 pill ap sat quanh diem neo,
+       cach nhau 8px, KHONG can biet be rong (xem ly do o hinh dang 03). -->
+  set(hotspot[calc('poi_board_' + n)].edge, right);
+  set(hotspot[calc('poi_board_' + n)].ox, -4);
+  set(hotspot[calc('poi_board_' + n)].oy, calc(0 - ph - 20));
+  set(hotspot[calc('poi_board_' + n)].distorted, false);
+  set(hotspot[calc('poi_board_' + n)].width, get(vw));
+  set(hotspot[calc('poi_board_' + n)].height, 40);
+  set(hotspot[calc('poi_board_' + n)].bg, true);
+  set(hotspot[calc('poi_board_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_board_' + n)].bgalpha, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].bgroundedge, 20);
+  set(hotspot[calc('poi_board_' + n)].bgborder, '1 0xFFFFFF 0.35');
+  set(hotspot[calc('poi_board_' + n)].bgshadow, '0 6 22 0x000000 0.5');
+  set(hotspot[calc('poi_board_' + n)].padding, '0 16 0 16');
+  set(hotspot[calc('poi_board_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].html, %3);
+  set(hotspot[calc('poi_board_' + n)].p_title, %3);
+  set(hotspot[calc('poi_board_' + n)].p_sub,   '');
+  set(hotspot[calc('poi_board_' + n)].p_dist,  %4);
+  set(hotspot[calc('poi_board_' + n)].p_type,  'p');
+  set(hotspot[calc('poi_board_' + n)].p_pole,  get(ph));
+  set(hotspot[calc('poi_board_' + n)].p_rot,   0);
+  set(hotspot[calc('poi_board_' + n)].p_rx,    0);
+  set(hotspot[calc('poi_board_' + n)].p_ry,    0);
+  set(hotspot[calc('poi_board_' + n)].p_rz,    0);
+  set(hotspot[calc('poi_board_' + n)].p_scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_fg,    get(vfg));
+  set(hotspot[calc('poi_board_' + n)].p_bg,    get(vbg));
+  set(hotspot[calc('poi_board_' + n)].p_bga,   get(vbga));
+  set(hotspot[calc('poi_board_' + n)].p_dot,   get(vdot));
+  set(hotspot[calc('poi_board_' + n)].p_d3d,   false);
+  set(hotspot[calc('poi_board_' + n)].p_w,     get(vw));
+  set(hotspot[calc('poi_board_' + n)].p_w2,    get(vw2));
+  poi_build_css(get(n));
+  set(hotspot[calc('poi_board_' + n)].onmousedown, calc("poi_drag(" + n + ")") );
+  set(hotspot[calc('poi_board_' + n)].zorder, 22);
+
+  <!-- pill SO — hotspot phu -->
+  addhotspot(calc('poi_a_' + n));
+  set(hotspot[calc('poi_a_' + n)].type, text);
+  set(hotspot[calc('poi_a_' + n)].ath, %1);
+  set(hotspot[calc('poi_a_' + n)].atv, %2);
+  set(hotspot[calc('poi_a_' + n)].edge, left);
+  set(hotspot[calc('poi_a_' + n)].ox, 4);
+  set(hotspot[calc('poi_a_' + n)].oy, calc(0 - ph - 20));
+  set(hotspot[calc('poi_a_' + n)].distorted, false);
+  set(hotspot[calc('poi_a_' + n)].width, get(vw2));
+  set(hotspot[calc('poi_a_' + n)].height, 40);
+  set(hotspot[calc('poi_a_' + n)].bg, true);
+  set(hotspot[calc('poi_a_' + n)].bgcolor, get(vdot));
+  set(hotspot[calc('poi_a_' + n)].bgalpha, 0.92);
+  set(hotspot[calc('poi_a_' + n)].bgroundedge, 20);
+  set(hotspot[calc('poi_a_' + n)].bgborder, '1 0xFFFFFF 0.35');
+  set(hotspot[calc('poi_a_' + n)].padding, '0 8 0 8');
+  set(hotspot[calc('poi_a_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_a_' + n)].enabled, false);
+  set(hotspot[calc('poi_a_' + n)].zorder, 23);
+  set(hotspot[calc('poi_a_' + n)].css, '');
+  txtadd(hotspot[calc('poi_a_' + n)].css, 'color:', get(vfg), '; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:700; text-align:center;');
+  set(hotspot[calc('poi_a_' + n)].html, %4);
+
+  inc(poi_count);
+</action>
+
+
+<!-- ============ 20 LA BAN HUONG ==================================
+     add_poi_c( ath, atv, 'TEN', 'HUONG', 'KM', bear, pole, scale, 'fg', bg, bga, dot )
+     Dung cho moc NGOAI TAM NHIN: "TP. BAO LOC · Huong Tay Nam · 9 km".
+     Vong tron (poi_a_) + KIM (poi_b_, glyph navigation-arrow) + 2 dong chu.
+     KIM XOAY THAT: rotate = p_bear - view.hlookat, cap nhat trong onviewchange.
+     ================================================================ -->
+<action name="add_poi_c">
+  set(n, get(poi_count));
+  set(vbe, %6);  ifnot(vbe GE -360, set(vbe, %1); );
+  set(ph, %7);   ifnot(ph GT 0, set(ph, 44); );
+  set(vsc, %8);  ifnot(vsc GT 0, set(vsc, 1.0); );
+  set(vfg, %9);  ifnot(vfg, set(vfg, '#FFFFFF'); );
+  set(vbg, %10); ifnot(vbg GE 0, set(vbg, 0x0C0C44); );
+  set(vbga, %11);ifnot(vbga GE 0, set(vbga, 0); );
+  set(vdot, %12);ifnot(vdot GE 0, set(vdot, 0xC8102E); );
+
+  addhotspot(calc('poi_dot_' + n));
+  set(hotspot[calc('poi_dot_' + n)].type, text);
+  set(hotspot[calc('poi_dot_' + n)].ath, %1);
+  set(hotspot[calc('poi_dot_' + n)].atv, %2);
+  set(hotspot[calc('poi_dot_' + n)].edge, center);
+  set(hotspot[calc('poi_dot_' + n)].distorted, false);
+  set(hotspot[calc('poi_dot_' + n)].width, 11);
+  set(hotspot[calc('poi_dot_' + n)].height, 11);
+  <!-- 🔴 BO COC + CHAM (Anh Tony chot 10/08). La ban khong con chan va diem cham o duoi:
+       chi con [vong tron + mui ten] o tren, [ten moc] o duoi. 2 hotspot nay van TAO
+       nhung an han, de era_poi_clear / poi_del_last / poi_drag chay dong nhat. -->
+  set(hotspot[calc('poi_dot_' + n)].bg, false);
+  set(hotspot[calc('poi_dot_' + n)].visible, false);
+  set(hotspot[calc('poi_dot_' + n)].enabled, false);
+  set(hotspot[calc('poi_dot_' + n)].zorder, 20);
+
+  addhotspot(calc('poi_pole_' + n));
+  set(hotspot[calc('poi_pole_' + n)].type, text);
+  set(hotspot[calc('poi_pole_' + n)].ath, %1);
+  set(hotspot[calc('poi_pole_' + n)].atv, %2);
+  set(hotspot[calc('poi_pole_' + n)].edge, bottom);
+  set(hotspot[calc('poi_pole_' + n)].distorted, false);
+  set(hotspot[calc('poi_pole_' + n)].width, 1);
+  set(hotspot[calc('poi_pole_' + n)].height, 1);
+  set(hotspot[calc('poi_pole_' + n)].bg, false);
+  set(hotspot[calc('poi_pole_' + n)].visible, false);
+  set(hotspot[calc('poi_pole_' + n)].enabled, false);
+  set(hotspot[calc('poi_pole_' + n)].zorder, 21);
+
+  <!-- 2 dong chu: TEN + (huong · km) -->
+  addhotspot(calc('poi_board_' + n));
+  set(hotspot[calc('poi_board_' + n)].type, text);
+  set(hotspot[calc('poi_board_' + n)].ath, %1);
+  set(hotspot[calc('poi_board_' + n)].atv, %2);
+  <!-- ten moc: neo canh TREN, nam NGAY DUOI diem cham -->
+  set(hotspot[calc('poi_board_' + n)].edge, top);
+  set(hotspot[calc('poi_board_' + n)].ox, 0);
+  set(hotspot[calc('poi_board_' + n)].oy, 8);
+  set(hotspot[calc('poi_board_' + n)].distorted, false);
+  set(hotspot[calc('poi_board_' + n)].bg, true);
+  set(hotspot[calc('poi_board_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_board_' + n)].bgalpha, get(vbga));
+  set(hotspot[calc('poi_board_' + n)].bgroundedge, 10);
+  set(hotspot[calc('poi_board_' + n)].padding, '4 12 5 12');
+  set(hotspot[calc('poi_board_' + n)].scale, get(vsc));
+  <!-- dong 2 chi hien khi CO noi dung. Truoc day ghep cung '[br]' + '  ·  ' nen la ban
+       khong nhap huong/km se ra 1 dong chi co dau · tro troi. -->
+  <!-- 🔴 11/08 BUG DA SUA: truoc day viet if(%4, ...) — %4 thay vao thanh CHUOI CO NHAY
+       ('Huong di'), krpano coi dieu kien do la FALSE nen dong phu bi bo mat, la ban
+       chi con moi ten moc. Nay do chuoi ra bien bang txtadd roi so sanh != ''. -->
+  set(cl2, '');
+  set(vs4, ''); txtadd(vs4, %4);
+  set(vs5, ''); txtadd(vs5, %5);
+  if(vs4 != '', txtadd(cl2, get(vs4)); );
+  if(vs5 != '',
+    if(cl2 != '', txtadd(cl2, get(cl2), '  ·  ', get(vs5)); );
+    if(cl2 == '', txtadd(cl2, get(vs5)); );
+  );
+  set(hotspot[calc('poi_board_' + n)].html, '');
+  <!-- 11/08: la ban doc "Huong di / TEN MOC" -> dong phu (%4) len TREN, ten dam o DUOI -->
+  if(cl2 != '', txtadd(hotspot[calc('poi_board_' + n)].html, get(cl2), '[br]'); );
+  txtadd(hotspot[calc('poi_board_' + n)].html, get(hotspot[calc('poi_board_' + n)].html), '[b]', %3, '[/b]');
+  set(hotspot[calc('poi_board_' + n)].p_title, %3);
+  set(hotspot[calc('poi_board_' + n)].p_sub,   %4);
+  set(hotspot[calc('poi_board_' + n)].p_dist,  %5);
+  set(hotspot[calc('poi_board_' + n)].p_type,  'c');
+  set(hotspot[calc('poi_board_' + n)].p_pole,  get(ph));
+  set(hotspot[calc('poi_board_' + n)].p_bear,  get(vbe));
+  set(hotspot[calc('poi_board_' + n)].p_rot,   0);
+  set(hotspot[calc('poi_board_' + n)].p_rx,    0);
+  set(hotspot[calc('poi_board_' + n)].p_ry,    0);
+  set(hotspot[calc('poi_board_' + n)].p_rz,    0);
+  set(hotspot[calc('poi_board_' + n)].p_scale, get(vsc));
+  set(hotspot[calc('poi_board_' + n)].p_fg,    get(vfg));
+  set(hotspot[calc('poi_board_' + n)].p_bg,    get(vbg));
+  set(hotspot[calc('poi_board_' + n)].p_bga,   get(vbga));
+  set(hotspot[calc('poi_board_' + n)].p_dot,   get(vdot));
+  set(hotspot[calc('poi_board_' + n)].p_d3d,   false);
+  poi_build_css(get(n));
+  set(hotspot[calc('poi_board_' + n)].onmousedown, calc("poi_drag(" + n + ")") );
+  set(hotspot[calc('poi_board_' + n)].zorder, 22);
+
+  <!-- VONG TRON — tam cach diem neo (ph + 88)px len tren -->
+  addhotspot(calc('poi_a_' + n));
+  set(hotspot[calc('poi_a_' + n)].type, text);
+  set(hotspot[calc('poi_a_' + n)].ath, %1);
+  set(hotspot[calc('poi_a_' + n)].atv, %2);
+  <!-- vong tron: day vong cach diem cham 8px len tren -->
+  set(hotspot[calc('poi_a_' + n)].edge, bottom);
+  set(hotspot[calc('poi_a_' + n)].ox, 0);
+  set(hotspot[calc('poi_a_' + n)].oy, -8);
+  set(hotspot[calc('poi_a_' + n)].distorted, false);
+  set(hotspot[calc('poi_a_' + n)].width, 54);
+  set(hotspot[calc('poi_a_' + n)].height, 54);
+  set(hotspot[calc('poi_a_' + n)].visible, false);
+  set(hotspot[calc('poi_a_' + n)].bg, false);
+  set(hotspot[calc('poi_a_' + n)].bgcolor, get(vbg));
+  set(hotspot[calc('poi_a_' + n)].bgalpha, get(vbga));
+  set(hotspot[calc('poi_a_' + n)].bgroundedge, 27);
+  set(hotspot[calc('poi_a_' + n)].bgborder, '1.5 0xFFFFFF 0.9');
+  set(hotspot[calc('poi_a_' + n)].padding, '0 0 0 0');
+  set(hotspot[calc('poi_a_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_a_' + n)].enabled, false);
+  set(hotspot[calc('poi_a_' + n)].zorder, 23);
+  set(hotspot[calc('poi_a_' + n)].html, '');
+
+  <!-- KIM — glyph Phosphor navigation-arrow, XOAY theo huong nhin -->
+  addhotspot(calc('poi_b_' + n));
+  set(hotspot[calc('poi_b_' + n)].ath, %1);
+  set(hotspot[calc('poi_b_' + n)].atv, %2);
+  <!-- mui ten: tam trung voi tam vong (vong cao 54, day o -8 -> tam o -35) -->
+  set(hotspot[calc('poi_b_' + n)].edge, center);
+  set(hotspot[calc('poi_b_' + n)].ox, 0);
+  set(hotspot[calc('poi_b_' + n)].oy, -36);
+  set(hotspot[calc('poi_b_' + n)].distorted, false);
+  set(hotspot[calc('poi_b_' + n)].type, image);
+  set(hotspot[calc('poi_b_' + n)].url, 'poi-icons/mui-ten.png');
+  set(hotspot[calc('poi_b_' + n)].preload, true);
+  set(hotspot[calc('poi_b_' + n)].width, 56);
+  set(hotspot[calc('poi_b_' + n)].height, 56);
+  set(hotspot[calc('poi_b_' + n)].scale, get(vsc));
+  set(hotspot[calc('poi_b_' + n)].enabled, false);
+  set(hotspot[calc('poi_b_' + n)].zorder, 24);
+  <!-- 🔴 11/08: poi_b_ la hotspot ANH (mui-ten.png, da co san vong tron).
+       TUYET DOI KHONG set .css hoac .html cho no — krpano se hieu day la text hotspot,
+       im lang bo url va ve ra RONG KHONG (dung y bay "krpano khong bao loi").
+       Muon doi mau kim thi doi file PNG, khong doi bang css. -->
+  set(hotspot[calc('poi_b_' + n)].rotate, calc(vbe - view.hlookat));
+
+  inc(poi_count);
+</action>
+
+
+<!-- ============ CAP NHAT KIM LA BAN theo huong nhin ==============
+     Goi tu onviewchange. Chi cham vao nhan loai 'c'.
+     rotate = huong moc - huong nhin hien tai  ->  kim luon tro dung phia moc.
+     ================================================================ -->
+<action name="era_poi_needles">
+  for(set(ni, 0), ni LT poi_count, inc(ni),
+    set(nbn, calc('poi_board_' + ni));
+    if(hotspot[get(nbn)].p_type == 'c',
+      <!-- 🔴 11/08 BUG DA SUA: truoc day viet calc(hotspot[nbn].p_bear - view.hlookat).
+           Trong calc(), krpano KHONG giai bien trong ngoac vuong neu thieu get()
+           => ket qua NaN => rotate = NaN => hotspot ANH khong dung duoc ma tran bien doi
+           => krpano ve chu placeholder "loading..." mai mai (khong bao loi).
+           Phai lay p_bear ra bien truoc bang get(hotspot[get(nbn)]...) roi moi calc. -->
+      set(nbe, get(hotspot[get(nbn)].p_bear));
+      set(hotspot[calc('poi_b_' + ni)].rotate, calc(nbe - view.hlookat));
+    );
+  );
+</action>
+
+
+<!-- ============ KEO bang (dot+coc di theo) ======================== -->
+<action name="poi_drag">
+  if(poi_edit_on == true,
+    <!-- (1) bo sang bang chon truoc do -->
+    if(poi_sel GE 0,
+      set(hotspot[calc('poi_board_' + poi_sel)].bgborder, '1 0xFFFFFF 0.35');
+    );
+
+    <!-- (2) chon bang nay + to sang vien vang de biet dang sua cai nao -->
+    set(poi_sel, %1);
+    <!-- ten bien RIENG (dgb/dgp/dgd) — KHONG dung 'bn' vi poi_save_draft cung dung 'bn',
+         asyncloop chay async se bi ghi de -->
+    set(dgb, calc('poi_board_' + %1));
+    set(dgp, calc('poi_pole_'  + %1));
+    set(dgd, calc('poi_dot_'   + %1));
+    set(dga, calc('poi_a_'     + %1));
+    set(dgx, calc('poi_b_'     + %1));
+    set(hotspot[get(dgb)].bgborder, '2 0xFFD966 1.0');
+    set(hotspot[get(dgb)].handcursor, true);
+    set(layer[poi_readout].html, '');
+    <!-- nhan duong thi 2 nut da nang doi thanh XOAY -->
+    <!-- mo BANG DIEU KHIEN (HTML, trong tour.html) — chinh realtime -->
+    js( eraPoiPanel(%1) );
+    set(layer[poi_readout].html, '');
+    txtadd(layer[poi_readout].html, 'Dang sua nhan #', %1, '  ·  KEO de doi cho  ·  dung BANG DIEU KHIEN ben trai de sua');
+
+    <!-- (3) LECH giua con tro va diem neo -> keo khong bi nhay giat.
+         Truoc day set ath/atv = ngay vi tri chuot nen bang "nhay" toi con tro,
+         nhat la nhan DOC (con tro o tren nhan, diem neo o duoi 110px). -->
+    screentosphere(mouse.x, mouse.y, dg0_ath, dg0_atv);
+    <!-- 🔴 SUA 11/08 (toi): truoc viet calc(hotspot[dgb].ath - dg0_ath) — SAI.
+         Trong calc(), ten bien trong [ ] phai boc get(), va KHONG duoc long get()
+         ben trong calc() -> phai TACH 2 BUOC nhu duoi. Viet sai thi krpano KHONG
+         bao loi, chi tra NaN -> keo nhan la nhan bay di mat.
+         (Cung goc voi loi la ban 11/08 chieu.) -->
+    set(dgb_ath, get(hotspot[get(dgb)].ath));
+    set(dgb_atv, get(hotspot[get(dgb)].atv));
+    set(dg_off_ath, calc(dgb_ath - dg0_ath));
+    set(dg_off_atv, calc(dgb_atv - dg0_atv));
+
+    asyncloop( hotspot[get(dgb)].pressed,
+      screentosphere(mouse.x, mouse.y, dg_ath, dg_atv);
+      set(dg_nath, calc(dg_ath + dg_off_ath));
+      set(dg_natv, calc(dg_atv + dg_off_atv));
+      set(hotspot[get(dgb)].ath, get(dg_nath));
+      set(hotspot[get(dgb)].atv, get(dg_natv));
+      set(hotspot[get(dgp)].ath, get(dg_nath));
+      set(hotspot[get(dgp)].atv, get(dg_natv));
+      set(hotspot[get(dgd)].ath, get(dg_nath));
+      set(hotspot[get(dgd)].atv, get(dg_natv));
+      set(hotspot[get(dga)].ath, get(dg_nath));
+      set(hotspot[get(dga)].atv, get(dg_natv));
+      set(hotspot[get(dgx)].ath, get(dg_nath));
+      set(hotspot[get(dgx)].atv, get(dg_natv));
+    );
+    poi_save_draft();
+  );
+</action>
+
+
+<!-- ============ NANG / HA COC cua bang dang chon ==================
+     Dung khi 2 bang NGANG o gan nhau -> cho 1 cai coc cao, 1 cai coc thap
+     la het de nhau. Cach dung: cham (mousedown) vao bang can sua truoc,
+     roi bam COC + / COC -.  Buoc 12px, gioi han 20..400.
+     ================================================================ -->
+<action name="poi_pole_adj">
+  if(poi_edit_on == true,
+    <!-- nhan DUONG khong co coc -> chan lai, tranh lam lech chu.
+         Binh thuong poi_adj_up/down da dinh tuyen sang poi_rot_adj roi,
+         day la chot an toan neu co ai goi truc tiep. -->
+    set(pa_ok, true);
+    if(poi_sel GE 0,
+      if(hotspot[calc('poi_board_' + poi_sel)].p_type == 'r', set(pa_ok, false); );
+    );
+    if(pa_ok == false,
+      set(layer[poi_readout].html, 'Nhan DUONG khong co coc — dung XOAY +/- de canh goc');
+    );
+    if(pa_ok == true,
+    if(poi_sel GE 0,
+      set(bn, calc('poi_board_' + poi_sel));
+      set(pn, calc('poi_pole_'  + poi_sel));
+      set(nh, calc(hotspot[get(pn)].height + %1));
+      if(nh LT 20,  set(nh, 20);  );
+      if(nh GT 400, set(nh, 400); );
+      set(hotspot[get(pn)].height, get(nh));
+      <!-- nhan DOC day bang ox (offset bi xoay theo rotate), nhan NGANG day bang oy -->
+      if(hotspot[get(bn)].p_type == 'v',
+        set(hotspot[get(bn)].ox, get(nh));
+        set(hotspot[get(bn)].oy, 0);
+      );
+      ifnot(hotspot[get(bn)].p_type == 'v',
+        set(hotspot[get(bn)].oy, calc(-1 * nh));
+      );
+      set(hotspot[get(bn)].p_pole, get(nh));
+      poi_save_draft();
+      set(layer[poi_readout].html, '');
+      txtadd(layer[poi_readout].html, 'Bang #', get(poi_sel), '  ·  cao coc = ', get(nh), 'px');
+    );
+    ifnot(poi_sel GE 0,
+      set(layer[poi_readout].html, 'Cham vao bang can sua truoc, roi bam COC + / COC -');
+    );
+    );
+  );
+</action>
+
+<action name="poi_pole_up">  poi_pole_adj(12);   </action>
+<action name="poi_pole_down">poi_pole_adj(-12);  </action>
+
+
+<!-- ============ Xoa het POI cu truoc khi nap scene moi ============ -->
+<action name="era_poi_clear">
+  if(poi_count LT 1, set(poi_count, 0); );
+  for(set(i, 0), i LT poi_count, inc(i),
+    removehotspot(calc('poi_dot_'   + i));
+    removehotspot(calc('poi_pole_'  + i));
+    removehotspot(calc('poi_board_' + i));
+    <!-- 2 hotspot PHU: cac hinh dang ghep nhieu manh dung them
+         poi_a_N (icon / gach ngang / vong la ban) va poi_b_N (kim la ban /
+         duong dan cheo / dong phu). Khong dung thi khong ton gi. -->
+    removehotspot(calc('poi_a_'     + i));
+    removehotspot(calc('poi_b_'     + i));
+  );
+  set(poi_count, 0);
+</action>
+
+
+<!-- ============ Bo dieu phoi: scene nao nap POI nao ============== -->
+<action name="era_poi_build">
+  era_poi_clear();
+  <!-- Khoi phuc pin da luu (localStorage); neu chua co draft -> nap data file -->
+  js( eraPoiRestore(get(xml.scene)) );
+</action>
+
+<!-- luu toan bo POI hien tai cua scene vao localStorage (khong mat khi reload) -->
+<action name="poi_save_draft">
+  set(dft, '');
+  for(set(i, 0), i LT poi_count, inc(i),
+    set(bn, calc('poi_board_' + i));
+    txtadd(dft, get(dft), get(hotspot[get(bn)].ath));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].atv));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_title));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_sub));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_dist));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_type));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_pole));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_rot));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_rx));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_ry));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_rz));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_scale));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_fg));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_bg));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_bga));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_dot));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_d3d));
+    <!-- THU TU 22 TRUONG NHAP (them cuoi, nhap cu thieu thi lay mac dinh):
+         0 ath · 1 atv · 2 title · 3 sub · 4 dist · 5 type · 6 pole · 7 rot
+         8 rx · 9 ry · 10 rz · 11 scale · 12 fg · 13 bg · 14 bga · 15 dot
+         16 d3d · 17 icon · 18 w · 19 w2 · 20 gc · 21 bear -->
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_icon));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_w));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_w2));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_gc));
+    txtadd(dft, get(dft), '|');
+    txtadd(dft, get(dft), get(hotspot[get(bn)].p_bear));
+    txtadd(dft, get(dft), '###');
+  );
+  js( eraPoiSave(get(xml.scene), get(dft)) );
+</action>
+
+
+<!-- ================================================================
+     TOOL: DAT POI (phim P) + XAC NHAN -> XUAT CODE
+     ================================================================ -->
+<action name="era_poi_ui_build">
+  set(poi_sel, -1);
+  set(poi_axis, '2D');
+  <!-- KHONG reset poi_count o day (chay sau restore se lam lech). era_poi_clear lo. -->
+  <!-- nut bat/tat che do sua -->
+  addlayer(poi_edit_btn);
+  set(layer[poi_edit_btn].type, text);
+  set(layer[poi_edit_btn].align, right); set(layer[poi_edit_btn].edge, right);
+  set(layer[poi_edit_btn].x, 16); set(layer[poi_edit_btn].y, -120);
+  set(layer[poi_edit_btn].bg, true); set(layer[poi_edit_btn].bgcolor, 0x0C0C44);
+  set(layer[poi_edit_btn].bgalpha, 0.82); set(layer[poi_edit_btn].bgroundedge, 8);
+  set(layer[poi_edit_btn].padding, '7 12 7 12'); set(layer[poi_edit_btn].handcursor, true);
+  set(layer[poi_edit_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_edit_btn].html, 'DAT POI (P)');
+  set(layer[poi_edit_btn].zorder, 120);
+  set(layer[poi_edit_btn].keep, true); set(layer[poi_edit_btn].visible, false);
+  set(layer[poi_edit_btn].onclick, toggle_poi_edit(); );
+
+  <!-- nut THEM DIEM — hien khi vao che do sua -->
+  addlayer(poi_add_btn);
+  set(layer[poi_add_btn].type, text);
+  set(layer[poi_add_btn].align, right); set(layer[poi_add_btn].edge, right);
+  set(layer[poi_add_btn].x, 16); set(layer[poi_add_btn].y, -80);
+  set(layer[poi_add_btn].bg, true); set(layer[poi_add_btn].bgcolor, 0x1565C0);
+  set(layer[poi_add_btn].bgalpha, 0.95); set(layer[poi_add_btn].bgroundedge, 8);
+  set(layer[poi_add_btn].padding, '7 12 7 12'); set(layer[poi_add_btn].handcursor, true);
+  set(layer[poi_add_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_add_btn].html, '&#43; NGANG (tien ich)');
+  set(layer[poi_add_btn].zorder, 120);
+  set(layer[poi_add_btn].keep, true); set(layer[poi_add_btn].visible, false);
+  set(layer[poi_add_btn].onclick, arm_add_h(); );
+
+  <!-- nut THEM NHAN DOC -->
+  addlayer(poi_addv_btn);
+  set(layer[poi_addv_btn].type, text);
+  set(layer[poi_addv_btn].align, right); set(layer[poi_addv_btn].edge, right);
+  set(layer[poi_addv_btn].x, 16); set(layer[poi_addv_btn].y, -40);
+  set(layer[poi_addv_btn].bg, true); set(layer[poi_addv_btn].bgcolor, 0x7A4FC0);
+  set(layer[poi_addv_btn].bgalpha, 0.95); set(layer[poi_addv_btn].bgroundedge, 8);
+  set(layer[poi_addv_btn].padding, '7 12 7 12'); set(layer[poi_addv_btn].handcursor, true);
+  set(layer[poi_addv_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_addv_btn].html, '&#43; DOC (huong / nui)');
+  set(layer[poi_addv_btn].zorder, 120);
+  set(layer[poi_addv_btn].keep, true); set(layer[poi_addv_btn].visible, false);
+  set(layer[poi_addv_btn].onclick, arm_add_v(); );
+
+  <!-- nut THEM NHAN DUONG -->
+  addlayer(poi_addr_btn);
+  set(layer[poi_addr_btn].type, text);
+  set(layer[poi_addr_btn].align, right); set(layer[poi_addr_btn].edge, right);
+  set(layer[poi_addr_btn].x, 16); set(layer[poi_addr_btn].y, 0);
+  set(layer[poi_addr_btn].bg, true); set(layer[poi_addr_btn].bgcolor, 0xB07A16);
+  set(layer[poi_addr_btn].bgalpha, 0.95); set(layer[poi_addr_btn].bgroundedge, 8);
+  set(layer[poi_addr_btn].padding, '7 12 7 12'); set(layer[poi_addr_btn].handcursor, true);
+  set(layer[poi_addr_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_addr_btn].html, '&#43; DUONG (ten tuyen)');
+  set(layer[poi_addr_btn].zorder, 120);
+  set(layer[poi_addr_btn].keep, true); set(layer[poi_addr_btn].visible, false);
+  set(layer[poi_addr_btn].onclick, arm_add_r(); );
+
+  <!-- nut &#43; CHIP SO (moc xa) -->
+  addlayer(poi_addp_btn);
+  set(layer[poi_addp_btn].type, text);
+  set(layer[poi_addp_btn].align, right); set(layer[poi_addp_btn].edge, right);
+  set(layer[poi_addp_btn].x, 16); set(layer[poi_addp_btn].y, 40);
+  set(layer[poi_addp_btn].bg, true); set(layer[poi_addp_btn].bgcolor, 0x7A1F5C);
+  set(layer[poi_addp_btn].bgalpha, 0.95); set(layer[poi_addp_btn].bgroundedge, 8);
+  set(layer[poi_addp_btn].padding, '7 12 7 12'); set(layer[poi_addp_btn].handcursor, true);
+  set(layer[poi_addp_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_addp_btn].html, '&#43; CHIP SO (moc xa)');
+  set(layer[poi_addp_btn].zorder, 120);
+  set(layer[poi_addp_btn].keep, true); set(layer[poi_addp_btn].visible, false);
+  set(layer[poi_addp_btn].onclick, arm_add_p(); );
+
+  <!-- nut &#43; LA BAN (huong) -->
+  addlayer(poi_addc_btn);
+  set(layer[poi_addc_btn].type, text);
+  set(layer[poi_addc_btn].align, right); set(layer[poi_addc_btn].edge, right);
+  set(layer[poi_addc_btn].x, 16); set(layer[poi_addc_btn].y, 80);
+  set(layer[poi_addc_btn].bg, true); set(layer[poi_addc_btn].bgcolor, 0x0E6E7A);
+  set(layer[poi_addc_btn].bgalpha, 0.95); set(layer[poi_addc_btn].bgroundedge, 8);
+  set(layer[poi_addc_btn].padding, '7 12 7 12'); set(layer[poi_addc_btn].handcursor, true);
+  set(layer[poi_addc_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_addc_btn].html, '&#43; LA BAN (huong)');
+  set(layer[poi_addc_btn].zorder, 120);
+  set(layer[poi_addc_btn].keep, true); set(layer[poi_addc_btn].visible, false);
+  set(layer[poi_addc_btn].onclick, arm_add_c(); );
+
+
+
+
+
+
+  <!-- nut xac nhan / xuat code — an mac dinh, hien khi vao che do sua -->
+  addlayer(poi_export_btn);
+  set(layer[poi_export_btn].type, text);
+  set(layer[poi_export_btn].align, right); set(layer[poi_export_btn].edge, right);
+  set(layer[poi_export_btn].x, 16); set(layer[poi_export_btn].y, 120);
+  set(layer[poi_export_btn].bg, true); set(layer[poi_export_btn].bgcolor, 0x1B9E5A);
+  set(layer[poi_export_btn].bgalpha, 0.95); set(layer[poi_export_btn].bgroundedge, 8);
+  set(layer[poi_export_btn].padding, '7 12 7 12'); set(layer[poi_export_btn].handcursor, true);
+  set(layer[poi_export_btn].css, 'color:#FFFFFF; font-family:Arial; font-size:12px; font-weight:bold;');
+  set(layer[poi_export_btn].html, 'XAC NHAN &#8594; XUAT CODE');
+  set(layer[poi_export_btn].zorder, 120);
+  set(layer[poi_export_btn].keep, true); set(layer[poi_export_btn].visible, false);
+  set(layer[poi_export_btn].onclick, poi_export(); );
+
+  <!-- bang huong dan (giua tren) — an mac dinh -->
+  addlayer(poi_readout);
+  set(layer[poi_readout].type, text);
+  set(layer[poi_readout].align, top); set(layer[poi_readout].y, 16);
+  set(layer[poi_readout].bg, true); set(layer[poi_readout].bgcolor, 0x0C0C44);
+  set(layer[poi_readout].bgalpha, 0.9); set(layer[poi_readout].bgroundedge, 10);
+  set(layer[poi_readout].padding, '10 18 10 18'); set(layer[poi_readout].enabled, false);
+  set(layer[poi_readout].css, 'color:#FFFFFF; font-family:Arial; font-size:13px; text-align:center;');
+  set(layer[poi_readout].html, 'CHE DO SUA: keo tung bang toi dung cho');
+  set(layer[poi_readout].zorder, 121);
+  set(layer[poi_readout].keep, true); set(layer[poi_readout].visible, false);
+</action>
+
+<action name="toggle_poi_edit">
+  if(poi_edit_on == true,
+    set(poi_edit_on, false);
+    set(poi_add_mode, false);
+    js( eraPoiPanelClose() );
+    if(poi_sel GE 0,
+      set(hotspot[calc('poi_board_' + poi_sel)].bgborder, '1 0xFFFFFF 0.35');
+    );
+    set(poi_sel, -1);
+    set(layer[poi_readout].visible, false);
+    set(layer[poi_export_btn].visible, false);
+    set(layer[poi_add_btn].visible, false);
+    set(layer[poi_addv_btn].visible, false);
+    set(layer[poi_addr_btn].visible, false);
+    set(layer[poi_addp_btn].visible, false);
+    set(layer[poi_addc_btn].visible, false);
+    set(layer[poi_axis_btn].visible, false);
+    set(layer[poi_up_btn].visible, false);
+    set(layer[poi_dn_btn].visible, false);
+    set(layer[poi_del_btn].visible, false);
+    set(layer[poi_edit_btn].bgcolor, 0x0C0C44);
+    set(layer[poi_edit_btn].html, 'DAT POI (P)');
+    set(layer[poi_edit_btn].visible, false);
+  ,
+    set(poi_edit_on, true);
+    set(poi_add_mode, false);
+    set(layer[poi_readout].html, 'CHE DO SUA · BAM vao bang cu de sua · hoac + NGANG (tien ich) / + DOC (huong, nui) / + DUONG (ten tuyen)');
+    set(layer[poi_readout].visible, true);
+    set(layer[poi_export_btn].visible, true);
+    set(layer[poi_add_btn].visible, true);
+    set(layer[poi_addv_btn].visible, true);
+    set(layer[poi_addr_btn].visible, true);
+    set(layer[poi_addp_btn].visible, true);
+    set(layer[poi_addc_btn].visible, true);
+    <!-- 4 nut CHE DO / +/- / XOA DIEM CUOI da bo:
+         BANG DIEU KHIEN lam het va lam tot hon (co slider realtime,
+         xoa duoc nhan BAT KY chu khong chi cai cuoi). -->
+    set(layer[poi_edit_btn].bgcolor, 0xC8102E);
+    set(layer[poi_edit_btn].html, 'XONG SUA (P)');
+    set(layer[poi_edit_btn].visible, true);
+  );
+</action>
+
+<!-- bat che do dat diem: click ke tiep se tao diem -->
+<action name="arm_add_h">
+  if(poi_edit_on == true,
+    set(poi_add_mode, 'h');
+    set(layer[poi_readout].html, 'NHAN NGANG · CLICK len anh de dat diem (1 lan)');
+  );
+</action>
+
+<action name="arm_add_v">
+  if(poi_edit_on == true,
+    set(poi_add_mode, 'v');
+    set(layer[poi_readout].html, 'NHAN DOC · CLICK len anh de dat diem (1 lan)');
+  );
+</action>
+
+<!-- click len anh khi dang o che do dat diem -> mo form nhap -->
+<action name="poi_click_add">
+  if(poi_edit_on == true,
+    if(poi_add_mode == 'h',
+      screentosphere(mouse.x, mouse.y, pk_ath, pk_atv);
+      set(poi_add_mode, false);
+      set(layer[poi_readout].html, 'Nhap thong tin bang NGANG o cua so...');
+      js( eraPoiPin(get(pk_ath), get(pk_atv), 'h') );
+    );
+    if(poi_add_mode == 'v',
+      screentosphere(mouse.x, mouse.y, pk_ath, pk_atv);
+      set(poi_add_mode, false);
+      set(layer[poi_readout].html, 'Nhap TEN nhan DOC o cua so...');
+      js( eraPoiPin(get(pk_ath), get(pk_atv), 'v') );
+    );
+    if(poi_add_mode == 'p',
+      screentosphere(mouse.x, mouse.y, pk_ath, pk_atv);
+      set(poi_add_mode, false);
+      set(layer[poi_readout].html, 'Nhap TEN + SO o cua so...');
+      js( eraPoiPin(get(pk_ath), get(pk_atv), 'p') );
+    );
+    if(poi_add_mode == 'c',
+      screentosphere(mouse.x, mouse.y, pk_ath, pk_atv);
+      set(poi_add_mode, false);
+      set(layer[poi_readout].html, 'Nhap TEN + HUONG + KM o cua so...');
+      js( eraPoiPin(get(pk_ath), get(pk_atv), 'c') );
+    );
+    if(poi_add_mode == 'r',
+      screentosphere(mouse.x, mouse.y, pk_ath, pk_atv);
+      set(poi_add_mode, false);
+      set(layer[poi_readout].html, 'Nhap TEN TUYEN o cua so...');
+      js( eraPoiPin(get(pk_ath), get(pk_atv), 'r') );
+    );
+  );
+</action>
+
+<!-- xoa 1 nhan BAT KY (goi tu bang dieu khien).
+     Cach lam: JS bo dong thu idx trong nhap roi nap lai ca scene
+     -> khong bi lo trong day so hotspot. -->
+<action name="poi_remove_one">
+  js( eraPoiDelete(get(xml.scene), %1) );
+</action>
+
+<!-- xoa bang vua them gan nhat -->
+<action name="poi_del_last">
+  if(poi_count GT 0,
+    dec(poi_count);
+    removehotspot(calc('poi_board_' + poi_count));
+    removehotspot(calc('poi_pole_'  + poi_count));
+    removehotspot(calc('poi_dot_'   + poi_count));
+    removehotspot(calc('poi_a_'     + poi_count));
+    removehotspot(calc('poi_b_'     + poi_count));
+    poi_save_draft();
+    set(layer[poi_readout].html, '');
+    txtadd(layer[poi_readout].html, 'Da xoa diem cuoi. Con lai: ', get(poi_count));
+  );
+</action>
+
+<!-- ghi 4 tham so mau vao cuoi 1 dong export (dung bien 'bn' + 'exp' dang chay) -->
+<action name="poi_exp_mau">
+  txtadd(exp, get(exp), ", '");
+  txtadd(exp, get(exp), get(hotspot[get(bn)].p_fg));
+  txtadd(exp, get(exp), "', ");
+  txtadd(exp, get(exp), get(hotspot[get(bn)].p_bg));
+  txtadd(exp, get(exp), ", ");
+  txtadd(exp, get(exp), get(hotspot[get(bn)].p_bga));
+  txtadd(exp, get(exp), ", ");
+  txtadd(exp, get(exp), get(hotspot[get(bn)].p_dot));
+</action>
+
+<!-- gom toa do hien tai cua tat ca POI trong scene -> textarea copy duoc -->
+<action name="poi_export">
+  set(exp, 'DAN KHOI NAY VAO era_poi_data_... TRONG era-poi-360.xml###');
+  for(set(i, 0), i LT poi_count, inc(i),
+    set(bn, calc('poi_board_' + i));
+    <!-- 17 CHIP SO -->
+    if(hotspot[get(bn)].p_type == 'p',
+      txtadd(exp, get(exp), '  add_poi_p( ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_title));
+      txtadd(exp, get(exp), "', '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_dist));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_pole));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_scale));
+      poi_exp_mau();
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_w));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_w2));
+      txtadd(exp, get(exp), " );###");
+    );
+    <!-- 20 LA BAN -->
+    if(hotspot[get(bn)].p_type == 'c',
+      txtadd(exp, get(exp), '  add_poi_c( ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_title));
+      txtadd(exp, get(exp), "', '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_sub));
+      txtadd(exp, get(exp), "', '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_dist));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_bear));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_pole));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_scale));
+      poi_exp_mau();
+      txtadd(exp, get(exp), " );###");
+    );
+    <!-- NHAN DUONG -->
+    if(hotspot[get(bn)].p_type == 'r',
+      txtadd(exp, get(exp), '  add_poi_r( ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_title));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_rot));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_rx));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_ry));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_rz));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_scale));
+      poi_exp_mau();
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_d3d));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_w));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_gc));
+      <!-- %16 = chu trong chip do (loai 'r' dung lai truong p_sub) -->
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_sub));
+      txtadd(exp, get(exp), "' );###");
+    );
+    <!-- NHAN DOC -->
+    if(hotspot[get(bn)].p_type == 'v',
+      txtadd(exp, get(exp), '  add_poi_v( ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_title));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_pole));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_scale));
+      poi_exp_mau();
+      txtadd(exp, get(exp), " );###");
+    );
+    <!-- NHAN NGANG -->
+    set(is_hz, true);
+    if(hotspot[get(bn)].p_type == 'v', set(is_hz, false); );
+    if(hotspot[get(bn)].p_type == 'r', set(is_hz, false); );
+    if(hotspot[get(bn)].p_type == 'p', set(is_hz, false); );
+    if(hotspot[get(bn)].p_type == 'c', set(is_hz, false); );
+    if(is_hz == true,
+      txtadd(exp, get(exp), '  add_poi( ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].ath));
+      txtadd(exp, get(exp), ', ');
+      txtadd(exp, get(exp), get(hotspot[get(bn)].atv));
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_title));
+      txtadd(exp, get(exp), "', '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_sub));
+      txtadd(exp, get(exp), "', '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_dist));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_pole));
+      txtadd(exp, get(exp), ", ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_scale));
+      poi_exp_mau();
+      txtadd(exp, get(exp), ", '");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_icon));
+      txtadd(exp, get(exp), "', ");
+      txtadd(exp, get(exp), get(hotspot[get(bn)].p_w));
+      txtadd(exp, get(exp), " );###");
+    );
+  );
+  <!-- mo o textarea copy duoc (ham trong tour.html) + log console -->
+  js( eraPoiExport(get(exp)) );
+  trace(get(exp));
+</action>
+
+
+
+<!-- SCENE 4 . Ma lo tren flycam  (scene_matbang_flycam)
+     ================================================================
+     🔴 11/08 (toi) — 24 diem nay CHEP NGUYEN tu era_poi_data_02 de lam MOC.
+     Toa do CHUA dung han: anh flycam chup tu do cao va vi tri khac anh
+     "Toan canh khu do thi", nen cung mot moc se nam o goc khac.
+       . Moc XA (nui, san bay, nut giao, huong TP.HCM, ten duong lon)
+         chi phu thuoc HUONG LA BAN  ->  lech gan nhu deu nhau, xoay ca bo
+         mot goc la khop.
+       . Moc GAN (truong 1km, cho 2km, tram y te) lech nhieu hon, phai
+         chinh tay tung cai.
+
+     CACH CAN LAI (lam 1 lan, 2 phut):
+       1. Bam phim  P  de mo che do sua nhan.
+       2. KEO nhan "NUI DAI BINH" (hoac 1 moc XA de nhan ra) ve dung cho.
+       3. Bam nut XUAT CODE, gui Em dong dau tien.
+       4. Em lay do lech ath do XOAY CA 24 DIEM roi ghi de khoi nay.
+     ================================================================ -->
+<action name="era_poi_data_04">
+  add_poi( 162.4, 18.6, 'Trường THCS Phan Bội Châu', 'Trường THCS', '1 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'truong-hoc', 0 );
+  add_poi( 178.3, 9.8, 'Trường Mầm Non Tư Thục Nụ Hồng', 'Trường mầm non', '1.7 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'truong-hoc', 0 );
+  add_poi_v( -108.3, -1.6, 'Núi Đại Bình', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi( -168.5, 1.3, 'Vincom Bảo Lộc', 'Trung tâm thương mại', '6 KM', 125, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'tttm', 0 );
+  add_poi_v( 154.1, 0.9, 'Hồ Nam Phương', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi( -142.1, 2.6, 'Bệnh viên', '', 'Lâm Đồng', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'benh-vien', 0 );
+  add_poi( -175.1, 2.4, 'Co.opmart Bảo Lộc', 'Siêu thị', '5 KM', 60, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'sieu-thi', 0 );
+  add_poi( 10.3, 13.9, 'Chợ Đại Lao', 'Siêu thị', '2 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'sieu-thi', 0 );
+  add_poi( 13.4, 6.9, 'Trạm Y Tế Xã Đại Lào', 'Trạm y tế', '3.4 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'benh-vien', 0 );
+  add_poi_v( -22.5, 3.5, 'Đồi Vô Ưu', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi_v( -26.8, 2.2, 'Đồi Bát Úp', 70, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi_v( 142.8, 1.4, 'NÚT GIAO CAO TỐC', 110, 1, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  add_poi_v( -153.7, -0.3, 'SÂN BAY LIÊN KHƯƠNG', 140, 0.85, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  add_poi_v( -127.4, 1.6, 'NGÃ 5 ĐẠI BÌNH (QL20 - QL55)', 130, 1.0, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  add_poi_c( -0.5, 6.1, 'Hồ Chí Minh', 'Hướng đi', '', -0.5, 44, 1, '#FFFFFF', 0x0C0C44, 0, 0xC8102E );
+  add_poi_c( -170.8, 31.4, 'Trung Tâm Bảo Lộc', 'Hướng đi', '', -170.8, 44, 1, '#FFFFFF', 0x0C0C44, 0, 0xC8102E );
+  add_poi_r( 67.7, 35.5, 'Bảo Lộc – Đà Lạt', -2, 0, 0, 0, 1.2, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'QL20' );
+  add_poi_r( 4.5, 34.8, 'Ngô Tất Tố', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -67.1, 22, 'Tránh TP Bảo Lộc', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -13.4, 18.7, 'Tránh TP Bảo Lộc', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -121.3, 24.5, 'Xuân Diệu', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( 118.9, 13.9, 'Lê Phụng Hiểu', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 56, 26, 'Đường' );
+  add_poi_r( 126.1, 6.6, 'Phan Đình Phùng', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 240, 26, 'Đường' );
+  add_poi( -169.9, 5.3, 'Đại Học Tôn Đức Thắng', 'Trường học', '3 KM', 20, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E, 'truong-hoc', 230 );
+</action>
+
+<!-- ============ SU KIEN (rieng, khong dung skin era_events) ======= -->
+<events name="era_poi_events" keep="true"
+        onxmlcomplete="era_poi_ui_build();"
+        onnewpano="era_poi_build();"
+        onviewchange="era_poi_needles();"
+        onclick="poi_click_add();"
+        onkeydown="if(keycode == 80, toggle_poi_edit(); );" />
+
+
+<!-- ================================================================
+     ================   DU LIEU POI — SUA O DAY   ==================
+     Moi dong = 1 bang:  add_poi( ath , atv , 'TIEU DE' , 'MO TA' , 'KHOANG CACH' )
+       - ath: -180..180 (trai/phai) · atv: -90..90 (so duong = thap hon)
+       - Khong can nhap tay: dung nut XAC NHAN de lay lai toa do da keo.
+     ================================================================ -->
+
+<!-- SCENE 1 · Tong the — chua gan POI (them sau) -->
+<action name="era_poi_data_01">
+</action>
+
+<!-- SCENE 2 · Toan canh khu do thi
+     Tony gim tay 12 diem (10/08) — NGANG = tien ich gan, DOC (add_poi_v) = moc xa/huong.
+     Tham so cuoi = cao coc (px). add_poi(ath,atv,'TIEU DE','MO TA','KHOANG CACH',coc)
+     ath = bearing thuc - 38.77 (north pano lay tu Google Earth heading 38.77). -->
+<action name="era_poi_data_02">
+  <!-- ====== 23 DIEM (22 cham 10/08 + Nga 5 Dai Binh them 11/08) ======
+       7 the tien ich · 6 nhan doc · 2 la ban · 7 nhan duong
+       Da bo Nha Tho Giao Xu Tan Bui theo yeu cau.
+       Tham so cuoi cua add_poi = 0  ->  pill TU CO theo do dai chu.
+       Nhan duong: cao duong dan 24px (nam gan mat duong).
+       🔴 DOI DATA O DAY  =>  PHAI lam 2 viec:
+          1. bump  window.ERA_POI_DATA_VER  trong tour.html
+          2. bump  ?nc=  cua <include era-poi-360.xml> trong tour.xml
+       Thieu 1 trong 2 -> tour van hien ban cu. -->
+  add_poi( 162.4, 18.6, 'Trường THCS Phan Bội Châu', 'Trường THCS', '1 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'truong-hoc', 0 );
+  add_poi( 178.3, 9.8, 'Trường Mầm Non Tư Thục Nụ Hồng', 'Trường mầm non', '1.7 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'truong-hoc', 0 );
+  add_poi_v( -108.3, -1.6, 'Núi Đại Bình', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi( -168.5, 1.3, 'Vincom Bảo Lộc', 'Trung tâm thương mại', '6 KM', 125, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'tttm', 0 );
+  add_poi_v( 154.1, 0.9, 'Hồ Nam Phương', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi( -142.1, 2.6, 'Bệnh viên', '', 'Lâm Đồng', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'benh-vien', 0 );
+  add_poi( -175.1, 2.4, 'Co.opmart Bảo Lộc', 'Siêu thị', '5 KM', 60, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'sieu-thi', 0 );
+  add_poi( 10.3, 13.9, 'Chợ Đại Lao', 'Siêu thị', '2 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'sieu-thi', 0 );
+  add_poi( 13.4, 6.9, 'Trạm Y Tế Xã Đại Lào', 'Trạm y tế', '3.4 KM', 44, 1, '#FFFFFF', 0x0C0C44, 0.8, 0xC8102E, 'benh-vien', 0 );
+  add_poi_v( -22.5, 3.5, 'Đồi Vô Ưu', 110, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi_v( -26.8, 2.2, 'Đồi Bát Úp', 70, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E );
+  add_poi_v( 142.8, 1.4, 'NÚT GIAO CAO TỐC', 110, 1, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  <!-- Sân bay Liên Khương xa 58 km -> coc CAO hon (110->140) va chu NHO lai (1->0.85)
+       de mat doc ra "o xa" ngay, va khong de len cac nhan gan. -->
+  add_poi_v( -153.7, -0.3, 'SÂN BAY LIÊN KHƯƠNG', 140, 0.85, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  add_poi_v( -127.4, 1.6, 'NGÃ 5 ĐẠI BÌNH (QL20 - QL55)', 130, 1.0, '#FFFFFF', 0xC8102E, 0.9, 0xC8102E );
+  add_poi_c( -0.5, 6.1, 'Hồ Chí Minh', 'Hướng đi', '', -0.5, 44, 1, '#FFFFFF', 0x0C0C44, 0, 0xC8102E );
+  add_poi_c( -170.8, 31.4, 'Trung Tâm Bảo Lộc', 'Hướng đi', '', -170.8, 44, 1, '#FFFFFF', 0x0C0C44, 0, 0xC8102E );
+  <!-- ==== 7 NHAN DUONG — kieu E (chip do + bien navy), Anh Tony chot 11/08 ====
+       Tham so cuoi (%16) = chu trong CHIP DO. Ten duong bo tien to 'Đ ' vi
+       chip da mang chu 'Đường' roi — de nguyen se doc thanh "Đường Đ Xuan Dieu".
+       Vi tri (ath/atv) va goc xoay (%4) GIU NGUYEN y ban Anh da cham 10/08. -->
+  add_poi_r( 67.7, 35.5, 'Bảo Lộc – Đà Lạt', -2, 0, 0, 0, 1.2, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'QL20' );
+  add_poi_r( 4.5, 34.8, 'Ngô Tất Tố', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -67.1, 22, 'Tránh TP Bảo Lộc', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -13.4, 18.7, 'Tránh TP Bảo Lộc', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( -121.3, 24.5, 'Xuân Diệu', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 200, 26, 'Đường' );
+  add_poi_r( 118.9, 13.9, 'Lê Phụng Hiểu', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 56, 26, 'Đường' );
+  add_poi_r( 126.1, 6.6, 'Phan Đình Phùng', 0, 0, 0, 0, 1, '#FFFFFF', 0x0C0C44, 1, 0xC8102E, false, 240, 26, 'Đường' );
+  add_poi( -169.9, 5.3, 'Đại Học Tôn Đức Thắng', 'Trường học', '3 KM', 20, 1, '#FFFFFF', 0x0C0C44, 0.85, 0xC8102E, 'truong-hoc', 230 );
+</action>
+
+<!-- SCENE 3 · View doi nui -->
+<action name="era_poi_data_03">
+  add_poi(    0.0,  7.0, 'DINH DOI TRA', 'View nui', '~1.2km' );
+</action>
+
+
+
+</krpano>

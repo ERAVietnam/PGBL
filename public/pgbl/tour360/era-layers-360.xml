@@ -1,0 +1,356 @@
+<krpano>
+
+<!-- =====================================================================
+     ERA — BANG BAT/TAT LOP CHI BAO  (goc TRAI TREN)
+     Phu Gia Bao Loc · ERA Vietnam · 12/08/2026
+     =====================================================================
+     File INCLUDE ADDITIVE. KHONG sua vtourskin.xml, KHONG sua era-poi-360.xml,
+     KHONG sua era-lots-flycam.xml. Go file nay ra la tour tro ve nhu cu.
+
+     4 LOP:
+       ti = Tien ich        <- nhan kieu 'h' (the tien ich) + 'p' (pill km)
+       ht = Ha tang         <- nhan kieu 'r' (bien ten duong) + 'c' (la ban huong di)
+                               + 3 moc dau moi giao thong nam trong nhom 'v' (xem duoi)
+       dl = Danh lam        <- nhan kieu 'v' (nhan doc: nui, ho, doi)
+       sp = San pham        <- gim ma lo (hotspot co co islot == true)
+
+     🎨 12/08 Anh Tony chot: BANG DUNG DUNG 1 MAU (xanh chanh #9BDC4C).
+     Ban dau Em lam 4 mau nhan dien cho 4 lop -> Anh: "nhieu mau thi lai re tien".
+     Da bo luon 4 cham mau dau dong (voi 1 mau thi 4 cham giong het nhau = nhieu rac).
+     Nay moi hang chi con: TEN LOP + CONG TAC GAT. Doi mau ca bang = sua 1 dong
+     `era_lay_acc` trong `era_layers_cfg`.
+
+     🔴 NHOM 'v' BI TRON — DAY LA CHO DUY NHAT PHAI SUA TAY.
+     Nhan doc 'v' vua chua danh lam (Nui Dai Binh, Ho Nam Phuong, Doi Vo Uu,
+     Doi Bat Up) vua chua dau moi giao thong (SAN BAY LIEN KHUONG, NUT GIAO
+     CAO TOC, NGA 5 DAI BINH). Anh Tony chot: 3 cai giao thong ve lop HA TANG.
+     => Bang ngoai le nam trong action `era_lay_map` ben duoi, doi chieu bang
+        MANH CHU KHONG DAU trong p_title. Them moc giao thong moi kieu 'v'
+        thi them 1 dong `indexoftxt` y het o do.
+
+     🔴 TAI SAO DUYET hotspot.count CHU KHONG DUYET poi_count:
+     Moi nhan POI gom toi 5 hotspot (poi_dot_N · poi_pole_N · poi_board_N ·
+     poi_a_N · poi_b_N) nhung poi_a_/poi_b_ CHI TON TAI voi vai kieu nhan
+     (do thuc te: 24 nhan -> 24 dot, 24 pole, 24 board, 17 a, 9 b).
+     Neu duyet theo chi so roi `set(hotspot[ten-khong-ton-tai].visible, ...)`
+     thi krpano TU TAO ra hotspot rong, im lang, khong bao loi -> rac chong chat
+     sau moi lan bam. Duyet mang that thi chi dung vao cai DANG CO.
+
+     🔴 BAY 12/08 — CHI SO 0 BI BO SOT:
+     Chan vong lap bang `hp2 != ''` (hp2 = chi so nhan) thi NHAN SO 0 mat tich,
+     vi krpano so chuoi '0' voi chuoi rong ra BANG NHAU. Dem thieu dung 1 muc,
+     khong bao loi gi. Nay chan bang `hp1` (luon la CHU: dot/pole/board/a/b).
+
+     🔴 BAY 12/08 — LOP TRONG SUOT KHONG BAM DUOC:
+     Ban dau cho ca dai tieu de lam vung bam thu gon, layer de `bg=false`
+     (khong nen). Chuot bam vao KHONG AN GI — krpano khong bat su kien tren
+     layer khong co nen, du DOM element van nam tren cung (elementFromPoint tra
+     ve dung no, pointer-events=auto). Dat `bg=true; bgalpha=0` cung khong an.
+     => Nut bam PHAI CO NEN THAY DUOC. Nay thu gon bang NUT MUI TEN co nen
+        (bgalpha 0.18) o goc phai tieu de. Cung ly do 4 hang deu co nen 0.14-0.16.
+     ===================================================================== -->
+
+
+<!-- ============ 1. TRANG THAI (mac dinh BAT het — Anh Tony chot) ======== -->
+<action name="era_layers_cfg">
+  set(era_lay_on_ti, true);
+  set(era_lay_on_ht, true);
+  set(era_lay_on_dl, true);
+  set(era_lay_on_sp, true);
+  set(era_lay_open,  true);
+  if(device.mobile, set(era_lay_open, false); );
+
+  set(era_lay_acc,     0x9BDC4C);
+  set(era_lay_cpanel,  0x0E2821);
+  set(era_lay_cborder, 0xCBF0D6);
+  set(era_lay_cmuted,  0x83A08D);
+</action>
+
+
+<!-- ============ 2. XEP LOP CHO 1 NHAN POI ==============================
+     Vao: bty = p_type cua poi_board_<hp2> · hp2 = chi so nhan
+     Ra : era_lay_r = 'ti' | 'ht' | 'dl' | ''
+
+     BANG NGOAI LE trong nhanh 'v' — doi chieu bang manh chu KHONG DAU
+     de khoi dinh bay ma hoa tieng Viet:
+       'BAY'      -> SAN BAY LIEN KHUONG
+       'GIAO CAO' -> NUT GIAO CAO TOC
+       'QL20'     -> NGA 5 DAI BINH (QL20 - QL55)
+     Them moc moi: chep them 2 dong y het voi manh chu rieng. Kiem truoc khi
+     them: manh chu do KHONG duoc xuat hien trong ten nhan danh lam nao
+     (Nui Dai Binh · Ho Nam Phuong · Doi Vo Uu · Doi Bat Up).              -->
+<action name="era_lay_map">
+  set(era_lay_r, '');
+  if(bty == 'h', set(era_lay_r, 'ti'); );
+  if(bty == 'p', set(era_lay_r, 'ti'); );
+  if(bty == 'r', set(era_lay_r, 'ht'); );
+  if(bty == 'c', set(era_lay_r, 'ht'); );
+  if(bty == 'v',
+    set(era_lay_r, 'dl');
+    set(btl, get(hotspot[calc('poi_board_' + hp2)].p_title));
+    set(bpos, -1); indexoftxt(bpos, get(btl), 'BAY');      if(bpos GE 0, set(era_lay_r, 'ht'); );
+    set(bpos, -1); indexoftxt(bpos, get(btl), 'GIAO CAO'); if(bpos GE 0, set(era_lay_r, 'ht'); );
+    set(bpos, -1); indexoftxt(bpos, get(btl), 'QL20');     if(bpos GE 0, set(era_lay_r, 'ht'); );
+  );
+</action>
+
+
+<!-- ============ 3. AP TRANG THAI LEN TOAN BO HOTSPOT ==================
+     Chay lai duoc bao nhieu lan cung duoc (idempotent). Vua an/hien vua dem.
+     Dem CHI tinh hotspot 'poi_board_N' (1 nhan = 1 don vi) va gim lo.
+
+     (a) gim ma lo nhan bang co RIENG islot, so voi == true.
+         🔴 TUYET DOI khong dung "!= null" — krpano tra ve CHUOI "null" cho
+         thuoc tinh khong ton tai nen moi hotspot khac deu lot luoi (bay da lam
+         nhap phinh 112 muc hom 11/08).
+     (b) nhan POI: ten dang poi_<phan>_<chiso>.
+     (c) an/hien + dem.
+
+     🔴🔴 BAY 12/08 — KHONG DUOC "BAT VISIBLE CHO CA LOP".
+     Ban dau Em viet thang `set(visible, get(era_lay_on_XX))`. Hong ngay:
+     mot so hotspot ĐANG BỊ ẨN CÓ CHỦ Ý tu truoc, bi bat den het.
+     Cu the Anh Tony bat duoc: nhan LA BAN (kieu 'c') co hotspot `poi_a_N` la
+     mot VONG TRON RONG 54x54 vien trang, `add_poi_c` da co tinh
+     `set(visible, false)` vi anh `mui-ten.png` da ve san vong roi.
+     Em bat len -> vong tron thua de chong len chu "Huong di / Trung Tam Bao Loc".
+     => CACH DUNG: CHI TRA LAI DUNG CAI MINH DA AN. Danh dau `lay_hid = true`
+        luc an; luc bat chi mo lai nhung cai co dau do. Hotspot bi an vi ly do
+        khac thi KHONG BAO GIO dung toi.                                    -->
+<action name="era_layers_apply">
+  set(era_lay_n_ti, 0);
+  set(era_lay_n_ht, 0);
+  set(era_lay_n_dl, 0);
+  set(era_lay_n_sp, 0);
+
+  for(set(i, 0), i LT hotspot.count, inc(i),
+    set(hlay, '');
+    set(hcnt, false);
+
+    if(hotspot[get(i)].islot == true,
+      set(hlay, 'sp');
+      set(hcnt, true);
+    );
+
+    if(hlay == '',
+      set(hp0, ''); set(hp1, ''); set(hp2, '');
+      txtsplit(get(hotspot[get(i)].name), '_', hp0, hp1, hp2);
+      if(hp0 == 'poi',
+        if(hp1 != '',
+          set(bty, get(hotspot[calc('poi_board_' + hp2)].p_type));
+          era_lay_map();
+          set(hlay, get(era_lay_r));
+          if(hp1 == 'board', set(hcnt, true); );
+        );
+      );
+    );
+
+    if(hlay != '',
+      set(von, false);
+      if(hlay == 'ti', copy(von, era_lay_on_ti); if(hcnt == true, inc(era_lay_n_ti); ); );
+      if(hlay == 'ht', copy(von, era_lay_on_ht); if(hcnt == true, inc(era_lay_n_ht); ); );
+      if(hlay == 'dl', copy(von, era_lay_on_dl); if(hcnt == true, inc(era_lay_n_dl); ); );
+      if(hlay == 'sp', copy(von, era_lay_on_sp); if(hcnt == true, inc(era_lay_n_sp); ); );
+
+      if(von,
+        if(hotspot[get(i)].lay_hid == true,
+          set(hotspot[get(i)].visible, true);
+          set(hotspot[get(i)].lay_hid, false);
+        );
+      ,
+        if(hotspot[get(i)].visible == true,
+          set(hotspot[get(i)].visible, false);
+          set(hotspot[get(i)].lay_hid, true);
+        );
+      );
+    );
+  );
+
+  era_layers_paint();
+</action>
+
+
+<!-- ============ 4. DUNG BANG (chay 1 lan) =============================
+     %1 chi so hang · %2 toa do y · %3 nhan chu
+     Moi hang 2 lop nhin thay (chu + cong tac) + 1 lop bam + 1 nut gat.     -->
+<action name="era_lay_mkrow">
+  addlayer(era_lay_hit_%1);
+  set(layer[era_lay_hit_%1].type, text); set(layer[era_lay_hit_%1].align, lefttop); set(layer[era_lay_hit_%1].edge, lefttop);
+  set(layer[era_lay_hit_%1].x, 24); set(layer[era_lay_hit_%1].y, %2); set(layer[era_lay_hit_%1].width, 198); set(layer[era_lay_hit_%1].height, 34);
+  set(layer[era_lay_hit_%1].bg, true); set(layer[era_lay_hit_%1].bgcolor, get(era_lay_acc)); set(layer[era_lay_hit_%1].bgalpha, 0.14); set(layer[era_lay_hit_%1].bgroundedge, 10);
+  set(layer[era_lay_hit_%1].handcursor, true); set(layer[era_lay_hit_%1].onclick, 'era_layers_toggle(%1)');
+  set(layer[era_lay_hit_%1].zorder, 220); set(layer[era_lay_hit_%1].keep, true); set(layer[era_lay_hit_%1].visible, true);
+
+  addlayer(era_lay_tx_%1);
+  set(layer[era_lay_tx_%1].type, text); set(layer[era_lay_tx_%1].align, lefttop); set(layer[era_lay_tx_%1].edge, lefttop);
+  set(layer[era_lay_tx_%1].x, 38); set(layer[era_lay_tx_%1].y, calc(%2 + 8)); set(layer[era_lay_tx_%1].width, 132); set(layer[era_lay_tx_%1].height, 18);
+  set(layer[era_lay_tx_%1].bg, false); set(layer[era_lay_tx_%1].enabled, false); set(layer[era_lay_tx_%1].vcenter, true);
+  set(layer[era_lay_tx_%1].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:12.5px; font-weight:600; white-space:nowrap;');
+  set(layer[era_lay_tx_%1].html, %3);
+  set(layer[era_lay_tx_%1].zorder, 222); set(layer[era_lay_tx_%1].keep, true); set(layer[era_lay_tx_%1].visible, true);
+
+  addlayer(era_lay_tr_%1);
+  set(layer[era_lay_tr_%1].type, text); set(layer[era_lay_tr_%1].align, lefttop); set(layer[era_lay_tr_%1].edge, lefttop);
+  set(layer[era_lay_tr_%1].x, 180); set(layer[era_lay_tr_%1].y, calc(%2 + 9)); set(layer[era_lay_tr_%1].width, 32); set(layer[era_lay_tr_%1].height, 16);
+  set(layer[era_lay_tr_%1].bg, true); set(layer[era_lay_tr_%1].bgcolor, get(era_lay_acc)); set(layer[era_lay_tr_%1].bgalpha, 0.95); set(layer[era_lay_tr_%1].bgroundedge, 8);
+  set(layer[era_lay_tr_%1].enabled, false);
+  set(layer[era_lay_tr_%1].zorder, 222); set(layer[era_lay_tr_%1].keep, true); set(layer[era_lay_tr_%1].visible, true);
+
+  addlayer(era_lay_kn_%1);
+  set(layer[era_lay_kn_%1].type, text); set(layer[era_lay_kn_%1].align, lefttop); set(layer[era_lay_kn_%1].edge, lefttop);
+  set(layer[era_lay_kn_%1].x, 198); set(layer[era_lay_kn_%1].y, calc(%2 + 11)); set(layer[era_lay_kn_%1].width, 12); set(layer[era_lay_kn_%1].height, 12);
+  set(layer[era_lay_kn_%1].bg, true); set(layer[era_lay_kn_%1].bgcolor, 0xFFFFFF); set(layer[era_lay_kn_%1].bgroundedge, 6);
+  set(layer[era_lay_kn_%1].bgshadow, '0 1 3 0x000000 0.45');
+  set(layer[era_lay_kn_%1].enabled, false);
+  set(layer[era_lay_kn_%1].zorder, 223); set(layer[era_lay_kn_%1].keep, true); set(layer[era_lay_kn_%1].visible, true);
+</action>
+
+
+<action name="era_layers_build">
+  era_layers_cfg();
+
+  addlayer(era_lay_bg);
+  set(layer[era_lay_bg].type, text); set(layer[era_lay_bg].align, lefttop); set(layer[era_lay_bg].edge, lefttop);
+  set(layer[era_lay_bg].x, 16); set(layer[era_lay_bg].y, 16); set(layer[era_lay_bg].width, 214); set(layer[era_lay_bg].height, 218);
+  set(layer[era_lay_bg].bg, true); set(layer[era_lay_bg].bgcolor, get(era_lay_cpanel)); set(layer[era_lay_bg].bgalpha, 0.82); set(layer[era_lay_bg].bgroundedge, 14);
+  set(layer[era_lay_bg].borderwidth, 1); set(layer[era_lay_bg].bordercolor, get(era_lay_cborder)); set(layer[era_lay_bg].borderalpha, 0.18);
+  set(layer[era_lay_bg].bgshadow, '0 4 18 0x000000 0.35');
+  set(layer[era_lay_bg].enabled, false);
+  set(layer[era_lay_bg].zorder, 218); set(layer[era_lay_bg].keep, true); set(layer[era_lay_bg].visible, true);
+
+  addlayer(era_lay_ttl);
+  set(layer[era_lay_ttl].type, text); set(layer[era_lay_ttl].align, lefttop); set(layer[era_lay_ttl].edge, lefttop);
+  set(layer[era_lay_ttl].x, 34); set(layer[era_lay_ttl].y, 26); set(layer[era_lay_ttl].width, 150); set(layer[era_lay_ttl].height, 18);
+  set(layer[era_lay_ttl].bg, false); set(layer[era_lay_ttl].enabled, false); set(layer[era_lay_ttl].vcenter, true);
+  set(layer[era_lay_ttl].css, 'color:#BAD8C3; font-family:Inter, Arial, sans-serif; font-size:11px; font-weight:700; letter-spacing:1.2px;');
+  set(layer[era_lay_ttl].html, 'LỚP HIỂN THỊ');
+  set(layer[era_lay_ttl].zorder, 222); set(layer[era_lay_ttl].keep, true); set(layer[era_lay_ttl].visible, true);
+
+  addlayer(era_lay_chev);
+  set(layer[era_lay_chev].type, text); set(layer[era_lay_chev].align, lefttop); set(layer[era_lay_chev].edge, lefttop);
+  set(layer[era_lay_chev].x, 186); set(layer[era_lay_chev].y, 24); set(layer[era_lay_chev].width, 28); set(layer[era_lay_chev].height, 22);
+  set(layer[era_lay_chev].bg, true); set(layer[era_lay_chev].bgcolor, get(era_lay_acc)); set(layer[era_lay_chev].bgalpha, 0.18); set(layer[era_lay_chev].bgroundedge, 6);
+  set(layer[era_lay_chev].vcenter, true); set(layer[era_lay_chev].handcursor, true);
+  set(layer[era_lay_chev].onclick, 'era_layers_fold()');
+  set(layer[era_lay_chev].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:12px; text-align:center;');
+  set(layer[era_lay_chev].html, '&#9662;');
+  set(layer[era_lay_chev].zorder, 224); set(layer[era_lay_chev].keep, true); set(layer[era_lay_chev].visible, true);
+
+  era_lay_mkrow(1,  58, 'Tiện ích');
+  era_lay_mkrow(2,  96, 'Hạ tầng');
+  era_lay_mkrow(3, 134, 'Danh lam');
+  era_lay_mkrow(4, 172, 'Sản phẩm');
+
+  era_layers_fold_paint();
+</action>
+
+
+<!-- ============ 5. VE LAI BANG THEO TRANG THAI ========================
+     %1 chi so hang · %2 dang bat? · %3 so moc · %4 ten lop                -->
+<action name="era_lay_paintrow">
+  set(vtxt, ''); txtadd(vtxt, %4); txtadd(vtxt, get(vtxt), '  ·  '); txtadd(vtxt, get(vtxt), %3);
+  set(layer[era_lay_tx_%1].html, get(vtxt));
+
+  if(%2,
+    set(layer[era_lay_hit_%1].bgalpha, 0.16);
+    set(layer[era_lay_tr_%1].bgcolor, get(era_lay_acc));   set(layer[era_lay_tr_%1].bgalpha, 0.95);
+    set(layer[era_lay_kn_%1].x, 198);
+    set(layer[era_lay_tx_%1].css, 'color:#EDF8EF; font-family:Inter, Arial, sans-serif; font-size:12.5px; font-weight:600; white-space:nowrap;');
+  ,
+    set(layer[era_lay_hit_%1].bgalpha, 0.05);
+    set(layer[era_lay_tr_%1].bgcolor, get(era_lay_cmuted)); set(layer[era_lay_tr_%1].bgalpha, 0.45);
+    set(layer[era_lay_kn_%1].x, 182);
+    set(layer[era_lay_tx_%1].css, 'color:#83A08D; font-family:Inter, Arial, sans-serif; font-size:12.5px; font-weight:500; white-space:nowrap;');
+  );
+
+  if(%3 == 0,
+    set(layer[era_lay_hit_%1].alpha, 0.35); set(layer[era_lay_hit_%1].handcursor, false); set(layer[era_lay_hit_%1].enabled, false);
+    set(layer[era_lay_tx_%1].alpha, 0.35);
+    set(layer[era_lay_tr_%1].alpha, 0.35);  set(layer[era_lay_kn_%1].alpha, 0.35);
+  ,
+    set(layer[era_lay_hit_%1].alpha, 1); set(layer[era_lay_hit_%1].handcursor, true); set(layer[era_lay_hit_%1].enabled, true);
+    set(layer[era_lay_tx_%1].alpha, 1);
+    set(layer[era_lay_tr_%1].alpha, 1);  set(layer[era_lay_kn_%1].alpha, 1);
+  );
+</action>
+
+
+<action name="era_layers_paint">
+  era_lay_paintrow(1, get(era_lay_on_ti), get(era_lay_n_ti), 'Tiện ích');
+  era_lay_paintrow(2, get(era_lay_on_ht), get(era_lay_n_ht), 'Hạ tầng');
+  era_lay_paintrow(3, get(era_lay_on_dl), get(era_lay_n_dl), 'Danh lam');
+  era_lay_paintrow(4, get(era_lay_on_sp), get(era_lay_n_sp), 'Sản phẩm');
+
+  set(era_lay_tot, calc(era_lay_n_ti + era_lay_n_ht + era_lay_n_dl + era_lay_n_sp));
+  if(era_lay_tot == 0, era_layers_show(false); , era_layers_show(true); );
+</action>
+
+
+<action name="era_layers_show">
+  set(layer[era_lay_bg].visible,   %1);
+  set(layer[era_lay_ttl].visible,  %1);
+  set(layer[era_lay_chev].visible, %1);
+  if(%1, era_layers_fold_paint(); , era_lay_rows_show(false); );
+</action>
+
+
+<!-- ============ 6. THU GON / MO ======================================= -->
+<action name="era_lay_rows_show">
+  set(layer[era_lay_hit_1].visible, %1); set(layer[era_lay_tx_1].visible, %1); set(layer[era_lay_tr_1].visible, %1); set(layer[era_lay_kn_1].visible, %1);
+  set(layer[era_lay_hit_2].visible, %1); set(layer[era_lay_tx_2].visible, %1); set(layer[era_lay_tr_2].visible, %1); set(layer[era_lay_kn_2].visible, %1);
+  set(layer[era_lay_hit_3].visible, %1); set(layer[era_lay_tx_3].visible, %1); set(layer[era_lay_tr_3].visible, %1); set(layer[era_lay_kn_3].visible, %1);
+  set(layer[era_lay_hit_4].visible, %1); set(layer[era_lay_tx_4].visible, %1); set(layer[era_lay_tr_4].visible, %1); set(layer[era_lay_kn_4].visible, %1);
+</action>
+
+<action name="era_layers_fold_paint">
+  if(era_lay_open,
+    set(layer[era_lay_bg].height, 218);
+    set(layer[era_lay_chev].html, '&#9662;');
+    era_lay_rows_show(true);
+  ,
+    set(layer[era_lay_bg].height, 38);
+    set(layer[era_lay_chev].html, '&#9656;');
+    era_lay_rows_show(false);
+  );
+</action>
+
+<action name="era_layers_fold">
+  set(era_lay_open, calc(!era_lay_open));
+  era_layers_fold_paint();
+</action>
+
+
+<!-- ============ 7. BAM 1 LOP ========================================== -->
+<action name="era_layers_toggle">
+  if(%1 == 1, set(era_lay_on_ti, calc(!era_lay_on_ti)); );
+  if(%1 == 2, set(era_lay_on_ht, calc(!era_lay_on_ht)); );
+  if(%1 == 3, set(era_lay_on_dl, calc(!era_lay_on_dl)); );
+  if(%1 == 4, set(era_lay_on_sp, calc(!era_lay_on_sp)); );
+  era_layers_apply();
+</action>
+
+
+<!-- ============ 8. HEN GIO AP LAI =====================================
+     🔴 PHAI CHAY SAU khi POI va gim lo dung xong:
+       - POI: era_poi_build() -> js eraPoiRestore(), co moc 2.5s va 7s trong tour.html
+       - Gim lo: era_lots_sync() theo scene
+     Neu chi chay 1 lan ngay sau onnewpano thi nhan nao dung MUON se hien lai
+     du Anh da tat. Chay lai nhieu lan vo hai vi era_layers_apply idempotent.
+
+     🔴🔴 BAY 12/08 — KHONG DUNG DUOC `delayedcall` CHO VIEC NAY.
+     Trong krpano 1.19-pr16, chay `era_layers_apply()` tu trong delayedcall thi
+     vong lap `for(... i LT hotspot.count ...)` KHONG CHAY LAN NAO: `hotspot.count`
+     doc ra rong trong pham vi delayedcall nen bo dem dung o 0, panel bi coi la
+     "scene khong co moc nao" roi tu an di. Goi thang thi dung (35 moc).
+     Dang 3 tham so `delayedcall(id, giay, lenh)` con khong ban lan nao.
+     CA HAI DEU IM LANG — khong console do, khong loi XML.
+     => Hen gio chuyen sang setTimeout ben JS: `window.eraLayersKick` trong
+        tour.html (giong cach eraHideLoading da lam).                       -->
+<action name="era_layers_kick">
+  js( eraLayersKick() );
+</action>
+
+<events name="era_layers_events" keep="true"
+        onxmlcomplete="era_layers_build(); era_layers_kick();"
+        onnewpano="era_layers_kick();" />
+
+</krpano>

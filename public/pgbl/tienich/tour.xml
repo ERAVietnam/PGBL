@@ -1,0 +1,220 @@
+<krpano version="1.19" title="ERA Tien ich ELC - mat bang phang">
+
+  <view hlookat="0" vlookat="0" fovtype="HFOV" fov="1.0" fovmin="0.08" fovmax="1.0" maxpixelzoom="1.2" limitview="fullrange" />
+
+  <!-- ==== NEN (sua 11/08) =======================================
+       🔴 GOC LOI "BAM TIEN ICH LA TRANG MAN":
+       Ban cu dat anh 3456x2239 lam <image>. krpano 1.19-pr16 chi nap
+       noi anh phang (che do NORMAL) toi 2048px - DA DO TREN MAY THAT:
+       2048 chay, 2560 TRANG, 3072 TRANG. Nghia la anh 3456 CHUA BAO GIO
+       duoc ve; cai Anh Tony thay nay gio chi la the <preview>. Nen he
+       zoom (doi fov) la het cai de ve => trang bech. krpano im lang.
+       => <image> nay doi sang ban 2048 (tienich-elc-2048.jpg, sinh bang
+       Python/PIL). <preview> van giu anh goc 3456 de khung dau tien hien
+       ngay. Anh goc tienich-elc-v2.jpg GIU NGUYEN, khong xoa.
+       ⚠️ Da thu cach "chuan" hon la cat MULTIRES bang Python: tile chay
+       tot khi bam tien ich, NHUNG krpano ban nay chi ve lai man khi co
+       doi tam nhin, nen luc moi nap thi trang hoac thieu gim - khong on
+       dinh (da do nhieu lan). Da go bo. Muon dung multires that thi phai
+       chay droplet krpano tren may Windows.
+       ============================================================ -->
+  <preview url="tienich-elc-v2.jpg" />
+  <image type="CYLINDER" hfov="1.0" vfov="0.6479" voffset="0.0"><cylinder url="tienich-elc-2048.jpg" /></image>
+
+  <style name="ti_pin" edge="bottom" distorted="false" zoom="false" scale="0.17" scale.mobile="0.22"
+         onover="ti_over_fx();" onout="ti_out_fx();"
+         onclick="js(tiClick(get(tid)));" ondown="ti_pin_down();" onup="ti_pin_up();"
+         handcursor="true" />
+
+  <!-- ==== CO GIAN GIM THEO MUC ZOOM =============================
+       Gim de zoom="false" (khong meo theo anh), nhung neu de scale
+       CO DINH thi luc thu nho anh gim trong to lu, luc phong to lai
+       trong li ti. Nen tinh lai scale moi lan doi tam nhin:
+
+         ti_sc = base * (fovmax / fov)      chan tren = tmax
+
+       fov = fovmax (anh vua man)  -> gim NHO NHAT  = base
+       zoom vao                    -> gim to dan, cham tran tmax roi dung
+       Mobile dung base/tran rieng (ngon tay to hon con tro chuot).
+       ========================================================== -->
+  <action name="ti_rescale">
+    set(tb,   0.17);
+    set(tmax, 0.30);
+    if(device.mobile,
+      set(tb,   0.22);
+      set(tmax, 0.38);
+    );
+    set(tf, get(view.fov));
+    ifnot(tf GT 0, set(tf, 1.0); );
+    set(ti_sc, calc(tb * 1.0 / tf));
+    if(ti_sc GT tmax, set(ti_sc, get(tmax)); );
+    if(ti_sc LT 0.05, set(ti_sc, get(tb)); );
+    set(ti_sc_over, calc(ti_sc * 1.18));
+    for(set(i,0), i LT hotspot.count, inc(i),
+      if(hotspot[get(i)].tid,
+        set(hotspot[get(i)].scale, get(ti_sc));
+      );
+    );
+  </action>
+
+  <events name="ti_zoom_events" keep="true"
+          onviewchange="ti_rescale();" onnewpano="ti_rescale();" onxmlcomplete="ti_rescale();" />
+
+  <!-- ==== CHE DO CHAM VI TRI ==================================
+       Bat bang nut CHAM VI TRI o goc phai duoi (hoac phim V).
+       Khi bat: keo duoc gim, va bam CHAM DIEM roi click len anh
+       de dat 1 tien ich moi.
+       ======================================================== -->
+  <action name="ti_pin_down">
+    if(ti_edit_on == true, draghotspot(); );
+  </action>
+  <action name="ti_pin_up">
+    if(ti_edit_on == true, js( tiSaveDraft() ); );
+  </action>
+
+  <!-- tao 1 gim:  ti_add( ath , atv , id , ten_hotspot )
+       Gan .style luc chay KHONG an tren krpano 1.19, phai set thang
+       tung thuoc tinh, neu khong gim to bang anh goc vi scale = 1.0.
+       KHONG dat comment ben trong than action. -->
+  <action name="ti_add">
+    addhotspot(%4);
+    set(hotspot[%4].url, calc('pins30/pin-ti-' + %3 + '.png'));
+    set(hotspot[%4].tid, %3);
+    set(hotspot[%4].ath, %1);
+    set(hotspot[%4].atv, %2);
+    set(hotspot[%4].zorder, 30);
+    set(hotspot[%4].edge, bottom);
+    set(hotspot[%4].distorted, false);
+    set(hotspot[%4].zoom, false);
+    set(hotspot[%4].scale, get(ti_sc));
+    set(hotspot[%4].handcursor, true);
+    set(hotspot[%4].onover, ti_over_fx(););
+    set(hotspot[%4].onout, ti_out_fx(););
+    set(hotspot[%4].onclick, ti_click_fx(););
+    set(hotspot[%4].ondown, ti_pin_down(););
+    set(hotspot[%4].onup, ti_pin_up(););
+  </action>
+
+  <action name="ti_over_fx">
+    tween(scale, get(ti_sc_over), 0.1);
+    js( tiOver(get(tid)) );
+  </action>
+  <action name="ti_out_fx">
+    tween(scale, get(ti_sc), 0.1);
+    js( tiOut() );
+  </action>
+  <action name="ti_click_fx">
+    js( tiClick(get(tid)) );
+  </action>
+
+  <action name="ti_remove">
+    removehotspot(%1);
+    js( tiSaveDraft() );
+  </action>
+
+  <!-- click len anh khi dang cho dat diem -->
+  <action name="ti_click_add">
+    if(ti_edit_on == true,
+      if(ti_add_mode == true,
+        screentosphere(mouse.x, mouse.y, tk_ath, tk_atv);
+        set(ti_add_mode, false);
+        js( tiPickPlace(get(tk_ath), get(tk_atv)) );
+      );
+    );
+  </action>
+
+  <!-- gom toa do tat ca gim vao bien tiexp.
+       Tach lam 3 action de KHONG phai truyen tham so co dau phay
+       vao trong js(...) - do la cach krpano hay hieu nham. -->
+  <action name="ti_collect_save">
+    ti_gather();
+    js( tiCollectedSave(get(tiexp)) );
+  </action>
+
+  <action name="ti_collect_export">
+    ti_gather();
+    js( tiCollectedExport(get(tiexp)) );
+  </action>
+
+  <action name="ti_gather">
+    set(tiexp, '');
+    for(set(i, 0), i LT hotspot.count, inc(i),
+      if(hotspot[get(i)].tid != null,
+        txtadd(tiexp, get(tiexp), get(hotspot[get(i)].tid));
+        txtadd(tiexp, get(tiexp), '|');
+        txtadd(tiexp, get(tiexp), get(hotspot[get(i)].ath));
+        txtadd(tiexp, get(tiexp), '|');
+        txtadd(tiexp, get(tiexp), get(hotspot[get(i)].atv));
+        txtadd(tiexp, get(tiexp), '|');
+        txtadd(tiexp, get(tiexp), get(hotspot[get(i)].name));
+        txtadd(tiexp, get(tiexp), '###');
+      );
+    );
+  </action>
+
+  <!-- xoa sach gim, KHONG ghi de ban nhap (dung khi nap lai tu nhap) -->
+  <action name="ti_wipe">
+    for(set(i, hotspot.count), i GT 0, dec(i),
+      set(j, calc(i - 1));
+      if(hotspot[get(j)].tid != null, removehotspot(get(hotspot[get(j)].name)); );
+    );
+  </action>
+
+  <!-- xoa sach VA ghi lai ban nhap rong -->
+  <action name="ti_clear_all">
+    ti_wipe();
+    js( tiSaveDraft() );
+  </action>
+
+  <events name="ti_events" keep="true" onclick="ti_click_add();" />
+
+  <!-- ==== VI TRI GIM - DAN O DAY ==============================
+       Dang TRONG: Tony cham lai toan bo 30 tien ich tu dau (10/08).
+       Cach lam: bam CHAM VI TRI (V) roi CHAM DIEM roi click len anh
+       roi chon tien ich. Cham xong 30 muc thi bam XUAT XML va dan
+       khoi hotspot vao ngay ben duoi dong nay, roi luu file.
+       CHU Y: tuyet doi khong go dau ngoac nhon trong comment krpano.
+       ========================================================= -->
+
+  <!-- ==== 37 GIM · 30 tien ich (Anh Tony cham 11/08 tren anh moi tienich-elc-v2.jpg) ====
+       Gim phu dung chung tid: 5b 5c · 20b · 27b · 30b 30c 30d
+       ================================================================================== -->
+  <hotspot name="ti_1" style="ti_pin" url="pins30/pin-ti-1.png" tid="1" ath="-0.40748" atv="-0.26211" zorder="30" />
+  <hotspot name="ti_2" style="ti_pin" url="pins30/pin-ti-2.png" tid="2" ath="-0.38568" atv="-0.26745" zorder="30" />
+  <hotspot name="ti_3" style="ti_pin" url="pins30/pin-ti-3.png" tid="3" ath="-0.4146" atv="-0.21985" zorder="30" />
+  <hotspot name="ti_4" style="ti_pin" url="pins30/pin-ti-4.png" tid="4" ath="-0.38435" atv="-0.21807" zorder="30" />
+  <hotspot name="ti_5" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.15659" atv="-0.02902" zorder="30" />
+  <hotspot name="ti_5b" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.03915" atv="-0.08863" zorder="30" />
+  <hotspot name="ti_5c" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.07651" atv="-0.06861" zorder="30" />
+  <hotspot name="ti_6" style="ti_pin" url="pins30/pin-ti-6.png" tid="6" ath="-0.18817" atv="-0.02279" zorder="30" />
+  <hotspot name="ti_7" style="ti_pin" url="pins30/pin-ti-7.png" tid="7" ath="-0.17127" atv="-0.00143" zorder="30" />
+  <hotspot name="ti_8" style="ti_pin" url="pins30/pin-ti-8.png" tid="8" ath="-0.06317" atv="-0.07439" zorder="30" />
+  <hotspot name="ti_9" style="ti_pin" url="pins30/pin-ti-9.png" tid="9" ath="-0.13835" atv="-0.03435" zorder="30" />
+  <hotspot name="ti_10" style="ti_pin" url="pins30/pin-ti-10.png" tid="10" ath="-0.14927" atv="-0.04811" zorder="30" />
+  <hotspot name="ti_11" style="ti_pin" url="pins30/pin-ti-11.png" tid="11" ath="-0.22354" atv="0.0223" zorder="30" />
+  <hotspot name="ti_12" style="ti_pin" url="pins30/pin-ti-12.png" tid="12" ath="-0.03304" atv="-0.08838" zorder="30" />
+  <hotspot name="ti_13" style="ti_pin" url="pins30/pin-ti-13.png" tid="13" ath="-0.08512" atv="-0.04835" zorder="30" />
+  <hotspot name="ti_14" style="ti_pin" url="pins30/pin-ti-14.png" tid="14" ath="-0.09887" atv="-0.05799" zorder="30" />
+  <hotspot name="ti_15" style="ti_pin" url="pins30/pin-ti-15.png" tid="15" ath="-0.02074" atv="-0.07295" zorder="30" />
+  <hotspot name="ti_16" style="ti_pin" url="pins30/pin-ti-16.png" tid="16" ath="-0.09417" atv="0.15329" zorder="30" />
+  <hotspot name="ti_17" style="ti_pin" url="pins30/pin-ti-17.png" tid="17" ath="-0.06326" atv="0.1231" zorder="30" />
+  <hotspot name="ti_18" style="ti_pin" url="pins30/pin-ti-18.png" tid="18" ath="-0.0327" atv="0.04762" zorder="30" />
+  <hotspot name="ti_19" style="ti_pin" url="pins30/pin-ti-19.png" tid="19" ath="0.03738" atv="0.09219" zorder="30" />
+  <hotspot name="ti_20" style="ti_pin" url="pins30/pin-ti-20.png" tid="20" ath="0.07261" atv="0.0638" zorder="30" />
+  <hotspot name="ti_20b" style="ti_pin" url="pins30/pin-ti-20.png" tid="20" ath="0.0532" atv="0.1116" zorder="30" />
+  <hotspot name="ti_21" style="ti_pin" url="pins30/pin-ti-21.png" tid="21" ath="0.15312" atv="0.19031" zorder="30" />
+  <hotspot name="ti_22" style="ti_pin" url="pins30/pin-ti-22.png" tid="22" ath="0.12983" atv="0.19451" zorder="30" />
+  <hotspot name="ti_23" style="ti_pin" url="pins30/pin-ti-23.png" tid="23" ath="0.17676" atv="0.2103" zorder="30" />
+  <hotspot name="ti_24" style="ti_pin" url="pins30/pin-ti-24.png" tid="24" ath="0.20088" atv="0.19363" zorder="30" />
+  <hotspot name="ti_25" style="ti_pin" url="pins30/pin-ti-25.png" tid="25" ath="0.20702" atv="0.10767" zorder="30" />
+  <hotspot name="ti_26" style="ti_pin" url="pins30/pin-ti-26.png" tid="26" ath="0.27719" atv="0.12258" zorder="30" />
+  <hotspot name="ti_27" style="ti_pin" url="pins30/pin-ti-27.png" tid="27" ath="0.32104" atv="0.13223" zorder="30" />
+  <hotspot name="ti_27b" style="ti_pin" url="pins30/pin-ti-27.png" tid="27" ath="0.38288" atv="0.14013" zorder="30" />
+  <hotspot name="ti_28" style="ti_pin" url="pins30/pin-ti-28.png" tid="28" ath="0.19386" atv="0.12872" zorder="30" />
+  <hotspot name="ti_29" style="ti_pin" url="pins30/pin-ti-29.png" tid="29" ath="0.36577" atv="0.0796" zorder="30" />
+  <hotspot name="ti_30" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="0.00044" atv="0.04916" zorder="30" />
+  <hotspot name="ti_30b" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="0.04678" atv="0.07222" zorder="30" />
+  <hotspot name="ti_30c" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="-0.367" atv="-0.24622" zorder="30" />
+  <hotspot name="ti_30d" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="-0.18773" atv="0.21063" zorder="30" />
+
+</krpano>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Mock nhãn tuyến đường — PGBL 360</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0C0C44; --red:#C8102E; --white:#FFFFFF;
+  --ink:#12123a; --muted:#6b6b8a; --line:#e3e3ee;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f4f8;font-family:Inter,Arial,sans-serif;color:var(--ink)}
+header{padding:18px 24px 12px;border-bottom:1px solid var(--line);background:#fff}
+header h1{margin:0 0 4px;font-size:19px;font-weight:800;letter-spacing:-.2px}
+header p{margin:0;font-size:13px;color:var(--muted)}
+.wrap{max-width:1500px;margin:0 auto;padding:18px 24px 60px}
+
+.stage{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;
+  background:#222 url('mock-nen.jpg') center/cover no-repeat;box-shadow:0 8px 30px rgba(12,12,68,.16)}
+.stage.dim::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.22)}
+
+/* ===== 1 nhãn = anchor(neo) + leader(đường dẫn) + sign(biển) ===== */
+.poi{position:absolute;transform:translate(-50%,0);z-index:5}
+.poi .dot{position:absolute;left:50%;top:0;width:9px;height:9px;margin-left:-4.5px;margin-top:-4.5px;
+  transform:rotate(45deg);background:var(--red);box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.poi .leader{position:absolute;left:50%;bottom:0;width:2px;margin-left:-1px;background:var(--red);opacity:.9}
+.poi .sign{position:absolute;left:50%;bottom:0;transform:translateX(-50%);white-space:nowrap;
+  transform-origin:50% 100%}
+.poi .signrot{position:absolute;left:50%;bottom:0;transform-origin:50% 100%}
+
+/* ---- style biển ---- */
+.s-base{display:inline-flex;align-items:center;gap:8px;font-weight:700;line-height:1;white-space:nowrap}
+
+/* 0 · HIỆN TẠI */
+.v0{color:#fff;font-family:Arial,sans-serif;font-size:17px;font-weight:700;font-style:italic;
+  letter-spacing:1.2px;text-shadow:0 2px 7px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.95);padding:2px 6px}
+.v0bar{height:2px;background:var(--red);opacity:.95;margin-top:4px}
+
+/* A · Biển đặc navy */
+.vA{background:var(--navy);color:#fff;font-size:14px;padding:7px 14px;border-radius:6px;
+  box-shadow:0 4px 14px rgba(0,0,0,.4)}
+
+/* B · Biển navy viền trắng (chuẩn biển tên đường VN) */
+.vB{background:var(--navy);color:#fff;font-size:14px;padding:7px 15px;border-radius:5px;
+  border:1.5px solid rgba(255,255,255,.92);box-shadow:0 4px 14px rgba(0,0,0,.45)}
+
+/* C · Biển trắng chữ navy */
+.vC{background:rgba(255,255,255,.96);color:var(--navy);font-size:14px;padding:7px 15px;border-radius:5px;
+  border:1.5px solid var(--navy);box-shadow:0 4px 14px rgba(0,0,0,.35)}
+
+/* D · Navy + vạch đỏ đầu biển */
+.vD{background:var(--navy);color:#fff;font-size:14px;padding:7px 15px 7px 12px;border-radius:5px;
+  box-shadow:0 4px 14px rgba(0,0,0,.42)}
+.vD .bar{display:inline-block;width:4px;height:15px;background:var(--red);border-radius:2px;margin-right:9px;
+  vertical-align:-2px}
+
+/* E · Quốc lộ: chip đỏ số hiệu + biển navy */
+.vE{display:inline-flex;align-items:stretch;border-radius:6px;overflow:hidden;gap:0;
+  box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.vE .chip{background:var(--red);color:#fff;font-size:14px;font-weight:800;padding:7px 11px;letter-spacing:.5px}
+.vE .name{background:var(--navy);color:#fff;font-size:14px;font-weight:700;padding:7px 14px}
+
+/* nhãn tên biến thể trên ảnh */
+.tag{position:absolute;transform:translate(-50%,0);font-size:10px;font-weight:800;letter-spacing:1px;
+  color:#fff;background:rgba(12,12,68,.82);padding:3px 7px;border-radius:4px;z-index:9;white-space:nowrap}
+
+/* ===== bảng điều khiển ===== */
+.panel{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.panel h2{margin:0 0 12px;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.row{display:flex;flex-wrap:wrap;gap:22px;align-items:center}
+.ctl{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
+.ctl input[type=range]{width:160px}
+.ctl b{color:var(--ink);font-weight:700}
+label.chk{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink)}
+
+/* ===== bảng so sánh ===== */
+table{width:100%;border-collapse:collapse;margin-top:18px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;overflow:hidden;font-size:13px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#fafaff;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.ok{color:#0a8a3f;font-weight:700}
+.warn{color:#c07800;font-weight:700}
+.no{color:var(--red);font-weight:700}
+.pick{display:inline-block;background:var(--navy);color:#fff;font-size:11px;font-weight:800;
+  padding:3px 8px;border-radius:4px;letter-spacing:.5px}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted);line-height:1.65}
+</style>
+</head>
+<body>
+<header>
+  <h1>Nhãn tuyến đường — 5 phương án so cạnh nhau</h1>
+  <p>Nền = ảnh flycam thật của Phú Gia Bảo Lộc (mặt trước pano <code>02-toan-canh</code>). Mọi kiểu bên dưới đều dựng được bằng thuộc tính krpano gốc (<code>bg / bgcolor / bgborder / bgroundedge / bgshadow / padding</code>) — không cần render PNG.</p>
+</header>
+
+<div class="wrap">
+  <div class="stage" id="stage">
+    <!-- các nhãn được JS sinh vào đây -->
+  </div>
+
+  <div class="panel">
+    <h2>Chỉnh thử</h2>
+    <div class="row">
+      <div class="ctl">Cỡ chữ <b id="lbFs">14</b> px<input type="range" id="fs" min="10" max="24" value="14"></div>
+      <div class="ctl">Cao đường dẫn <b id="lbGc">26</b> px<input type="range" id="gc" min="0" max="90" value="26"></div>
+      <div class="ctl">Bo góc <b id="lbRd">5</b> px<input type="range" id="rd" min="0" max="20" value="5"></div>
+      <div class="ctl">Độ mờ nền biển <b id="lbOp">100</b> %<input type="range" id="op" min="40" max="100" value="100"></div>
+      <label class="chk"><input type="checkbox" id="rot" checked> Nghiêng theo độ dốc đường</label>
+      <label class="chk"><input type="checkbox" id="dim"> Tối nền 22% (thử độ đọc)</label>
+    </div>
+  </div>
+
+  <table>
+    <tr><th style="width:90px">Phương án</th><th>Mô tả</th><th style="width:190px">Dựng bằng krpano gốc</th><th style="width:230px">Điểm mạnh / điểm yếu</th></tr>
+    <tr><td><b>0 · Hiện tại</b></td><td>Chữ trắng in nghiêng + gạch đỏ 2px + đường dẫn dọc mờ 0.55</td><td class="ok">Đang chạy</td><td>Gạch cố định 200px không co theo chữ · đường dẫn gần như vô hình · chữ chìm trên nền sáng</td></tr>
+    <tr><td><b>A</b></td><td>Biển đặc navy ERA, bo 6, bóng đổ</td><td class="ok">100% — 1 hotspot chữ</td><td>Gọn, đọc rõ mọi nền · hơi "nặng" nếu nhiều tuyến</td></tr>
+    <tr><td><b>B</b> <span class="pick">GỢI Ý</span></td><td>Navy + viền trắng mảnh — đúng ngữ pháp biển tên đường Việt Nam</td><td class="ok">100% — <code>bgborder="1.5 0xFFFFFF 0.92"</code></td><td>Nhìn ra ngay là tên đường · viền trắng tách khỏi nền cây cối</td></tr>
+    <tr><td><b>C</b></td><td>Biển trắng chữ navy, viền navy</td><td class="ok">100%</td><td>Sáng, sạch · dễ lẫn với mái tôn / nhà trắng trong ảnh</td></tr>
+    <tr><td><b>D</b></td><td>Navy + vạch đỏ ERA đầu biển</td><td class="warn">Cần thêm 1 hotspot nhỏ làm vạch</td><td>Có chất thương hiệu ERA · thêm 1 khối = thêm chỗ lệch</td></tr>
+    <tr><td><b>E</b></td><td>Quốc lộ: chip đỏ số hiệu + biển navy tên</td><td class="warn">2 hotspot ghép cạnh (quy tắc neo trái/phải)</td><td>Phân cấp rõ QL / đường tỉnh / đường nội bộ · chỉ hợp tuyến có số hiệu</td></tr>
+  </table>
+
+  <div class="note">
+    Ghi chú kỹ thuật: krpano <b>không</b> có <code>backdrop-filter</code> nên không làm được kính mờ thật — mọi hiệu ứng "kính" chỉ là nền bán trong suốt. Chữ <b>không</b> uốn theo đường cong được (không có text-on-path); tuyến cong thì cắt 2–3 đoạn, mỗi đoạn 1 nhãn góc riêng. Thuộc tính <code>rx/ry/rz</code> (nằm bẹp xuống mặt đường) đã nghiệm thu là <b>không dùng được với text hotspot</b> — chỉ còn <code>rotate</code> phẳng.
+  </div>
+</div>
+
+<script>
+/* ====== dữ liệu 6 nhãn đặt lên các tuyến thật trong ảnh ====== */
+const POIS = [
+  { v:'v0', x:22.5, y:70.5, rot:-4,  label:'0 · HIỆN TẠI',  name:'Đ Ngô Tất Tố' },
+  { v:'vA', x:52.0, y:63.0, rot:-8,  label:'A · BIỂN ĐẶC',  name:'Đ Trần Phú' },
+  { v:'vB', x:80.0, y:57.5, rot:6,   label:'B · VIỀN TRẮNG', name:'Đ Xuân Diệu' },
+  { v:'vC', x:33.0, y:47.0, rot:-3,  label:'C · BIỂN TRẮNG', name:'Đ Tránh TP Bảo Lộc' },
+  { v:'vD', x:63.0, y:38.5, rot:-2,  label:'D · VẠCH ĐỎ',   name:'Đ Lê Phụng Hiểu' },
+  { v:'vE', x:47.0, y:24.0, rot:-1,  label:'E · QUỐC LỘ',   name:'Bảo Lộc – Đà Lạt', code:'QL20' }
+];
+
+const stage = document.getElementById('stage');
+
+function build(){
+  const fs = +document.getElementById('fs').value;
+  const gc = +document.getElementById('gc').value;
+  const rd = +document.getElementById('rd').value;
+  const op = +document.getElementById('op').value/100;
+  const useRot = document.getElementById('rot').checked;
+
+  document.getElementById('lbFs').textContent = fs;
+  document.getElementById('lbGc').textContent = gc;
+  document.getElementById('lbRd').textContent = rd;
+  document.getElementById('lbOp').textContent = Math.round(op*100);
+  stage.classList.toggle('dim', document.getElementById('dim').checked);
+
+  stage.innerHTML = '';
+  POIS.forEach(p=>{
+    const rot = useRot ? p.rot : 0;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'poi';
+    wrap.style.left = p.x + '%';
+    wrap.style.top  = p.y + '%';
+    wrap.style.height = '0px';
+
+    // chấm neo
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    wrap.appendChild(dot);
+
+    // đường dẫn
+    const ld = document.createElement('div');
+    ld.className = 'leader';
+    ld.style.height = gc + 'px';
+    ld.style.bottom = '0px';
+    ld.style.position = 'absolute';
+    ld.style.top = (-gc) + 'px';
+    wrap.appendChild(ld);
+
+    // biển
+    const holder = document.createElement('div');
+    holder.style.position = 'absolute';
+    holder.style.left = '50%';
+    holder.style.top  = (-gc) + 'px';
+    holder.style.transform = 'translate(-50%,-100%) rotate(' + rot + 'deg)';
+    holder.style.transformOrigin = '50% 100%';
+
+    if(p.v === 'v0'){
+      const t = document.createElement('div');
+      t.className = 'v0';
+      t.style.fontSize = fs + 'px';
+      t.textContent = p.name;
+      const bar = document.createElement('div');
+      bar.className = 'v0bar';
+      bar.style.width = '200px';
+      bar.style.marginLeft = 'auto'; bar.style.marginRight = 'auto';
+      holder.appendChild(t); holder.appendChild(bar);
+    } else {
+      const s = document.createElement('div');
+      s.className = 's-base ' + p.v;
+      s.style.fontSize = fs + 'px';
+      s.style.borderRadius = rd + 'px';
+      if(p.v === 'vE'){
+        s.style.borderRadius = rd + 'px';
+        s.innerHTML = '<span class="chip" style="font-size:'+fs+'px">'+p.code+'</span>' +
+                      '<span class="name" style="font-size:'+fs+'px">'+p.name+'</span>';
+      } else if(p.v === 'vD'){
+        s.innerHTML = '<span class="bar" style="height:'+(fs+1)+'px"></span>' + p.name;
+      } else {
+        s.textContent = p.name;
+      }
+      // độ mờ nền (chỉ nền, không mờ chữ)
+      if(p.v === 'vA' || p.v === 'vB' || p.v === 'vD'){
+        s.style.background = 'rgba(12,12,68,' + op + ')';
+      } else if(p.v === 'vC'){
+        s.style.background = 'rgba(255,255,255,' + Math.min(op+0.02,1) + ')';
+      }
+      holder.appendChild(s);
+    }
+    wrap.appendChild(holder);
+
+    // nhãn tên phương án
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.style.left = p.x + '%';
+    tag.style.top  = 'calc(' + p.y + '% + 12px)';
+    tag.textContent = p.label;
+    stage.appendChild(tag);
+
+    stage.appendChild(wrap);
+  });
+}
+
+['fs','gc','rd','op','rot','dim'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', build);
+  document.getElementById(id).addEventListener('change', build);
+});
+build();
+</script>
+</body>
+</html>

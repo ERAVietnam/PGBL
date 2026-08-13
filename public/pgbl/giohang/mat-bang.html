@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<title>Mat bang phan lo - Khu do thi Phu Gia Bao Loc</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<style>
+		html { height:100%; overflow:hidden; }
+		body {
+			height:100%; overflow:hidden; margin:0; padding:0;
+			font-family:'Inter', Arial, sans-serif;
+			background-color:#F5F5F5;
+		}
+		#era-bar {
+			position:absolute; top:0; left:0; right:0; height:46px; z-index:50;
+			background:#FFFFFF; border-bottom:1px solid #EEEEEE;
+			display:flex; align-items:center; padding:0 18px; gap:14px;
+		}
+		#era-bar .t { font-size:14px; font-weight:700; color:#C8102E; letter-spacing:.3px; }
+		#era-bar .s { font-size:12px; color:#666; }
+		#era-bar .legend { margin-left:auto; display:flex; gap:14px; font-size:11px; color:#444; }
+		#era-bar .legend i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:5px; }
+		#pano { position:absolute; top:46px; left:0; right:0; bottom:0; }
+	</style>
+</head>
+<body>
+
+<div id="era-bar">
+	<span class="t">ERA VIETNAM</span>
+	<span class="s">Mat bang phan lo - Khu do thi Phu Gia Bao Loc</span>
+	<span class="legend">
+		<span><i style="background:#41B3E0"></i>Con hang</span>
+		<span><i style="background:#FF9015"></i>Giu cho</span>
+		<span><i style="background:#C8102E"></i>Da ban</span>
+	</span>
+</div>
+
+<script src="pano.js"></script>
+
+<div id="pano">
+	<noscript>Vui long bat Javascript de xem mat bang.</noscript>
+	<script>
+		embedpano({
+			swf:"pano.swf",
+			xml:"mb-tour.xml",
+			target:"pano",
+			html5:"auto",
+			bgcolor:"#F5F5F5",
+			mobilescale:1.0,
+			passQueryParameters:true
+		});
+	</script>
+</div>
+
+</body>
+</html>
