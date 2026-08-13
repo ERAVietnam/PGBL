@@ -31,8 +31,7 @@ export function PgblBottomNav() {
   if (
     pathname.startsWith("/tour360") ||
     pathname.startsWith("/giohang") ||
-    pathname.startsWith("/tienich") ||
-    pathname.startsWith("/ebro")
+    pathname.startsWith("/tienich")
   ) {
     return null;
   }
