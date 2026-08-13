@@ -30,9 +30,7 @@ export function PgblBottomNav() {
   const pathname = usePathname();
   if (
     pathname.startsWith("/tour360") ||
-    pathname.startsWith("/giohang") ||
-    pathname.startsWith("/tienich") ||
-    pathname.startsWith("/ebro")
+    pathname.startsWith("/giohang")
   ) {
     return null;
   }
