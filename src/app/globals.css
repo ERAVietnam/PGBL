@@ -24,7 +24,9 @@ html {
 }
 
 body {
-  min-height: 100vh;
+  /* NEXT: 100dvh thay 100vh — tren mobile 100vh tinh ca vung bi thanh dia chi
+     trinh duyet che, khien iframe dai hon man hinh that va menu day bi cat. */
+  min-height: 100dvh;
   background: var(--background);
   color: var(--foreground);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
