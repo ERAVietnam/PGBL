@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Maximize2, Minus, Plus, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PGBL_ROUTES } from "@/lib/routes";
 
 type BrochurePage = {
   src: string;
@@ -216,7 +217,7 @@ export function EBrochureViewer() {
   return (
     <main className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_-10%,#16342B_0%,#0D2620_46%,#081712_100%)] pb-28 text-[var(--pgbl-text)]">
       <header className="flex flex-wrap items-center justify-between gap-4 px-[26px] py-[18px]">
-        <Link href="/" className="block">
+        <Link href={PGBL_ROUTES.home} className="block">
           <Image
             src="/pgbl/assets/wordmark.png"
             alt="Phú Gia Bảo Lộc"

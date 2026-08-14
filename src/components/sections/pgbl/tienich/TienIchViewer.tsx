@@ -136,7 +136,17 @@ export function TienIchViewer() {
     if (!kp) return;
 
     const isMobileLayout = window.matchMedia("(max-width: 767px)").matches;
-    kp.set("view.vlookatmax", isMobileLayout ? 0.324 : 0.435);
+    if (isMobileLayout) {
+      /* Mobile: menu duoi khong de len map nhu desktop nen khong can khoang
+         dem xanh duoi map. Cho range trung dung mep anh (vfov=0.6479 ->
+         +-0.324) + can giua: krpano tu cap fov de anh phu kin chieu doc va
+         chan pan theo mep anh -> khong con khoang trong xanh duoi map. */
+      kp.set("view.vlookatmin", -0.324);
+      kp.set("view.vlookatmax", 0.324);
+      kp.set("view.vlookat", 0);
+    } else {
+      kp.set("view.vlookatmax", 0.435);
+    }
   }, []);
 
   const activeAmenity = useMemo(
@@ -394,8 +404,13 @@ export function TienIchViewer() {
             kpRef.current = krpano;
             krpano.set("ti_edit_on", false);
             krpano.set("ti_add_mode", false);
-            applyResponsiveViewLimit();
-            window.setTimeout(syncHotspots, 350);
+            /* tour.xml nap xong SAU onready va se GHI DE <view> (vlookatmax...),
+               nen phai cho XML xong roi moi set gioi han mobile. Moc 350ms da
+               duoc dung de doc hotspot (chung to luc do XML da nap xong). */
+            window.setTimeout(() => {
+              applyResponsiveViewLimit();
+              syncHotspots();
+            }, 350);
             window.setTimeout(() => {
               const fov = Number(krpano.get("view.fov"));
               if (Number.isFinite(fov)) krpano.set("view.fov", fov * 0.995);

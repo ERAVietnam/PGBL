@@ -1,4 +1,5 @@
 import { BookOpen, Grid3X3, House, Images, Map, Plane, type LucideIcon } from "lucide-react";
+import { PGBL_ROUTES } from "@/lib/routes";
 
 export type PgblHomeCard = {
   title: string;
@@ -14,21 +15,21 @@ export const pgblHomeCards: PgblHomeCard[] = [
   {
     title: "Flycam 360°",
     description: "Ba cảnh bay: tổng thể, toàn cảnh và view núi. Xoay 360°, xem trên điện thoại.",
-    href: "/tour360",
+    href: PGBL_ROUTES.tour360,
     action: "Bay vào tour",
     icon: Plane,
   },
   {
     title: "Mặt bằng sản phẩm",
     description: "Giỏ hàng phân lô tương tác: mã lô, diện tích, hướng, trạng thái, giá - kèm bộ lọc.",
-    href: "/giohang",
+    href: PGBL_ROUTES.giohang,
     action: "Mở mặt bằng",
     icon: Grid3X3,
   },
   {
     title: "Mặt bằng tiện ích",
     description: "Sơ đồ tiện ích nội khu: bấm marker hoặc chọn danh sách để xem chi tiết từng điểm.",
-    href: "/tienich",
+    href: PGBL_ROUTES.tienich,
     action: "Xem tiện ích",
     icon: Map,
   },
@@ -53,7 +54,7 @@ export const pgblHomeCards: PgblHomeCard[] = [
   {
     title: "E-Brochure",
     description: "Ấn phẩm giới thiệu dự án dạng flipbook lật trang, đọc mượt trên mọi thiết bị.",
-    href: "/ebro",
+    href: PGBL_ROUTES.ebro,
     action: "Lật brochure",
     icon: BookOpen,
   },

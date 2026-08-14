@@ -41,6 +41,11 @@ export function HomeIntro() {
     const ruleEl = rule;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    /* Warning X4122 (double precision) do ANGLE/D3D tren Windows sinh ra khi
+       compile shader noi bo cua three.js - vo hai va khong sua duoc tu code
+       minh. Tat kiem tra shader log de console sach (scene chi dung vat lieu
+       co san cua three, khong co shader tu viet nen khong mat gi). */
+    renderer.debug.checkShaderErrors = false;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;

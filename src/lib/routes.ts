@@ -1,10 +1,17 @@
-import type { PgblRoute } from "@/types/navigation";
+// ============================================
+// PGBL - Route Configuration
+// Single source of truth cho đường dẫn. Label/icon/soon
+// thuộc về từng component, không khai báo ở đây.
+// ============================================
 
-export const pgblRoutes: PgblRoute[] = [
-  { id: "tour360", href: "/tour360", label: "Flycam 360" },
-  { id: "giohang", href: "/giohang", label: "San pham" },
-  { id: "tienich", href: "/tienich", label: "Tien ich" },
-  { id: "nhamau", href: "#", label: "Nha mau", soon: true },
-  { id: "gallery", href: "#", label: "Gallery", soon: true },
-  { id: "ebro", href: "/ebro", label: "E-Brochure" },
-];
+export const PGBL_ROUTES = {
+  home: "/",
+  tour360: "/tour360",
+  giohang: "/giohang",
+  tienich: "/tienich",
+  nhamau: "/nhamau",
+  gallery: "/gallery",
+  ebro: "/ebro",
+} as const;
+
+export default PGBL_ROUTES;
