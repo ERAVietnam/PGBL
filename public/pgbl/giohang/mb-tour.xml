@@ -118,6 +118,35 @@
 <action name="era_init" autorun="onstart">
 	set(bgcolor, 0xFFFFFF);
 	set(layer[defaultskin_buttons].y, 98);
+
+	<!-- 🔴 14/08/2026 - Anh Tony chot: GIU MOI NUT TOAN MAN HINH.
+	     Ly do bo 8 nut kia tren trang MAT BANG PHANG:
+	       - 4 mui ten: keo ban do lam duoc y het, iPad cang tu nhien hon
+	       - + / - : lan chuot va chum 2 ngon da co
+	       - btn_ctrlmode: gat qua lai drag <-> moveto, bam nham giua luc demo
+	         thi cach keo ban do doi kieu, sale tuong web hong
+	       - btn_autorot: day la MAT BANG PHANG, bat len la ban ve tu quay tron
+	     🔴 BAY 11/08 (giu nguyen canh bao): TUYET DOI KHONG khai bao lai
+	     layer[defaultskin_buttons] o cap goc de sua. Chi duoc set() trong action
+	     nhu duoi day - khai bao lai la krpano BO LUON ANH NEN.
+	     BAT LAI: xoa khoi set(...visible,false) duoi day, tra x cua btn_fs ve 320
+	     va width ve 360. File skin/defaultskin.xml VAN NGUYEN, khong dung toi. -->
+	set(layer[btn_in].visible,       false);  set(layer[btn_in].enabled,       false);
+	set(layer[btn_out].visible,      false);  set(layer[btn_out].enabled,      false);
+	set(layer[btn_left].visible,     false);  set(layer[btn_left].enabled,     false);
+	set(layer[btn_right].visible,    false);  set(layer[btn_right].enabled,    false);
+	set(layer[btn_up].visible,       false);  set(layer[btn_up].enabled,       false);
+	set(layer[btn_down].visible,     false);  set(layer[btn_down].enabled,     false);
+	set(layer[btn_ctrlmode].visible, false);  set(layer[btn_ctrlmode].enabled, false);
+	set(layer[btn_autorot].visible,  false);  set(layer[btn_autorot].enabled,  false);
+	<!-- don nut toan man hinh ve dau hop + thu hop lai cho no nam giua man -->
+	set(layer[btn_fs].x, 0);
+	<!-- 🔴 Doi hanh dong nut toan man hinh: KHONG dung switch(fullscreen) cua krpano
+	     nua. Krpano chi phong to canvas cua no, ma bang thong tin lo (#detbox) la
+	     the HTML nam CANH canvas -> vao toan man hinh la bam vao lo khong thay gi
+	     (Anh Tony bat loi 14/08). eraFS() phong to ca khoi #pano nen ca hai cung vao. -->
+	set(layer[btn_fs].onclick, 'js(eraFS())');
+	set(layer[defaultskin_buttons].width, 40);
 	delayedcall(0.4,
 		set(view.fovmin, 0.02);
 		lookto(0.0, 0.0, 0.7066, smooth(), true, true);

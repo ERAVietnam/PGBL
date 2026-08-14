@@ -271,8 +271,12 @@
 
 <action name="era_lots_sync">
   era_lots_ui_build();
+  <!-- 🔴 14/08/2026: nut DAT MA LO chi hien khi mo tour kem ?tool=1.
+       Anh Tony chot ban tren website chi sale dung, cong cu dung du lieu
+       khong duoc hien. 'tool' den tu URL nho passQueryParameters:true
+       da bat san trong tour.html. -->
   if(xml.scene == 'scene_matbang_flycam',
-    set(layer[lots_edit_btn].visible, true);
+    if(tool == 1, set(layer[lots_edit_btn].visible, true); , set(layer[lots_edit_btn].visible, false); );
     js( eraLotRestore() );
   ,
     set(lots_edit_on, false);
@@ -289,7 +293,7 @@
 <events name="era_lots_events" keep="true"
         onnewpano="era_lots_sync();"
         onclick="era_lots_click_add();"
-        onkeydown="if(keycode == 76, era_lots_toggle_edit(); );" />
+        onkeydown="if(keycode == 76, if(tool == 1, era_lots_toggle_edit(); ); );" />
 
 
 <!-- ==================================================================

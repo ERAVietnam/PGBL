@@ -1,5 +1,5 @@
-import { TienIchViewer } from "@/components/sections/pgbl/tienich/TienIchViewer";
+import { PgblFrame } from "@/components/sections/pgbl/PgblFrame";
 
 export default function TienIchPage() {
-  return <TienIchViewer />;
+  return <PgblFrame src="/pgbl/tienich/index.html" title="Mặt bằng tiện ích - Phú Gia Bảo Lộc" />;
 }

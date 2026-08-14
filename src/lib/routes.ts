@@ -9,6 +9,7 @@ export const PGBL_ROUTES = {
   tour360: "/tour360",
   giohang: "/giohang",
   tienich: "/tienich",
+  hatang: "/hatang",
   nhamau: "/nhamau",
   gallery: "/gallery",
   ebro: "/ebro",
