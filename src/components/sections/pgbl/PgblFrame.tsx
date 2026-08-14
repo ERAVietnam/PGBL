@@ -12,7 +12,7 @@ function Frame({ src, title }: { src: string; title: string }) {
     <iframe
       src={query ? `${src}?${query}` : src}
       title={title}
-      className="block h-screen w-screen border-0"
+      className="block h-dvh w-screen border-0"
       allow="fullscreen; clipboard-read; clipboard-write"
       allowFullScreen
     />
