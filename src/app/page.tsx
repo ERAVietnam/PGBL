@@ -1,5 +1,5 @@
-import { PgblHomePage } from "@/components/sections/pgbl/home/HomePage";
+import { PgblFrame } from "@/components/sections/pgbl/PgblFrame";
 
 export default function HomePage() {
-  return <PgblHomePage />;
+  return <PgblFrame src="/pgbl/index.html" title="Phú Gia Bảo Lộc - ERA Vietnam" />;
 }

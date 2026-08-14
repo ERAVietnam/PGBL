@@ -1,7 +1,6 @@
 <krpano version="1.19" title="ERA Tien ich ELC - mat bang phang">
 
-  <view hlookat="0" vlookat="0" fovtype="HFOV" fov="1.0" fovmin="0.08" fovmax="1.0" maxpixelzoom="1.2"
-        limitview="range" hlookatmin="-0.50" hlookatmax="0.50" vlookatmin="-0.324" vlookatmax="0.435" />
+  <view hlookat="0" vlookat="0" fovtype="HFOV" fov="1.0" fovmin="0.08" fovmax="1.0" maxpixelzoom="1.2" limitview="fullrange" />
 
   <!-- ==== NEN (sua 11/08) =======================================
        🔴 GOC LOI "BAM TIEN ICH LA TRANG MAN":

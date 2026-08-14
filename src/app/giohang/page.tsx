@@ -1,5 +1,5 @@
-import { GioHangViewer } from "@/components/sections/pgbl/giohang/GioHangViewer";
+import { PgblFrame } from "@/components/sections/pgbl/PgblFrame";
 
 export default function GioHangPage() {
-  return <GioHangViewer />;
+  return <PgblFrame src="/pgbl/giohang/index.html" title="Mặt bằng - Phú Gia Bảo Lộc" />;
 }

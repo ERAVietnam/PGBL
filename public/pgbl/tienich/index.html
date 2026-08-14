@@ -29,8 +29,22 @@ body{font-family:var(--f);background:var(--soft);color:#111;display:flex;flex-di
 #ib .zn{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
 #ib h3{font-size:15.5px;font-weight:800;color:var(--navy);line-height:1.15;margin-top:2px}
 #ib p{font-size:12px;line-height:1.55;color:#555;padding:0 14px 13px}
-/* ==== TOOL CHAM VI TRI ==== */
-#tool{position:absolute;right:14px;bottom:14px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+/* ==== TOOL CHAM VI TRI ====
+   🔴 14/08/2026 Anh Tony chot: ban tren website chi sale dung, cong cu dung
+   du lieu KHONG duoc hien -> gay phan tam. Mac dinh AN, bat bang ?tool=1
+   (cung 1 quy uoc voi /hatang/ va nut DAT MA LO trong tour flycam). */
+#tool{position:absolute;right:14px;bottom:14px;z-index:40;display:none;flex-direction:column;align-items:flex-end;gap:7px}
+#tool.tool-on{display:flex}
+
+/* NEXT 14/08 — MOBILE (<=820px): ban do tren, danh sach thanh khay duoi 42vh.
+   Ban goc chi co layout ngang: #side co dinh 312px nen tren dien thoai map
+   bi ep con vai chuc px. Desktop giu nguyen 100%. */
+@media (max-width:820px){
+  #wrap{flex-direction:column}
+  #side{width:auto;min-width:0;flex:0 0 42vh;border-left:0;border-top:1px solid var(--mid);
+        padding-bottom:92px}   /* chung day cho thanh nav eranav fixed */
+  #ib{width:min(260px,calc(100vw - 16px))}
+}
 #tool button{font-family:var(--f);font-size:12px;font-weight:700;border:0;border-radius:9px;padding:9px 14px;cursor:pointer;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.22)}
 #tBase{background:var(--navy)}
 #tBase.on{background:var(--red)}
@@ -292,7 +306,10 @@ g('tAdd').onclick=arm;
 g('tDel').onclick=delLast;
 g('tWipe').onclick=wipeAll;
 g('tExp').onclick=tiExport;
-document.addEventListener('keydown',e=>{ if(e.key==='v'||e.key==='V'){ if(!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) editToggle(); } });
+/* 🔴 Bat che do cong cu bang ?tool=1 — khoa CUNG ca phim tat, khong chi an nut */
+var TOOLMODE = /[?&]tool=1(?:&|$)/.test(location.search);
+if(TOOLMODE) g('tool').classList.add('tool-on');
+document.addEventListener('keydown',e=>{ if(!TOOLMODE) return; if(e.key==='v'||e.key==='V'){ if(!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) editToggle(); } });
 
 buildList();
 /* cache-buster: krpano tai tour.xml bang XHR nen Ctrl+Shift+R khong phai luc nao
@@ -332,6 +349,6 @@ embedpano({swf:"pano.swf", xml:"tour.xml?v="+Date.now(), target:"pano", html5:"o
     style="margin-top:10px;background:#1B9E5A;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit">COPY</button>
 </div>
 
-<script src="/pgbl/assets/eranav.js" data-active="tienich"></script>
+<script src="/pgbl/assets/eranav.js?nc=20260814224500" data-active="tienich"></script>
 </body>
 </html>

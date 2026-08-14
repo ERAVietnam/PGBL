@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Phú Gia Bảo Lộc — ERA Vietnam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/light/style.css">
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.184.0/build/three.module.js" } }
+</script>
+<style>
+  :root{
+    --base:#0D2620; --panel:#0E2821; --gold:#BF9642;
+    --lime:#9BDC4C; --teal:#5FE5BE; --accent:#A9F0C4;
+    --text:#EDF8EF; --text2:#BAD8C3; --dim:#83A08D;
+    --line:rgba(203,240,214,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;position:relative}
+
+  /* ===== INTRO 3D ===== */
+  #intro{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 90% at 50% 24%, #16342B 0%, #103029 34%, #0B1F1A 72%, #07140F 100%);transition:opacity .8s cubic-bezier(.4,0,.2,1)}
+  #intro.done{opacity:0;pointer-events:none}
+  #gl{position:absolute;inset:0;display:block;width:100%;height:100%}
+  #wordmark{position:absolute;left:0;top:0;opacity:0;transform:translateX(-26px);will-change:opacity,transform;filter:drop-shadow(0 6px 24px rgba(0,0,0,.45))}
+  #rule{position:absolute;left:50%;transform:translateX(-50%) scaleX(0);height:1px;background:linear-gradient(90deg,transparent,#9BDC4C,#5FE5BE,transparent);transition:transform .9s cubic-bezier(.22,1,.36,1);transform-origin:center}
+  #status{position:absolute;left:50%;transform:translateX(-50%);bottom:74px;font:500 11px/1 'Be Vietnam Pro',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#83A08D;opacity:0;transition:opacity .5s}
+  #skip{position:absolute;right:28px;bottom:26px;z-index:3;background:none;border:0;cursor:pointer;color:#83A08D;font:500 12px/1 'Be Vietnam Pro',sans-serif;letter-spacing:.22em;text-transform:uppercase;padding:10px 2px;transition:color .3s}
+  #skip:hover{color:#A9F0C4}
+  @media (max-width:720px){#skip{right:18px;bottom:18px}#status{bottom:60px}}
+
+  /* ===== MAN CHON ===== */
+  .bg{position:fixed;inset:0;z-index:-2;background:var(--base) url('assets/home-bg.jpg') center/cover no-repeat}
+  .scrim{position:fixed;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(13,38,32,.42) 0%,rgba(13,38,32,.30) 38%,rgba(13,38,32,.66) 78%,rgba(13,38,32,.94) 100%)}
+
+  .brand{display:flex;align-items:center;gap:10px;position:fixed;top:22px;left:26px;z-index:5}
+  .brand img{height:34px;width:auto;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+
+    /* 🔴 14/08: đẩy cả khối nội dung LÊN để hàng thẻ cuối không bị thanh nav
+     gim đáy màn đè. Anh Tony ước 30px, nhưng ĐO THẬT trên máy thì +30 vẫn còn
+     đè 28px -> phải lên 124px (46 + 78) mới hở ~20px.
+     Vì sao body{padding-bottom:86px} của eranav.js không đủ: .stage dùng
+     min-height:100vh + justify-content:flex-end nên nội dung vẫn bị đẩy sát đáy. */
+  .stage{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;max-width:1120px;margin:0 auto;padding:96px 26px 124px}
+  .eyebrow{display:inline-block;font-size:12.5px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:12px;color:var(--accent)}
+  h1{font-size:clamp(32px,6vw,58px);line-height:1.03;font-weight:800;margin-bottom:14px;text-shadow:0 2px 24px rgba(0,0,0,.5)}
+  p.lead{font-size:clamp(15px,2vw,18px);max-width:640px;color:var(--text2);line-height:1.55;margin-bottom:30px;text-shadow:0 1px 12px rgba(0,0,0,.5)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card{position:relative;background:rgba(14,40,33,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid var(--line);border-radius:16px;padding:20px 18px 18px;text-decoration:none;color:var(--text);
+    display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 38px rgba(0,0,0,.32);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+  .card:hover{transform:translateY(-5px);box-shadow:0 20px 48px rgba(0,0,0,.44);border-color:rgba(159,220,76,.5)}
+  .card .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,rgba(155,220,76,.16),rgba(95,229,190,.16));border:1px solid var(--line);margin-bottom:4px}
+  .card .ic i{font-size:26px;color:var(--accent)}
+  .card h3{font-size:18px;font-weight:700}
+  .card p{font-size:12.5px;color:var(--text2);line-height:1.5}
+  .card .go{margin-top:6px;display:inline-flex;align-items:center;gap:7px;color:var(--teal);font-weight:700;font-size:13.5px}
+  .card .go span{transition:transform .18s ease}
+  .card:hover .go span{transform:translateX(4px)}
+  .card .soon{position:absolute;top:14px;right:14px;font-size:9px;letter-spacing:.5px;text-transform:uppercase;font-weight:700;color:#0D2620;background:var(--gold);border-radius:7px;padding:2px 7px}
+  .card.dim{opacity:.82}
+
+  .reveal{opacity:0;transform:translateY(22px);animation:rise .8s cubic-bezier(.22,.61,.36,1) forwards}
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+  .brand.reveal{transform:translateY(-10px);animation-name:riseB}
+  @keyframes riseB{to{opacity:1;transform:translateY(0)}}
+  .db{animation-delay:2.6s}.d1{animation-delay:2.9s}.d2{animation-delay:3.05s}.d3{animation-delay:3.2s}
+  .c1{animation-delay:3.35s}.c2{animation-delay:3.45s}.c3{animation-delay:3.55s}
+  .c4{animation-delay:3.65s}.c5{animation-delay:3.75s}.c6{animation-delay:3.85s}.c7{animation-delay:3.95s}.c8{animation-delay:4.05s}
+</style>
+</head>
+<body>
+  <!-- ep nap Phosphor + Inter truoc khi ve (tranh tofu) -->
+  <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none">
+    <span style="font-family:'Phosphor-Light'">&#xe316;&#xe464;&#xe2c4;&#xe834;&#xe0e6;</span>
+    <span style="font-family:'Inter';font-weight:800">ERA</span>
+  </div>
+
+  <div class="bg"></div>
+  <div class="scrim"></div>
+
+  <div class="brand reveal db"><img src="assets/wordmark.png" alt="Phú Gia Bảo Lộc"></div>
+
+  <div class="stage">
+    <span class="eyebrow reveal d1">Khu đô thị · Bảo Lộc · Lâm Đồng</span>
+    <h1 class="reveal d2">Phú Gia Bảo Lộc</h1>
+    <p class="lead reveal d3">Trải nghiệm dự án bằng một chạm: tour 360° flycam, mặt bằng sản phẩm &amp; tiện ích tương tác, thư viện ảnh và e-brochure lật trang.</p>
+
+    <div class="grid">
+      <!-- 🔴 14/08 — THỨ TỰ CHUẨN, phải khớp assets\eranav.js và thanh nav
+           trong tour krpano (tour360\era-txv-skin-pgbl.xml).
+           Chạy được trước · "Sắp có" xếp cuối. Mục "Vị Trí" đã bỏ hẳn —
+           thẻ Hạ tầng đã bao gồm vị trí. -->
+      <a class="card reveal c1" href="/tour360/?startscene=scene_matbang_flycam" target="_top">
+        <div class="ic"><i class="ph-light ph-mountains"></i></div>
+        <h3>Toàn cảnh</h3>
+        <p>Ảnh flycam 360° có gắn mã căn ngay trên nền — nhìn phát ra vị trí từng lô.</p>
+        <span class="go">Xem toàn cảnh <span>→</span></span>
+      </a>
+
+      <a class="card reveal c2" href="/tour360/?startscene=scene_02-toan-canh" target="_top">
+        <div class="ic"><i class="ph-light ph-drone"></i></div>
+        <h3>Flycam hiện trạng</h3>
+        <p>Ảnh flycam 360° nguyên bản, không gắn mã căn — xem hiện trạng khu đất.</p>
+        <span class="go">Bay vào tour <span>→</span></span>
+      </a>
+      <a class="card reveal c3" href="/giohang/" target="_top">
+        <div class="ic"><i class="ph-light ph-squares-four"></i></div>
+        <h3>Mặt bằng</h3>
+        <p>Giỏ hàng phân lô tương tác: mã lô, diện tích, hướng, trạng thái, giá — kèm bộ lọc.</p>
+        <span class="go">Mở mặt bằng <span>→</span></span>
+      </a>
+      <a class="card reveal c4" href="/tienich/" target="_top">
+        <div class="ic"><i class="ph-light ph-map-trifold"></i></div>
+        <h3>Mặt bằng tiện ích</h3>
+        <p>Sơ đồ tiện ích nội khu: bấm marker hoặc chọn danh sách để xem chi tiết từng điểm.</p>
+        <span class="go">Xem tiện ích <span>→</span></span>
+      </a>
+      <!-- 14/08: Bản đồ hạ tầng — cao tốc TP.HCM–Liên Khương, QL20, đường vào trung tâm -->
+      <a class="card reveal c5" href="/hatang/" target="_top">
+        <div class="ic"><i class="ph-light ph-road-horizon"></i></div>
+        <h3>Hạ tầng kết nối</h3>
+        <p>Bản đồ 3D tuyến cao tốc TP.HCM – Liên Khương, QL20 và đường từ dự án vào trung tâm Bảo Lộc.</p>
+        <span class="go">Xem hạ tầng <span>→</span></span>
+      </a>
+      <a class="card reveal c6" href="/ebro/" target="_top">
+        <div class="ic"><i class="ph-light ph-book-open"></i></div>
+        <h3>E-Brochure</h3>
+        <p>Ấn phẩm giới thiệu dự án dạng flipbook lật trang, đọc mượt trên mọi thiết bị.</p>
+        <span class="go">Lật brochure <span>→</span></span>
+      </a>
+      <a class="card reveal c7 dim" href="#">
+        <span class="soon">Sắp có</span>
+        <div class="ic"><i class="ph-light ph-house-line"></i></div>
+        <h3>360 Nhà mẫu</h3>
+        <p>Bước vào nhà mẫu bằng panorama 360°. Đang hoàn thiện dữ liệu — sẽ mở sớm.</p>
+        <span class="go">Sắp ra mắt <span>→</span></span>
+      </a>
+      <!-- 12/08: Anh Tony chốt TẮT TẠM Gallery (hình ảnh đang cập nhật).
+           BẬT LẠI = bỏ class "dim", bỏ dòng span.soon, trả href về gallery/index.html
+           và trả lại 2 dòng chữ cũ. Trang gallery/ VẪN CÒN nguyên. -->
+      <a class="card reveal c8 dim" href="#">
+        <span class="soon">Sắp có</span>
+        <div class="ic"><i class="ph-light ph-images"></i></div>
+        <h3>Gallery</h3>
+        <p>Bộ ảnh phối cảnh, tiện ích và vị trí dự án. Đang cập nhật bộ ảnh mới — sẽ mở lại sớm.</p>
+        <span class="go">Sắp ra mắt <span>→</span></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== INTRO OVERLAY ===== -->
+  <div id="intro">
+    <canvas id="gl"></canvas>
+    <img id="wordmark" src="assets/wordmark.png" alt="Phú Gia Bảo Lộc">
+    <div id="rule"></div>
+    <div id="status">Phú Gia Bảo Lộc</div>
+    <button id="skip" type="button">Vào trang</button>
+  </div>
+
+  <script type="module">
+  import * as THREE from 'three';
+  import { buildLogoMark } from './logo-model.js';
+
+  const MARK_H = 1.2, PX = MARK_H / 675;
+  const WM_W = 1454 * PX, WM_H = 591 * PX, MARK_W = 616 * PX;
+  const LOCK_W = WM_W + 132 * PX + MARK_W;
+  const MARK_X = LOCK_W / 2 - MARK_W / 2, WM_X = -LOCK_W / 2 + WM_W / 2;
+  const MARK_Y = 0.038, WM_Y = -0.038;
+
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+  function makeEnv() {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+    const g = c.getContext('2d');
+    const grd = g.createLinearGradient(0, 0, 0, 256);
+    grd.addColorStop(0, '#fff6e3'); grd.addColorStop(.32, '#d8c184');
+    grd.addColorStop(.56, '#3f6a5c'); grd.addColorStop(1, '#0a1e19');
+    g.fillStyle = grd; g.fillRect(0, 0, 512, 256);
+    const spot = g.createRadialGradient(150, 60, 4, 150, 60, 110);
+    spot.addColorStop(0, 'rgba(255,255,255,1)'); spot.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = spot; g.fillRect(0, 0, 512, 256);
+    const tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const env = pmrem.fromEquirectangular(tex).texture;
+    pmrem.dispose(); tex.dispose();
+    return env;
+  }
+  scene.environment = makeEnv();
+
+  const key = new THREE.DirectionalLight(0xfff2d8, 2.1); key.position.set(2.4, 3, 4); scene.add(key);
+  const rim = new THREE.DirectionalLight(0x5FE5BE, 1.25); rim.position.set(-3.5, 1.2, -2.6); scene.add(rim);
+  const rim2 = new THREE.DirectionalLight(0x9BDC4C, 0.55); rim2.position.set(-1.2, -2.4, 1.8); scene.add(rim2);
+  scene.add(new THREE.AmbientLight(0x1d3529, 0.7));
+
+  const mark = buildLogoMark(THREE, { height: MARK_H, depth: 0.17, metalness: 0.92, roughness: 0.36 });
+  const holder = new THREE.Group(); holder.add(mark); scene.add(holder);
+
+  const P = {
+    leaf_main: mark.getObjectByName('pivot_leaf_main'),
+    leaf_bud: mark.getObjectByName('pivot_leaf_bud'),
+    leaf_fold: mark.getObjectByName('pivot_leaf_fold')
+  };
+  const HOME = {}; for (const k in P) HOME[k] = P[k].position.clone();
+
+  const wm = document.getElementById('wordmark');
+  const rule = document.getElementById('rule');
+  const intro = document.getElementById('intro');
+  const status = document.getElementById('status');
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    const fov = THREE.MathUtils.degToRad(camera.fov);
+    const fill = w / h > 1 ? 0.60 : 0.88;
+    const dW = (LOCK_W / fill) / (2 * Math.tan(fov / 2) * camera.aspect);
+    const dH = (MARK_H * 2.6) / (2 * Math.tan(fov / 2));
+    camera.position.set(0, 0, Math.max(dW, dH));
+    camera.updateProjectionMatrix();
+    const ppw = h / (2 * camera.position.z * Math.tan(fov / 2));
+    const wPx = WM_W * ppw;
+    wm.style.width = wPx + 'px';
+    wm.style.left = (w / 2 + WM_X * ppw - wPx / 2) + 'px';
+    wm.style.top = (h / 2 - WM_Y * ppw - (WM_H * ppw) / 2) + 'px';
+    rule.style.width = (LOCK_W * ppw) + 'px';
+    rule.style.top = (h / 2 + MARK_H * 0.86 * ppw) + 'px';
+  }
+  addEventListener('resize', resize); resize();
+
+  const clamp01 = t => t < 0 ? 0 : t > 1 ? 1 : t;
+  const seg = (t, a, b) => clamp01((t - a) / (b - a));
+  const outCubic = t => 1 - Math.pow(1 - t, 3);
+  const outQuint = t => 1 - Math.pow(1 - t, 5);
+  const inOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const outBack = t => 1 + 2.2 * Math.pow(t - 1, 3) + 1.4 * Math.pow(t - 1, 2);
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const T_END = 3050;      // ket thuc animation
+  const T_DISSOLVE = 3200; // tu tan (khong phu thuoc pano)
+  let start = performance.now(), finished = false, running = true;
+
+  function place(k, from, prog) {
+    const p = P[k], h = HOME[k];
+    p.position.set(lerp(h.x + from.x, h.x, prog), lerp(h.y + from.y, h.y, prog), lerp(from.z, 0, prog));
+    p.rotation.set(lerp(from.rx, 0, prog), lerp(from.ry, 0, prog), lerp(from.rz, 0, prog));
+  }
+
+  function frame(now) {
+    const t = reduced ? T_END : now - start;
+    place('leaf_main', { x: -4.2, y: .5, z: -1.6, rx: .2, ry: -1.5, rz: -.55 }, outQuint(seg(t, 180, 1320)));
+    place('leaf_fold', { x: 4.2, y: -.5, z: -1.6, rx: -.2, ry: 1.5, rz: .55 }, outQuint(seg(t, 300, 1440)));
+    const bud = seg(t, 620, 1520);
+    place('leaf_bud', { x: .1, y: 2.6, z: -.4, rx: 1.3, ry: .5, rz: .4 }, bud > 0 ? outBack(bud) : 0);
+
+    const spin = outCubic(seg(t, 180, 1700));
+    mark.rotation.y = lerp(-.62, 0, spin);
+    mark.rotation.x = lerp(.22, 0, spin);
+    mark.scale.setScalar(lerp(.86, 1, spin));
+    key.position.x = lerp(-3.6, 3.2, inOut(seg(t, 1200, 2400)));
+
+    holder.position.x = MARK_X * inOut(seg(t, 1500, 2320));
+    const wmP = outCubic(seg(t, 1680, 2500));
+    wm.style.opacity = wmP;
+    wm.style.transform = `translateX(${lerp(-26, 0, wmP)}px)`;
+    if (t > 2200) rule.style.transform = 'translateX(-50%) scaleX(1)';
+    if (t > 2320) {
+      const d = (t - 2320) / 1000;
+      mark.rotation.y = Math.sin(d * .8) * .05;
+      mark.rotation.x = Math.sin(d * .6) * .02;
+    }
+    if (!finished && t >= T_DISSOLVE) end();
+    renderer.render(scene, camera);
+    if (running) requestAnimationFrame(frame);
+  }
+
+  function end() {
+    if (finished) return;
+    finished = true;
+    status.style.opacity = 0;
+    intro.classList.add('done');
+    setTimeout(() => { intro.style.display = 'none'; running = false; }, 900);
+  }
+
+  document.getElementById('skip').addEventListener('click', end);
+  requestAnimationFrame(frame);
+  </script>
+
+  <script src="assets/eranav.js?nc=20260814224500" data-active=""></script>
+</body>
+</html>

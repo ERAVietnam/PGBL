@@ -1,5 +1,5 @@
-import { EBrochureViewer } from "@/components/sections/pgbl/ebro/EBrochureViewer";
+import { PgblFrame } from "@/components/sections/pgbl/PgblFrame";
 
 export default function EBrochurePage() {
-  return <EBrochureViewer />;
+  return <PgblFrame src="/pgbl/ebro/index.html" title="E-Brochure - Phú Gia Bảo Lộc" />;
 }

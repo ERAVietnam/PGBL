@@ -123,7 +123,7 @@
      (8 trang lat, ban moi) thay vi lightbox 2 anh to gap cu.
      Mo tab moi (_blank) de nguoi xem KHONG mat tour dang xoay.
      Ban lightbox cu giu lai ben duoi (era_ebro_open_lightbox_cu) de bat lai neu can. -->
-<action name="era_ebro_open">   openurl('/ebro/', '_top'); </action>
+<action name="era_ebro_open">   openurl('/ebro/', '_blank'); </action>
 <action name="era_ebro_open_lightbox_cu">   set(era_gal_mode, ebro); set(era_gcount, 2); era_gal_start(); </action>
 
 <!-- ===== WRAPPER goi tu menu (onclick khong co dau phay/&, tranh bay parse) ===== -->

@@ -120,6 +120,10 @@
 <action name="era_gallery_soon">
 </action>
 
+<!-- hanh dong RONG cho Nha Mau (14/08 chuyen sang SAP CO) — giu ten de khong goi vao ten trong -->
+<action name="era_nhamau_soon">
+</action>
+
 <!-- muc CHET: hien nhung mo + khong bam. %1 ten %2 x %3 glyph %4 label -->
 <action name="era_navdead">
   addlayer(%1_ic);
@@ -194,22 +198,16 @@
 </action>
 
 <action name="era_menu_hideall">
-  set(layer[era_pop_vitri].visible, false);
   set(layer[era_pop_tienich].visible, false);
   set(layer[era_pop_nhamau].visible, false);
-  set(layer[era_pop_matbang].visible, false);
-  set(layer[era_sv1].visible, false); set(layer[era_sv2].visible, false);
   set(layer[era_sn1].visible, false); set(layer[era_sn2].visible, false); set(layer[era_sn3].visible, false);
   set(layer[era_st1].visible, false); set(layer[era_st2].visible, false); set(layer[era_st3].visible, false); set(layer[era_st4].visible, false); set(layer[era_st5].visible, false);
-  set(layer[era_sm1].visible, false); set(layer[era_sm2].visible, false);
   set(era_menu_open, '');
 </action>
 
 <action name="era_menu_showitems">
-  if(%1 == vitri,   set(layer[era_sv1].visible, true); set(layer[era_sv2].visible, true); );
   if(%1 == nhamau,  set(layer[era_sn1].visible, true); set(layer[era_sn2].visible, true); set(layer[era_sn3].visible, true); );
   if(%1 == tienich, set(layer[era_st1].visible, true); set(layer[era_st2].visible, true); set(layer[era_st3].visible, true); set(layer[era_st4].visible, true); set(layer[era_st5].visible, true); );
-  if(%1 == matbang, set(layer[era_sm1].visible, true); set(layer[era_sm2].visible, true); );
 </action>
 
 <action name="era_menu_toggle">
@@ -223,14 +221,32 @@
   );
 </action>
 
+<!-- 🔴 14/08 (chieu) Anh Tony doi lai y nghia 2 muc dau:
+       TOAN CANH        = anh flycam CO gan ma can  -> scene_matbang_flycam
+       FLYCAM HIEN TRANG = anh flycam KHONG ma can  -> scene_02-toan-canh
+     Giu nguyen ten action era_go_live (con 3 cho goi vao) nhung tro sang
+     scene KHONG ma can, dung nghia "hien trang". -->
 <action name="era_go_live">
   loadscene(scene_02-toan-canh, null, MERGE, BLEND(0.6));
+  era_menu_hideall();
+</action>
+
+<action name="era_go_toancanh">
+  loadscene(scene_matbang_flycam, null, MERGE, BLEND(0.6));
   era_menu_hideall();
 </action>
 
 <!-- mo trang mat bang tien ich (web thuan) - wrapper khong tham so tranh bay dau phay -->
 <action name="era_go_tienich">
   openurl('/tienich/', _top);
+</action>
+
+<!-- 14/08/2026: ban do HA TANG (cao toc TP.HCM - Lien Khuong, QL20, duong vao trung tam).
+     Anh Tony chot dua thang len THANH NAV lam muc thu 8 (khong de lam muc con).
+     => Da gian lai ca 8 nut: moc -525..525 buoc 150 (truoc la 7 nut -450..450),
+        va doi theo x cua 4 hop submenu cho khop nut cha. -->
+<action name="era_go_hatang">
+  openurl('/hatang/', _top);
 </action>
 
 <!-- Mat bang can: 2 cach xem ma lo -->
@@ -351,10 +367,11 @@
 <action name="era_shell_set">
   set(layer[era_nav_bg].visible, %1);
   set(layer[era_n_toancanh].visible, %1); set(layer[era_n_toancanh_ic].visible, %1); set(layer[era_n_toancanh_tx].visible, %1);
-  set(layer[era_n_vitri].visible, %1); set(layer[era_n_vitri_ic].visible, %1); set(layer[era_n_vitri_tx].visible, %1);
+  set(layer[era_n_hientrang].visible, %1); set(layer[era_n_hientrang_ic].visible, %1); set(layer[era_n_hientrang_tx].visible, %1);
   set(layer[era_n_matbang].visible, %1); set(layer[era_n_matbang_ic].visible, %1); set(layer[era_n_matbang_tx].visible, %1);
   set(layer[era_n_nhamau].visible, %1); set(layer[era_n_nhamau_ic].visible, %1); set(layer[era_n_nhamau_tx].visible, %1);
   set(layer[era_n_tienich].visible, %1); set(layer[era_n_tienich_ic].visible, %1); set(layer[era_n_tienich_tx].visible, %1);
+  set(layer[era_n_hatang].visible, %1); set(layer[era_n_hatang_ic].visible, %1); set(layer[era_n_hatang_tx].visible, %1);
   set(layer[era_n_gallery].visible, %1); set(layer[era_n_gallery_ic].visible, %1); set(layer[era_n_gallery_tx].visible, %1);
   set(layer[era_n_ebro].visible, %1); set(layer[era_n_ebro_ic].visible, %1); set(layer[era_n_ebro_tx].visible, %1);
   <!-- 🔴 11/08: da go logo ERA + thanh ten du an + the "Diem nhin hien tai".
@@ -442,53 +459,64 @@
     set(layer[era_nav_bg].keep, true); set(layer[era_nav_bg].visible, true);
 
   <!-- 7 muc: icon Phosphor + chu co dau. SONG tru Phan Khu (MO cho noi ruot nhanh A) -->
-  era_navitem(era_n_toancanh, -450, '&#xe7ae;', 'Toàn Cảnh',  'era_nav_setactive(era_n_toancanh); era_go_live()');
-  era_navitem(era_n_vitri,    -300, '&#xe316;', 'Vị Trí',     'era_menu_toggle(vitri)');
-  era_navitem(era_n_matbang,  -150, '&#xe464;', 'Mặt bằng căn', 'era_menu_toggle(matbang)');
-  era_navitem(era_n_nhamau,      0, '&#xe2c4;', 'Nhà Mẫu',    'era_menu_toggle(nhamau)');
-  era_navitem(era_n_tienich,   150, '&#xe6a2;', 'Mặt bằng tiện ích', 'era_nav_setactive(era_n_tienich); era_go_tienich()');
-  <!-- 🔴 12/08: Anh Tony chot TAT TAM Gallery (hinh anh dang cap nhat).
-       BAT LAI = tra dong duoi ve 'era_nav_setactive(era_n_gallery); era_gallery_open()'
-       va xoa dong era_navdim(era_n_gallery). Action era_gallery_open() VAN CON NGUYEN. -->
-  era_navitem(era_n_gallery,   300, '&#xe834;', 'Gallery <span style="color:#BF9642; font-size:9px; font-weight:700;">SẮP CÓ</span>', 'era_gallery_soon()');
-  era_navdim(era_n_gallery);
-  era_navitem(era_n_ebro,      450, '&#xe0e6;', 'E-Brochure', 'era_nav_setactive(era_n_ebro); era_ebro_open()');
+  <!-- 🔴 14/08 (chieu) Anh Tony chot lai bo cuc menu:
+       - BO HAN muc "Vi Tri" — Ha tang da bao gom vi tri roi, de 2 muc la trung y.
+       - "Nha Mau" chuyen ve trang thai SAP CO, don xuong cuoi cung nam canh Gallery.
+       => Con 7 muc, moc quay ve -450..450 buoc 150 y nhu truoc khi them Ha tang.
+       Thu tu: chay duoc truoc, "sap co" xep cuoi. -->
+  era_navitem(era_n_toancanh, -525, '&#xe7ae;', 'Toàn cảnh',  'era_nav_setactive(era_n_toancanh); era_go_toancanh()');
+  era_navitem(era_n_hientrang,-375, '&#xed74;', 'Flycam hiện trạng', 'era_nav_setactive(era_n_hientrang); era_go_live()');
+  era_navitem(era_n_matbang,  -225, '&#xe464;', 'Mặt bằng',   'era_nav_setactive(era_n_matbang); era_go_giohang()');
+  era_navitem(era_n_tienich,   -75, '&#xe6a2;', 'Mặt bằng tiện ích', 'era_nav_setactive(era_n_tienich); era_go_tienich()');
+  <!-- 🔴 Glyph &#xe838; = ph-road-horizon cua Phosphor 2.1.1 (light).
+       DA TRA THANG TRONG FILE CSS CDN roi moi dat, KHONG doan:
+       doi chieu nguoc ca 7 glyph cu deu khop (e7ae=mountains, e316=map-pin,
+       e464=squares-four, e2c4=house-line, e6a2=sparkle, e834=images-square,
+       e0e6=book-open). Dat sai codepoint thi krpano ve O VUONG RONG, khong bao loi. -->
+  era_navitem(era_n_hatang,     75, '&#xe838;', 'Hạ tầng',    'era_nav_setactive(era_n_hatang); era_go_hatang()');
+  era_navitem(era_n_ebro,      225, '&#xe0e6;', 'E-Brochure', 'era_nav_setactive(era_n_ebro); era_ebro_open()');
 
-  <!-- submenu Vi Tri -->
-  era_box(era_pop_vitri, bottom, -300, 68, 230, 96, get(era_c_panel), 12, 230);
-    set(layer[era_pop_vitri].bgalpha, 0.80);
-    set(layer[era_pop_vitri].borderwidth, 1); set(layer[era_pop_vitri].bordercolor, get(era_c_border)); set(layer[era_pop_vitri].borderalpha, 0.18);
-    set(layer[era_pop_vitri].visible, false);
-  era_reg_sub(era_sv1, vitri, -300, 72,  230, 'Bản đồ vị trí',        'era_nav_setactive(era_n_vitri); era_open_map()');
-  era_reg_sub(era_sv2, vitri, -300, 116, 230, 'Toàn cảnh khu đô thị', 'era_nav_setactive(era_n_vitri); era_go_live()');
+  <!-- ==== 2 muc SAP CO xep CUOI. Giu du 3 lop (%1 / %1_ic / %1_tx) roi moi
+       era_navdim(), KHONG dung era_navdead: navdead thieu lop hit %1 ma
+       era_shell_set van set vao ten do -> krpano tu tao layer rong, im lang
+       (bay 11/08 + 12/08).
+       BAT LAI Nha Mau  = tra onclick ve 'era_nav_setactive(era_n_nhamau); era_menu_toggle(nhamau)'
+                          va xoa dong era_navdim(era_n_nhamau). Submenu era_sn1..3 VAN CON.
+       BAT LAI Gallery  = tra onclick ve 'era_nav_setactive(era_n_gallery); era_gallery_open()'
+                          va xoa dong era_navdim(era_n_gallery). ==== -->
+  era_navitem(era_n_nhamau,    375, '&#xe2c4;', 'Nhà Mẫu <span style="color:#BF9642; font-size:9px; font-weight:700;">SẮP CÓ</span>', 'era_nhamau_soon()');
+  era_navdim(era_n_nhamau);
+  era_navitem(era_n_gallery,   525, '&#xe834;', 'Gallery <span style="color:#BF9642; font-size:9px; font-weight:700;">SẮP CÓ</span>', 'era_gallery_soon()');
+  era_navdim(era_n_gallery);
+
+  <!-- 14/08: da GO submenu "Vi Tri" cung voi muc nav cua no.
+       2 action ben trong VAN CON nguyen o era-media-pgbl.xml:
+       era_open_map() (anh ban do vi tri) va era_go_live() (Toan Canh, van dung).
+       Muon bat lai thi tra lai 1 era_navitem + 1 era_box + 2 era_reg_sub. -->
 
   <!-- submenu Tien Ich -->
-  era_box(era_pop_tienich, bottom, 150, 68, 232, 228, get(era_c_panel), 12, 230);
+  era_box(era_pop_tienich, bottom, -75, 68, 232, 228, get(era_c_panel), 12, 230);
     set(layer[era_pop_tienich].bgalpha, 0.80);
     set(layer[era_pop_tienich].borderwidth, 1); set(layer[era_pop_tienich].bordercolor, get(era_c_border)); set(layer[era_pop_tienich].borderalpha, 0.18);
     set(layer[era_pop_tienich].visible, false);
-  era_reg_sub(era_st1, tienich, 150, 72,  232, 'Cafe Đôi Dép',        'era_nav_setactive(era_n_tienich); era_ti_cafe()');
-  era_reg_sub(era_st2, tienich, 150, 116, 232, 'Công viên',           'era_nav_setactive(era_n_tienich); era_ti_congvien()');
-  era_reg_sub(era_st3, tienich, 150, 160, 232, 'Apollo Garden',       'era_nav_setactive(era_n_tienich); era_ti_apollo()');
-  era_reg_sub(era_st4, tienich, 150, 204, 232, 'Hồ Cá Koi',           'era_nav_setactive(era_n_tienich); era_ti_hoca()');
-  era_reg_sub(era_st5, tienich, 150, 248, 232, 'Vườn thiền &amp; Yoga','era_nav_setactive(era_n_tienich); era_ti_vuonthien()');
+  era_reg_sub(era_st1, tienich, -75, 72,  232, 'Cafe Đôi Dép',        'era_nav_setactive(era_n_tienich); era_ti_cafe()');
+  era_reg_sub(era_st2, tienich, -75, 116, 232, 'Công viên',           'era_nav_setactive(era_n_tienich); era_ti_congvien()');
+  era_reg_sub(era_st3, tienich, -75, 160, 232, 'Apollo Garden',       'era_nav_setactive(era_n_tienich); era_ti_apollo()');
+  era_reg_sub(era_st4, tienich, -75, 204, 232, 'Hồ Cá Koi',           'era_nav_setactive(era_n_tienich); era_ti_hoca()');
+  era_reg_sub(era_st5, tienich, -75, 248, 232, 'Vườn thiền &amp; Yoga','era_nav_setactive(era_n_tienich); era_ti_vuonthien()');
 
   <!-- submenu Nha Mau -->
-  era_box(era_pop_nhamau, bottom, 0, 68, 240, 140, get(era_c_panel), 12, 230);
+  era_box(era_pop_nhamau, bottom, 375, 68, 240, 140, get(era_c_panel), 12, 230);
     set(layer[era_pop_nhamau].bgalpha, 0.80);
     set(layer[era_pop_nhamau].borderwidth, 1); set(layer[era_pop_nhamau].bordercolor, get(era_c_border)); set(layer[era_pop_nhamau].borderalpha, 0.18);
     set(layer[era_pop_nhamau].visible, false);
-  era_reg_sub(era_sn1, nhamau, 0, 72,  240, 'Nhà mẫu - Phối cảnh',    'era_nav_setactive(era_n_nhamau); era_nm_phoicanh()');
-  era_reg_sub(era_sn2, nhamau, 0, 116, 240, 'Mặt bằng liền kề 5x20',  'era_nav_setactive(era_n_nhamau); era_nm_mb5x20()');
-  era_reg_sub(era_sn3, nhamau, 0, 160, 240, 'Mặt bằng song lập 7x20', 'era_nav_setactive(era_n_nhamau); era_nm_mb7x20()');
+  era_reg_sub(era_sn1, nhamau, 375, 72,  240, 'Nhà mẫu - Phối cảnh',    'era_nav_setactive(era_n_nhamau); era_nm_phoicanh()');
+  era_reg_sub(era_sn2, nhamau, 375, 116, 240, 'Mặt bằng liền kề 5x20',  'era_nav_setactive(era_n_nhamau); era_nm_mb5x20()');
+  era_reg_sub(era_sn3, nhamau, 375, 160, 240, 'Mặt bằng song lập 7x20', 'era_nav_setactive(era_n_nhamau); era_nm_mb7x20()');
 
-  <!-- submenu Mat bang can: 2 cach xem ma lo -->
-  era_box(era_pop_matbang, bottom, -150, 68, 260, 96, get(era_c_panel), 12, 230);
-    set(layer[era_pop_matbang].bgalpha, 0.80);
-    set(layer[era_pop_matbang].borderwidth, 1); set(layer[era_pop_matbang].bordercolor, get(era_c_border)); set(layer[era_pop_matbang].borderalpha, 0.18);
-    set(layer[era_pop_matbang].visible, false);
-  era_reg_sub(era_sm1, matbang, -150, 72,  260, 'Mã lô trên mặt bằng', 'era_nav_setactive(era_n_matbang); era_go_giohang()');
-  era_reg_sub(era_sm2, matbang, -150, 116, 260, 'Mã lô trên flycam',   'era_nav_setactive(era_n_matbang); era_go_mbflycam()');
+  <!-- 14/08: BO submenu "Mat bang can". Nay "Mat bang" bam thang ra gio hang,
+       con "Ma lo tren flycam" da thanh chinh muc TOAN CANH.
+       2 action era_go_giohang() / era_go_mbflycam() VAN CON nguyen. -->
 
   era_chrome_build();
   era_viewpanel_build();
@@ -502,15 +530,49 @@
 <action name="era_update_crumb">
 </action>
 
+<!-- NEXT 14/08 — MOBILE (<560px): 6 muc nav chia deu be ngang man hinh.
+     Ban goc dat x co dinh -525..525 (thiet ke cho man >=1080) nen tren dien thoai
+     chi thay 2 muc giua, con lai bi cat khoi man hinh.
+     era_navplace: don vi tri + thu nho icon/chu. era_navreset: tra ve y nguyen desktop.
+     %1 ten muc, %2 he so (boi so cua stagewidth/6, am = ben trai tam). -->
+<action name="era_navplace">
+  mul(era_mx, era_mstep, %2);
+  set(layer[%1].x, get(era_mx)); set(layer[%1].width, get(era_mstep)); set(layer[%1].height, 60);
+  set(layer[%1_ic].x, get(era_mx)); set(layer[%1_ic].width, get(era_mstep)); set(layer[%1_ic].height, 22); set(layer[%1_ic].y, 34);
+  set(layer[%1_ic].css, 'color:#DCEFDA; font-family:"Phosphor-Light"; font-size:18px; text-align:center;');
+  set(layer[%1_tx].x, get(era_mx)); set(layer[%1_tx].width, get(era_mstep)); set(layer[%1_tx].height, 26); set(layer[%1_tx].y, 5);
+  set(layer[%1_tx].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:10px; font-weight:600; text-align:center; line-height:1.15;');
+</action>
+
+<!-- tra 1 muc nav ve dung thong so desktop goc (xem era_navitem) -->
+<action name="era_navreset">
+  set(layer[%1].x, %2); set(layer[%1].width, 138); set(layer[%1].height, 52);
+  set(layer[%1_ic].x, %2); set(layer[%1_ic].width, 150); set(layer[%1_ic].height, 26); set(layer[%1_ic].y, 28);
+  set(layer[%1_ic].css, 'color:#DCEFDA; font-family:"Phosphor-Light"; font-size:22px; text-align:center;');
+  set(layer[%1_tx].x, %2); set(layer[%1_tx].width, 150); set(layer[%1_tx].height, 20); set(layer[%1_tx].y, 8);
+  set(layer[%1_tx].css, 'color:#DCEFDA; font-family:Inter, Arial, sans-serif; font-size:13px; font-weight:600; text-align:center;');
+</action>
+
 <action name="era_responsive">
   if(!era_in_intro,
-    if(stagewidth LT 900,
+    <!-- 🔴 14/08 (chieu): lai len 8 nut (-525..525 = 1050 px) -> nguong 1080.
+         Man hep an 2 muc SAP CO (Nha Mau + Gallery), KHONG an E-Brochure. -->
+    if(stagewidth LT 1080,
       set(layer[era_n_gallery].visible, false); set(layer[era_n_gallery_ic].visible, false); set(layer[era_n_gallery_tx].visible, false);
-      set(layer[era_n_ebro].visible, false); set(layer[era_n_ebro_ic].visible, false); set(layer[era_n_ebro_tx].visible, false);
+      set(layer[era_n_nhamau].visible, false); set(layer[era_n_nhamau_ic].visible, false); set(layer[era_n_nhamau_tx].visible, false);
       <!-- 🔴 11/08: bo era_crumb + era_vp_* (da go han) -->
     ,
       set(layer[era_n_gallery].visible, true); set(layer[era_n_gallery_ic].visible, true); set(layer[era_n_gallery_tx].visible, true);
-      set(layer[era_n_ebro].visible, true); set(layer[era_n_ebro_ic].visible, true); set(layer[era_n_ebro_tx].visible, true);
+      set(layer[era_n_nhamau].visible, true); set(layer[era_n_nhamau_ic].visible, true); set(layer[era_n_nhamau_tx].visible, true);
+    );
+    <!-- NEXT 14/08: mobile thi 6 muc con lai chia deu chieu ngang -->
+    if(stagewidth LT 560,
+      div(era_mstep, stagewidth, 6);
+      era_navplace(era_n_toancanh, -2.5); era_navplace(era_n_hientrang, -1.5); era_navplace(era_n_matbang, -0.5);
+      era_navplace(era_n_tienich, 0.5);  era_navplace(era_n_hatang, 1.5);    era_navplace(era_n_ebro, 2.5);
+    ,
+      era_navreset(era_n_toancanh, -525); era_navreset(era_n_hientrang, -375); era_navreset(era_n_matbang, -225);
+      era_navreset(era_n_tienich, -75);   era_navreset(era_n_hatang, 75);     era_navreset(era_n_ebro, 225);
     );
   );
 </action>
