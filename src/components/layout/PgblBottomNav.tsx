@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Grid3X3, House, Images, Map, Plane } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { PgblRouteId } from "@/types/navigation";
+import { PGBL_ROUTES } from "@/lib/routes";
 
 const navItems: Array<{
   id: PgblRouteId;
@@ -13,12 +14,12 @@ const navItems: Array<{
   icon: LucideIcon;
   soon?: boolean;
 }> = [
-  { id: "tour360", href: "/tour360", label: "Flycam 360", icon: Plane },
-  { id: "giohang", href: "/giohang", label: "Sản phẩm", icon: Grid3X3 },
-  { id: "tienich", href: "/tienich", label: "Tiện ích", icon: Map },
+  { id: "tour360", href: PGBL_ROUTES.tour360, label: "Flycam 360", icon: Plane },
+  { id: "giohang", href: PGBL_ROUTES.giohang, label: "Sản phẩm", icon: Grid3X3 },
+  { id: "tienich", href: PGBL_ROUTES.tienich, label: "Tiện ích", icon: Map },
   { id: "nhamau", href: "#", label: "Nhà mẫu", icon: House, soon: true },
   { id: "gallery", href: "#", label: "Gallery", icon: Images, soon: true },
-  { id: "ebro", href: "/ebro", label: "E-Brochure", icon: BookOpen },
+  { id: "ebro", href: PGBL_ROUTES.ebro, label: "E-Brochure", icon: BookOpen },
 ];
 
 function activeId(pathname: string): PgblRouteId | "" {
@@ -28,10 +29,7 @@ function activeId(pathname: string): PgblRouteId | "" {
 
 export function PgblBottomNav() {
   const pathname = usePathname();
-  if (
-    pathname.startsWith("/tour360") ||
-    pathname.startsWith("/giohang")
-  ) {
+  if (pathname.startsWith("/tour360")) {
     return null;
   }
 

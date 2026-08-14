@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HomeIntro } from "./HomeIntro";
 import { pgblHomeCards } from "@/lib/pgblHome";
+import { PGBL_ROUTES } from "@/lib/routes";
 
 export function PgblHomePage() {
   return (
@@ -18,14 +19,18 @@ export function PgblHomePage() {
       </div>
       <div className="fixed inset-0 -z-10 bg-[linear-gradient(180deg,rgba(13,38,32,.42)_0%,rgba(13,38,32,.30)_38%,rgba(13,38,32,.66)_78%,rgba(13,38,32,.94)_100%)]" />
 
-      <Link href="/" className="pgbl-home-reveal pgbl-home-delay-brand fixed left-6 top-5 z-10 block">
+      <Link href={PGBL_ROUTES.home} className="pgbl-home-reveal pgbl-home-delay-brand fixed left-6 top-5 z-10 block">
         <Image
           src="/pgbl/assets/wordmark.png"
           alt="Phú Gia Bảo Lộc"
           width={1454}
           height={591}
           priority
-          className="h-[34px] w-auto drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]"
+          className="h-[34px] w-auto"
+          style={{
+            filter:
+              "drop-shadow(0 2px 8px rgba(0,0,0,.5)) drop-shadow(0 0 14px rgba(0,0,0,.65))",
+          }}
         />
       </Link>
 
