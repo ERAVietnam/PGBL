@@ -41,11 +41,12 @@ window.ERA_TT = (function () {
     MA_MO_KHOA : 'era2026',
 
     /* 5 trang thai chuan . phai TRUNG voi CAUHINH.mau ben giohang */
-    DS : ['Còn hàng', 'Giữ chỗ', 'Đã cọc', 'Đã bán', 'Lock'],
+    /* 18/08: BO "Giữ chỗ" theo yeu cau Anh Tony - quy trinh ban khong dung nua.
+       Con 4 trang thai. Bang van hanh (banghang/) doc thang tu day nen tu theo. */
+    DS : ['Còn hàng', 'Đã cọc', 'Đã bán', 'Lock'],
 
     MAU : {
       'Còn hàng' : '#41B3E0',
-      'Giữ chỗ'  : '#FF9015',
       'Đã cọc'   : '#5B2D86',
       'Đã bán'   : '#C8102E',
       'Lock'     : '#888888'
@@ -76,7 +77,8 @@ window.ERA_TT = (function () {
   var BANG_TRA = {};
   C.DS.forEach(function (t) { BANG_TRA[khongDau(t)] = t; });
   [['con', 'Còn hàng'], ['con hang', 'Còn hàng'], ['available', 'Còn hàng'],
-   ['giu', 'Giữ chỗ'], ['giu cho', 'Giữ chỗ'], ['booking', 'Giữ chỗ'],
+   /* 18/08: da bo "Giữ chỗ". CO Y KHONG anh xa 'giu'/'booking' sang trang thai khac
+      -> Sheet con ghi "Giữ chỗ" thi lo do ve MAC_DINH "Còn hàng" (Anh Tony tu sua Sheet). */
    ['coc', 'Đã cọc'], ['da coc', 'Đã cọc'], ['deposit', 'Đã cọc'],
    ['ban', 'Đã bán'], ['da ban', 'Đã bán'], ['sold', 'Đã bán'],
    ['lock', 'Lock'], ['khoa', 'Lock'], ['da khoa', 'Lock']

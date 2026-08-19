@@ -13,6 +13,8 @@
 <script src="caotoc-data.js?nc=20260814171500"></script>
 <!-- Ranh giới tỉnh — ADDITIVE, gỡ 1 dòng này là bản đồ về như cũ -->
 <script src="ranhgioi-data.js?nc=20260814210000"></script>
+<!-- Tiện ích quanh dự án (OSM) — ADDITIVE, gỡ 1 dòng này là lớp tiện ích biến mất -->
+<script src="tienich-data.js?nc=20260818163000"></script>
 
 <style>
   /* 🔴 14/08: đổi sang ĐÚNG bộ màu dự án PGBL (chép từ 06-WEB\PGBL-web\index.html)
@@ -26,6 +28,11 @@
     --text:#EDF8EF; --text2:#BAD8C3; --dim:#83A08D;
     --line:rgba(203,240,214,.18);
     --panel-bg:rgba(14,40,33,.82);
+    /* 🔴 Chiều cao thanh NAV ERA phải chừa ở đáy. Bản vệ tinh này KHÔNG có
+       nav nên = 0. Bản web ship 06-WEB\PGBL-web\hatang\index.html để 86px.
+       Đây là ĐIỂM KHÁC DUY NHẤT về layout giữa 2 bản — sửa 1 dòng, không
+       phải rà lại 4 chỗ bottom như trước. */
+    --nav-h:86px;   /* thanh nav ERA cua web ship */
   }
   html,body{margin:0;height:100%;font-family:'Segoe UI',system-ui,Arial,sans-serif;}
   #map{position:absolute;inset:0;}
@@ -75,12 +82,6 @@
   #tools button.gold:hover{background:#D3A94E;color:#0D2620;}
   #tools button.ghost{background:rgba(255,255,255,.04);color:var(--text2);}
 
-  /* NEXT 14/08: nut THU GON thanh cong cu (ca mobile lan desktop).
-     Khi .min: an het nut con, chi con nut bat/tat -> khoi map trong. */
-  #tools #btnToolsToggle{font-weight:800;color:var(--accent);text-align:center;}
-  #tools.min{width:auto;}
-  #tools.min > button:not(#btnToolsToggle){display:none;}
-
   /* Ô hiển thị toạ độ khi ghim */
   #coord{
     position:absolute;bottom:96px;right:20px;z-index:5;
@@ -100,7 +101,7 @@
      Đây là bảng chữ dày đặc 8 dòng danh sách — nền tối làm mỏi mắt.
      Vẫn giữ chất ERA bằng viền + tiêu đề xanh rêu, không lạc khỏi bộ màu. */
   #legend{
-    /* NEXT 14/08: right:16px -> 64px, nhuong cho 2 nut zoom/fullscreen cua MapLibre
+    /* NEXT 18/08: right:16px -> 64px, nhuong cho 2 nut zoom/fullscreen cua MapLibre
        (dang top-right, rong ~29px + margin) khoi bi de. */
     position:absolute;top:16px;right:64px;z-index:5;
     background:#FFFFFF;border:1px solid rgba(13,38,32,.10);border-radius:16px;padding:11px 13px;
@@ -172,35 +173,38 @@
   .rd-chip b{display:block;font-size:11.5px;font-weight:700;letter-spacing:.2px;}
   .rd-chip i{display:block;font-style:normal;font-size:9px;opacity:.92;margin-top:1px;}
 
-  /* ===== PIN DỰ ÁN — phải nổi hơn mọi thứ khác trên bản đồ ===== */
+  /* ===== PIN DỰ ÁN — phải nổi hơn mọi thứ khác trên bản đồ =====
+     🆕 18/08/2026: Anh Tony đưa ảnh pin gold có phối cảnh dự án bên trong,
+     thay hẳn giọt nước vẽ bằng CSS. File: pin-pgbl.png (120×161 @2x,
+     8,3 KB, nền trong suốt sẵn) -> hiển thị 60×80, retina vẫn nét.
+     🔴 .era-pin NAY CÓ KÍCH THƯỚC THẬT (trước là width:0;height:0).
+        Bản cũ 0×0 làm getBoundingClientRect() ra hộp rỗng -> hệ dò va chạm
+        coi pin không chiếm chỗ, chip đè thẳng lên dự án. Nay đo được. */
   .era-pin{
-    position:relative; width:0; height:0; z-index:9;
-    display:flex; flex-direction:column; align-items:center; cursor:pointer;
+    position:relative; width:60px; height:80px; z-index:9; cursor:pointer;
+  }
+  .era-pin .era-anh{
+    display:block; width:60px; height:80px;
+    background:url(pin-pgbl.png) center/contain no-repeat;
+    filter:drop-shadow(0 5px 13px rgba(0,0,0,.55));
   }
   .era-pin .era-halo{
-    position:absolute; left:50%; bottom:-6px; width:52px; height:52px;
-    margin-left:-26px; border-radius:50%;
+    position:absolute; left:50%; bottom:-9px; width:54px; height:54px;
+    margin-left:-27px; border-radius:50%;
     background:radial-gradient(circle, rgba(191,150,66,.55) 0%, rgba(191,150,66,0) 70%);
     animation:eraPulse 2.2s ease-out infinite; pointer-events:none;
+    z-index:-1;                      /* nhịp toả ra SAU pin, không phủ lên ảnh */
   }
   @keyframes eraPulse{
     0%{transform:scale(.55);opacity:.95;}
     70%{transform:scale(1.5);opacity:.12;}
     100%{transform:scale(1.6);opacity:0;}
   }
-  /* Giọt nước: hình vuông bo 3 góc tròn, xoay 45° -> mũi nhọn chỉ xuống */
-  .era-pin .era-drop{
-    position:relative; width:26px; height:26px; margin-bottom:9px;
-    background:var(--gold); border:2.5px solid #fff;
-    border-radius:50% 50% 50% 4px; transform:rotate(-45deg);
-    box-shadow:0 4px 12px rgba(0,0,0,.55);
-  }
-  .era-pin .era-core{
-    position:absolute; left:50%; top:50%; width:9px; height:9px; margin:-4.5px 0 0 -4.5px;
-    background:#0D2620; border-radius:50%;
-  }
+  /* 🔴 18/08 Anh Tony chốt: chữ nằm TRÊN ĐỈNH icon, không phải dưới chân.
+     Dưới chân thì nó đè lên chính con đường mà mũi pin đang chỉ vào. */
   .era-pin .era-name{
-    position:absolute; bottom:-20px; white-space:nowrap;
+    position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%);
+    white-space:nowrap;
     font:700 11.5px/1.2 'Segoe UI',system-ui,Arial,sans-serif;
     color:#0D2620; background:var(--gold);
     border:2px solid #fff; border-radius:8px; padding:3px 9px;
@@ -317,11 +321,6 @@
 
     #coord{bottom:auto; top:8px; left:auto; right:8px; font-size:11px; padding:6px 9px;}
     #globe{width:70px;height:70px;right:10px;bottom:170px;}
-
-    /* NEXT 14/08: nhac thuoc do + attribution len TREN thanh nav (nav cao ~94px
-       tinh tu day, qua cau bat dau tu 170px -> 96px nam vua khe giua). */
-    .maplibregl-ctrl-bottom-left{bottom:96px;}
-    .maplibregl-ctrl-bottom-right{bottom:96px;}
     .gl-ball{inset:9px;}
     .gl-so{bottom:-15px;font-size:9px;}
     .gl-h{font-size:8px;}
@@ -331,10 +330,71 @@
     .rd-chip i{display:none;}           /* dòng phụ bỏ đi cho đỡ rối màn nhỏ */
     .hw-label{font-size:10px;}
     .hw-label span{display:none;}
-    /* Pin dự án GIỮ NGUYÊN CỠ trên điện thoại — đây là thứ duy nhất
-       không được thu nhỏ, vì nó là điểm khách cần tìm. */
-    .era-pin .era-name{font-size:11px;padding:3px 8px;}
+    /* Pin dự án chỉ thu RẤT NHẸ trên điện thoại — đây là thứ khách cần
+       tìm, thu nhiều là mất điểm neo của cả bản đồ. */
+    .era-pin, .era-pin .era-anh{width:52px;height:70px;}
+    .era-pin .era-name{font-size:11px;padding:3px 8px;bottom:calc(100% + 5px);}
   }
+
+  /* ============================================================
+     🆕 18/08/2026 — CHẤM ĐƯỜNG NỘI THỊ + CHẾ ĐỘ MÀN NHỎ
+     Anh Tony chốt sau khi soi 3 ảnh thật (PC · iPad dọc · iPad ngang):
+       (a) 4 đường nội thị THU THÀNH CHẤM, chạm/bấm mới hiện tên
+       (b) màn nhỏ thì MỌI bảng đều có nút ẩn
+     🔴 Đặt SAU media query 820px để đè được nó (class trên <html>
+        có độ ưu tiên cao hơn selector trần trong media query).
+     ============================================================ */
+
+  /* (Chấm đường nội thị nay vẽ bằng layer circle của MapLibre, không còn
+     phần tử HTML — xem hàm veChamNoiThi(). CSS .rd-dot đã gỡ.) */
+
+  /* --- Chế độ MÀN NHỎ (class gán bằng JS, xem hàm capNhatCoMan) ---
+     Không dùng media query thuần vì phải xét CẢ chiều cao và cảm ứng:
+     iPad ngang rộng 1180px (lọt lưới 820px) nhưng cao chỉ 820px nên
+     bảng chú giải vẫn tràn quá đáy và bị thanh nav che — thấy rõ ảnh 3. */
+  html.man-nho #btnLegend{ display:block; }
+  html.man-nho #legend{
+    display:none;
+    top:auto; right:0; left:0; bottom:var(--nav-h); max-width:none;
+    max-height:56vh; overflow-y:auto;
+    border-radius:16px 16px 0 0; padding:14px 16px 20px;
+    box-shadow:0 -8px 30px rgba(0,0,0,.35);
+  }
+  html.man-nho #legend.open{ display:block; }
+  html.man-nho #legend h2{ font-size:13px; padding-right:36px; }
+  html.man-nho #legend .dong{
+    display:block; position:sticky; top:0; float:right;
+    width:30px; height:30px; margin:-4px -4px 0 0;
+    border:none; border-radius:50%;
+    background:#E8EFEA; color:#0D2620; font-size:16px; cursor:pointer;
+  }
+  /* Chip gọn lại trên màn nhỏ — bỏ dòng phụ, chữ nhỏ hơn */
+  html.man-nho .rd-chip{ padding:2px 6px; border-width:1.5px; }
+  html.man-nho .rd-chip b{ font-size:10.5px; }
+  html.man-nho .rd-chip i{ display:none; }
+
+  /* --- Công tắc con (tiện ích + lớp cao tốc) trong thanh công cụ --- */
+  #nhomTI, #nhomHW{ display:none; flex-direction:column; gap:4px; margin:-2px 0 2px; padding-left:8px; }
+  #nhomTI.mo, #nhomHW.mo{ display:flex; }
+  #nhomTI button, #nhomHW button{
+    text-align:left; padding:7px 10px; font-size:12px; border-radius:9px;
+    border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--dim);
+    cursor:pointer; display:flex; align-items:center; gap:7px;
+  }
+  #nhomTI button .cham, #nhomHW button .cham{ width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#555; }
+  #nhomTI button.bat, #nhomHW button.bat{ color:var(--text); background:rgba(255,255,255,.07); }
+
+  /* --- Nút ẩn/hiện TẤT CẢ bảng (chỉ có trên màn nhỏ) --- */
+  #btnAnHet{ display:none; }
+  html.man-nho #btnAnHet{ display:block; }
+  /* Khi bật chế độ xem sạch: giấu mọi khối giao diện, chừa đúng nút bật lại */
+  html.sach #tools > button:not(#btnAnHet){ display:none; }
+  html.sach #legend, html.sach #globe, html.sach #coord{ display:none !important; }
+  html.sach #tools{ width:auto; background:transparent; border-color:transparent; box-shadow:none; padding:4px; }
+
+  /* NEXT 18/08: day controls MapLibre + attribution len tren nav ERA tren mobile */
+  .maplibregl-ctrl-bottom-left,
+  .maplibregl-ctrl-bottom-right{ bottom: calc(var(--nav-h) + 8px) !important; }
 </style>
 </head>
 <body>
@@ -391,7 +451,6 @@
 </div>
 
 <div id="tools">
-  <button class="ghost" id="btnToolsToggle">— Thu gọn công cụ</button>
   <button class="gold" id="btnSpin">↻ Xoay 360°</button>
   <button id="btnReset">⌂ Về tổng quan</button>
   <button class="gold" id="btnLegend">ⓘ Chú giải</button>
@@ -399,8 +458,18 @@
   <button class="ghost" id="btnHighway">🛣 Toàn tuyến cao tốc</button>
   <button class="ghost" id="btnInfo">ⓘ Thông tin tuyến</button>
   <button class="ghost" id="btnTinh">🗺 Tắt ranh giới tỉnh</button>
-  <button class="ghost" id="btnHwToggle">👁 Tắt lớp cao tốc</button>
+  <button class="ghost" id="btnHwToggle">🛣 Lớp cao tốc</button>
+  <div id="nhomHW"></div>
+  <!-- 🆕 18/08: lớp tiện ích + công tắc từng nhóm (Anh Tony đặt) -->
+  <button class="ghost" id="btnTienIch">🏙 Bật tiện ích</button>
+  <div id="nhomTI"></div>
+  <!-- 🆕 18/08: chỉ hiện trên màn nhỏ — Anh Tony: "màn nhỏ thì tất cả
+       cái gì hiển thị đều có nút ẩn đi" -->
+  <button class="ghost" id="btnAnHet">🙈 Ẩn hết bảng</button>
   <button class="gold"  id="btnSendPins" style="display:none">📤 Gửi điểm ghim</button>
+  <!-- 🆕 18/08: Anh Tony chốt "tự vẽ theo công cụ điểm". Nút này KHÔNG cần
+       cầu nối 8091 -> luôn dùng được, chép xong dán thẳng vào chat cho Em. -->
+  <button class="gold"  id="btnChepGhim" style="display:none">📋 Chép toạ độ</button>
   <button class="ghost" id="btnClearPins" style="display:none">🗑 Xoá ghim</button>
 </div>
 
@@ -491,12 +560,6 @@ map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'top-rig
 map.addControl(new maplibregl.FullscreenControl(), 'top-right');
 map.addControl(new maplibregl.ScaleControl({unit:'metric'}));
 
-/* NEXT 14/08: attribution compact dang MO SAN (<details open>) tren dien thoai ->
-   dai 4 dong de len qua cau. Dong lai thanh nut (i), bam moi bung xem nguon. */
-requestAnimationFrame(()=>{
-  document.querySelectorAll('.maplibregl-ctrl-attrib[open]').forEach(a=>a.removeAttribute('open'));
-});
-
 map.on('load', ()=>{
   /* Bật địa hình 3D + phóng đại để thấy khối núi/đồi rõ */
   map.setTerrain({ source:'terrainDEM', exaggeration:1.5 });
@@ -556,8 +619,11 @@ function addHighway(){
   map.addLayer({ id:'d-noithi', type:'line', source:'ct-tuyen',
     filter:['==',['get','status'],'noithi'],
     layout:{ 'line-cap':'round', 'line-join':'round' },
-    paint:{ 'line-color':'#CFD6DE', 'line-opacity':0.9,
-            'line-width':['interpolate',['linear'],['zoom'],10,1,13,2.2,16,3.5] } });
+    /* 🔴 18/08: nới nét. Bản cũ chỉ 1 px ở zoom 10, màu xám nhạt trên ảnh vệ
+       tinh vùng đồi -> gần như vô hình, làm chấm trông như trôi nổi không
+       thuộc con đường nào. Đây là NỬA CÒN LẠI của lỗi "không ăn vào đường". */
+    paint:{ 'line-color':'#CFD6DE', 'line-opacity':0.95,
+            'line-width':['interpolate',['linear'],['zoom'],10,1.8,13,3,16,4.5] } });
 
   /* 🔴 ĐƯỜNG NỐI THẲNG VÀO CAO TỐC (Nguyễn Văn Cừ) — đây là câu trả lời
      cho câu hỏi "từ dự án ra cao tốc đi đường nào", nên phải NỔI:
@@ -681,6 +747,301 @@ function addHighway(){
   });
 
   addTheThongTin();
+  veTienIch();
+  veNutXuongCaoToc();
+}
+
+/* ============================================================
+   BIỂN "GIAO NHAU" TẠI CHỖ ĐƯỜNG DẪN GẶP CAO TỐC  (18/08/2026)
+   Anh Tony: "vẽ cái icon giống vậy, gắn lên điểm nối giữa cao tốc
+   và đường xuống" — biển báo hình thoi vàng, viền đen, dấu cộng đen.
+
+   🔴 KHÔNG GHI CỨNG TOẠ ĐỘ. Vị trí được DÒ RA từ chính dữ liệu tuyến:
+      lấy mọi tuyến `noicaotoc`, tìm điểm gần các tuyến cao tốc nhất.
+      Anh sửa/kéo dài tuyến thì biển TỰ ĐI THEO, không phải nhớ sửa
+      thêm chỗ nào. (Sáng nay đã dính đúng kiểu lỗi này: thêm tuyến mới
+      mà quên ghi chú tuyến cũ -> 2 câu trái nhau trên cùng bản đồ.)
+   ============================================================ */
+function khoangToiTuyen(p, geom){
+  const ls = (geom.type === 'MultiLineString') ? geom.coordinates : [geom.coordinates];
+  let best = Infinity;
+  for(const l of ls){
+    for(let i = 1; i < l.length; i++){
+      const a = l[i-1], b = l[i], co = Math.cos(a[1] * Math.PI/180);
+      const ax = a[0]*co, ay = a[1], bx = b[0]*co, by = b[1], px = p[0]*co, py = p[1];
+      const dx = bx-ax, dy = by-ay, L2 = dx*dx + dy*dy;
+      const t = L2 ? Math.max(0, Math.min(1, ((px-ax)*dx + (py-ay)*dy) / L2)) : 0;
+      const d = Math.hypot(px - (ax + t*dx), py - (ay + t*dy)) * 111320;
+      if(d < best) best = d;
+    }
+  }
+  return best;
+}
+
+/* Biển báo giao nhau ĐỨNG TRÊN CỘT + BIỂN PHỤ CHỮ.
+   🔴 18/08 Anh Tony: chữ "Nút giao - lối ra" phải HIỆN THƯỜNG TRỰC.
+
+   🔑 CÁCH LÀM: VẼ CHỮ THẲNG VÀO ẢNH ICON bằng canvas, KHÔNG dùng `text-field`.
+      Đây là đường duy nhất tránh được cả 3 cái bẫy cùng lúc:
+        · `text-field` đòi kho font `glyphs` — style trang này viết tay,
+          không khai; nạp từ CDN ngoài thì CDN chết là CHỮ BIẾN MẤT IM LẶNG
+          (bẫy 13/08, chính là lý do cả trang né layer `symbol` có chữ).
+        · Nhãn HTML thì KHÔNG bám địa hình 3D — chữ trôi khỏi biển ở sườn dốc
+          (bẫy sáng nay với 4 chấm nội thị).
+        · Nhãn HTML cũng không có cơ chế tránh đè.
+      Chữ nằm trong ảnh -> đi theo icon tuyệt đối, mọi góc nghiêng, mọi độ cao.
+
+   ⚠️ Đánh đổi đã biết: chữ là ảnh raster, phóng quá cỡ sẽ hơi mềm nét.
+      Vẽ @2x nên ở cỡ hiển thị thật (≤ 0,85) mắt không nhận ra.
+   ⚠️ Chữ cứng trong ảnh -> đổi nội dung phải sửa 2 biến DONG1/DONG2 dưới đây,
+      không sửa được từ dữ liệu. Chấp nhận vì cả 2 biển dùng chung một câu. */
+function iconBienGiaoNhau(){
+  const R = 2;
+  const DONG1 = 'NÚT GIAO', DONG2 = 'LỐI RA';
+  const FONT  = `700 ${10*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
+
+  /* Đo chữ TRƯỚC để canvas vừa khít — đặt cứng bề rộng thì chữ dài hơn
+     font hệ thống của máy khác là bị CẮT CỤT, không báo lỗi. */
+  const do1 = document.createElement('canvas').getContext('2d');
+  do1.font = FONT;
+  const wChu  = Math.max(do1.measureText(DONG1).width, do1.measureText(DONG2).width);
+  const wBien = Math.ceil(wChu + 13*R);
+
+  const sThoi = 34 * R;                      /* cạnh vuông trước khi xoay */
+  const nc    = sThoi * Math.SQRT1_2;        /* nửa đường chéo hình thoi */
+  const W     = Math.max(wBien, Math.ceil(nc*2 + 6*R));
+  const hThoi = Math.ceil(nc*2 + 4*R);
+  const hBien = 27 * R;
+  const hCot  = 22 * R;
+  const H     = hThoi + hBien + hCot;
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const cx = W/2, cyThoi = nc + 3*R;
+  const yBien = hThoi, yCot = hThoi + hBien;
+
+  /* --- CỘT (vẽ trước, biển đè lên) --- */
+  const wc = 6 * R;
+  x.fillStyle = '#B9C0C8';
+  x.fillRect(cx - wc/2, yBien, wc, H - yBien - R);
+  x.strokeStyle = '#2F343B'; x.lineWidth = 1.4 * R;
+  x.strokeRect(cx - wc/2, yBien, wc, H - yBien - R);
+  x.fillStyle = 'rgba(0,0,0,.22)';
+  x.fillRect(cx + wc/2 - 2*R, yBien, 2*R, H - yBien - R);
+
+  function boGoc(g, l, t, w, h, r){
+    g.beginPath();
+    if(g.roundRect){ g.roundRect(l, t, w, h, r); return; }
+    /* 🔴 roundRect chỉ có từ Chrome 99 / Safari 16 — thiếu đường lùi là
+       ICON KHÔNG VẼ RA, im lặng, không lỗi đỏ. */
+    g.moveTo(l + r, t);
+    g.arcTo(l + w, t,     l + w, t + h, r);
+    g.arcTo(l + w, t + h, l,     t + h, r);
+    g.arcTo(l,     t + h, l,     t,     r);
+    g.arcTo(l,     t,     l + w, t,     r);
+    g.closePath();
+  }
+
+  /* --- BIỂN PHỤ CHỮ (nền trắng, viền đen — như biển phụ thật) --- */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 4*R; x.shadowOffsetY = 1.5*R;
+  boGoc(x, (W - wBien)/2, yBien, wBien, hBien, 3*R);
+  x.fillStyle = '#FFFFFF'; x.fill();
+  x.shadowColor = 'transparent';
+  x.lineWidth = 2*R; x.strokeStyle = '#111111'; x.stroke();
+  x.restore();
+
+  x.font = FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = '#111111';
+  x.fillText(DONG1, cx, yBien + hBien*0.31);
+  x.fillText(DONG2, cx, yBien + hBien*0.71);
+
+  /* --- MẶT BIỂN THOI --- */
+  x.save();
+  x.translate(cx, cyThoi);
+  x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 5*R; x.shadowOffsetY = 2*R;
+  x.rotate(Math.PI/4);
+  boGoc(x, -sThoi/2, -sThoi/2, sThoi, sThoi, sThoi*0.14);
+  x.fillStyle = '#F5A623'; x.fill();
+  x.shadowColor = 'transparent';             /* tắt bóng kẻo viền bị nhoè */
+  x.lineWidth = 3.2*R; x.strokeStyle = '#111111'; x.stroke();
+  x.rotate(-Math.PI/4);
+  const w2 = sThoi*0.92, t2 = sThoi*0.24;
+  x.fillStyle = '#111111';
+  x.fillRect(-w2/2, -t2/2, w2, t2);
+  x.fillRect(-t2/2, -w2/2, t2, w2);
+  x.restore();
+
+  return x.getImageData(0, 0, W, H);
+}
+
+function veNutXuongCaoToc(){
+  const T = window.CAOTOC_TUYEN.features;
+  const caoToc = T.filter(f=> ['khaithac','thicong','dexuat'].includes(f.properties.status));
+  const fc = { type:'FeatureCollection', features:[] };
+
+  T.forEach(f=>{
+    if(f.properties.status !== 'noicaotoc') return;
+    let tot = null, min = Infinity;
+    f.geometry.coordinates.forEach(l=> l.forEach(p=>{
+      caoToc.forEach(c=>{
+        const d = khoangToiTuyen(p, c.geometry);
+        if(d < min){ min = d; tot = p; }
+      });
+    }));
+    /* 150 m: đủ rộng để bắt được cả tuyến ghim tay hơi lệch, đủ hẹp để
+       không dán biển vào tuyến chỉ chạy ngang qua gần cao tốc. */
+    if(tot && min < 150){
+      fc.features.push({ type:'Feature',
+        properties:{ ten:f.properties.ten, cach:Math.round(min), mota:'Nút giao — lối ra' },
+        geometry:{ type:'Point', coordinates:tot } });
+    }
+  });
+
+  if(!fc.features.length){
+    console.warn('[nút xuống] Không dò ra chỗ nào đường dẫn gặp cao tốc.');
+    return;
+  }
+  try{ map.addImage('bien-giao-nhau', iconBienGiaoNhau(), { pixelRatio:2 }); }
+  catch(e){ console.warn('[nút xuống] không nạp được icon:', e.message); return; }
+
+  map.addSource('nut-xuong', { type:'geojson', data:fc });
+  map.addLayer({
+    id:'nut-xuong', type:'symbol', source:'nut-xuong',
+    layout:{
+      'icon-image':'bien-giao-nhau',
+      /* 🔴 'bottom' = CHÂN CỘT cắm đúng toạ độ, mặt biển nhô lên trên.
+         Để mặc định 'center' là cả cái biển bị dìm xuống nửa dưới. */
+      'icon-anchor':'bottom',
+      /* Ảnh nay CÕNG THÊM BIỂN PHỤ nên to hơn hẳn -> hạ icon-size xuống,
+         không thì ở zoom cao nó chiếm cả góc màn hình. */
+      'icon-size':['interpolate',['linear'],['zoom'],8,0.42,12,0.62,16,0.85],
+      /* 🔴 CHO PHÉP ĐÈ: đây là 2 điểm quan trọng nhất của cả câu chuyện
+         "dự án ra cao tốc" — không được để MapLibre ẩn đi vì chật chỗ. */
+      'icon-allow-overlap':true,
+      'icon-ignore-placement':true
+    }
+  });
+  /* Chữ mô tả Anh Tony chốt 18/08: "Nút giao - lối ra" */
+  map.on('click','nut-xuong',(e)=>{
+    const p = e.features[0].properties;
+    new maplibregl.Popup({offset:16}).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b style="color:#F5A623">NÚT GIAO — LỐI RA</b>
+                <br><span style="color:#C4B5FD;font-weight:600">${p.ten}</span>
+                <br><span style="color:#83A08D">Cách tim cao tốc ~${p.cach} m</span>`).addTo(map);
+  });
+  map.on('mouseenter','nut-xuong',()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave','nut-xuong',()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+  console.log('[nút giao — lối ra] đã gắn biển tại', fc.features.length, 'chỗ:',
+              fc.features.map(f=> f.properties.ten).join(' · '));
+}
+
+/* ============================================================
+   LỚP TIỆN ÍCH QUANH DỰ ÁN  (18/08/2026 — Anh Tony đặt)
+   Nguồn: OpenStreetMap (ODbL), lấy qua lay-tienich.html + LAY-OSM.bat.
+
+   🔴 DÙNG LAYER `symbol`, KHÔNG dùng Marker HTML — 2 lý do, cả 2 đều là
+      bẫy đã trả giá trong ngày:
+      (1) Marker HTML KHÔNG bám địa hình 3D (bẫy sáng nay với 4 chấm nội thị).
+      (2) Marker HTML không có cơ chế tránh đè — phải tự viết như đã làm cho chip.
+      Layer `symbol` được cả hai thứ đó miễn phí.
+
+   🔴 VÀ KHÔNG BỊ DÍNH BẪY `glyphs` 13/08: kho font `glyphs` chỉ cần cho
+      **chữ** (`text-field`). Layer này CHỈ có `icon-image`, ảnh nạp bằng
+      `map.addImage()` -> không đụng gì tới font. Tên tiện ích nằm trong
+      popup lúc bấm, không vẽ lên bản đồ.
+   ============================================================ */
+const TI_LAYER = 'tienich';
+let tiOn = false;
+const tiNhomBat = new Set();
+
+/* Vẽ 1 icon tròn bằng canvas rồi nạp vào MapLibre.
+   🔴 Nền TRẮNG + viền màu nhóm, KHÔNG tô nền màu: bảng màu tuyến đã dùng
+      hết đỏ/cam/vàng/tím/xanh: tô nền màu là khách nhầm icon với tuyến. */
+function iconTron(emoji, mau){
+  const R = 2, D = 32 * R;                    /* @2x cho màn retina */
+  const c = document.createElement('canvas');
+  c.width = c.height = D;
+  const x = c.getContext('2d');
+  x.beginPath(); x.arc(D/2, D/2, D/2 - 3.5*R, 0, Math.PI*2);
+  x.fillStyle = '#FFFFFF'; x.fill();
+  x.lineWidth = 2.6*R; x.strokeStyle = mau; x.stroke();
+  x.font = `${14*R}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",system-ui,sans-serif`;
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(emoji, D/2, D/2 + 1*R);
+  return x.getImageData(0, 0, D, D);
+}
+
+function veTienIch(){
+  if(typeof window.TIEN_ICH === 'undefined'){
+    console.warn('[tiện ích] Không thấy tienich-data.js — lớp tiện ích bị bỏ qua.');
+    return;
+  }
+  const fc = { type:'FeatureCollection', features:[] };
+  Object.keys(window.TIEN_ICH.nhom).forEach(id=>{
+    const n = window.TIEN_ICH.nhom[id];
+    try{ map.addImage(id, iconTron(n.icon, n.mau), { pixelRatio:2 }); }
+    catch(e){ console.warn('[tiện ích] không nạp được icon', id, e.message); }
+    tiNhomBat.add(id);
+    n.diem.forEach(p=>{
+      if(p.bo) return;                        /* điểm Em đề xuất bỏ — xem tienich-data.js */
+      fc.features.push({ type:'Feature',
+        properties:{ nhom:id, nhomTen:n.ten, ten:p.ten, km:p.km, mau:n.mau },
+        geometry:{ type:'Point', coordinates:[p.lng, p.lat] } });
+    });
+  });
+
+  map.addSource('tienich', { type:'geojson', data:fc,
+    attribution:'Tiện ích © OpenStreetMap contributors (ODbL)' });
+  map.addLayer({
+    id:TI_LAYER, type:'symbol', source:'tienich',
+    minzoom:11.2,
+    layout:{
+      'icon-image':['get','nhom'],
+      'icon-size':['interpolate',['linear'],['zoom'],11.2,0.55,14,0.8,17,1],
+      'icon-allow-overlap':false,             /* để MapLibre tự tránh đè */
+      'icon-padding':2,
+      'visibility':'none'                     /* mặc định TẮT, bật bằng nút */
+    }
+  });
+
+  map.on('click', TI_LAYER, (e)=>{
+    const p = e.features[0].properties;
+    new maplibregl.Popup({offset:14}).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>${p.ten}</b><br><span style="color:${p.mau};font-weight:600">${p.nhomTen}</span>
+                <br><span style="color:#83A08D">Cách dự án ~${p.km} km (đường chim bay)</span>`).addTo(map);
+  });
+  map.on('mouseenter', TI_LAYER, ()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave', TI_LAYER, ()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+
+  dungNutNhom();
+}
+
+function dungNutNhom(){
+  const hop = document.getElementById('nhomTI');
+  if(!hop) return;
+  hop.innerHTML = '';
+  Object.keys(window.TIEN_ICH.nhom).forEach(id=>{
+    const n = window.TIEN_ICH.nhom[id];
+    const so = n.diem.filter(p=>!p.bo).length;
+    const b = document.createElement('button');
+    b.className = 'bat';
+    b.innerHTML = `<span class="cham" style="background:${n.mau}"></span>${n.icon} ${n.ten} (${so})`;
+    b.onclick = ()=>{
+      if(tiNhomBat.has(id)) tiNhomBat.delete(id); else tiNhomBat.add(id);
+      b.classList.toggle('bat', tiNhomBat.has(id));
+      locTienIch();
+    };
+    hop.appendChild(b);
+  });
+}
+
+function locTienIch(){
+  if(!map.getLayer(TI_LAYER)) return;
+  /* Bỏ hết nhóm thì lọc rỗng — KHÔNG tắt visibility, vì nút chính đang
+     dùng visibility; hai cơ chế ghi chung một thuộc tính là hỏng ngầm. */
+  map.setFilter(TI_LAYER, ['in', ['get','nhom'], ['literal', [...tiNhomBat]]]);
 }
 
 /* ============================================================
@@ -813,35 +1174,622 @@ const CHIP_KIEU = {
 const CHIP_TEN = {
   era:'VP ERA Vietnam → cao tốc', ttam:'Vào trung tâm Bảo Lộc',
   q1dg:'QL1 · nối Dầu Giây', lph:'Lê Phụng Hiếu', nct:'Nguyễn Công Trứ',
-  nvc:'Nguyễn Văn Cừ → CAO TỐC', ltk:'Lý Thường Kiệt', pdp:'Phan Đình Phùng',
+  nvc:'Nguyễn Văn Cừ → CAO TỐC', td:'Phan Đình Phùng → CAO TỐC',
+  ltk:'Lý Thường Kiệt', pdp:'Phan Đình Phùng',
   q20:'QL20 · xuyên tâm Bảo Lộc', q20t:'QL20 · đường tránh',
   s1:'CT.29 · An Phú–Dầu Giây', s2:'CT.27 · Dầu Giây–Tân Phú',
   s3:'CT.27 · Tân Phú–Bảo Lộc', s4:'CT.27 · Bảo Lộc–Liên Khương',
   s5:'CT.27 · Liên Khương–Prenn', s6:'Phan Thiết–Bảo Lộc–Gia Nghĩa'
 };
+/* ============================================================
+   🆕 18/08/2026 — TÌM ĐIỂM GIỮA TUYẾN (Anh Tony bắt lỗi "4 chấm lệch")
+   🔴 BẢN CŨ SAI Ở HAI CHỖ, cộng dồn thành lệch tới 6 km:
+      (1) chọn mảnh "dài nhất" bằng `l.length` = ĐẾM SỐ ĐIỂM, không phải đo
+          chiều dài. Một mảnh ngắn mà cong nhiều điểm sẽ thắng mảnh dài thẳng.
+      (2) lấy `dai[length/2]` = điểm GIỮA MẢNG. OSM đặt đỉnh DÀY ở khúc cong,
+          THƯA ở đoạn thẳng -> điểm giữa mảng bị kéo lệch về phía khúc cong.
+   Đo thật trên dữ liệu đang chạy: s3 lệch 6,18 km · q20 4,76 km · s4 4,70 km ·
+   4 chấm nội thị 30–340 m.
+   Bản này: chọn mảnh dài nhất THEO HÌNH HỌC, rồi đi dọc tới đúng 50% chiều
+   dài, nội suy giữa 2 đỉnh -> nhãn luôn nằm TRÊN đường và đúng giữa.
+   ============================================================ */
+function khoangCach(a, b){
+  /* Xấp xỉ phẳng, nhân cos(vĩ độ) để bù kinh tuyến co lại. Ở quy mô một
+     tỉnh thì sai số không đáng kể, mà rẻ hơn haversine rất nhiều —
+     hàm này chạy trên hàng nghìn đỉnh. */
+  const co = Math.cos(a[1] * Math.PI / 180);
+  const dx = (b[0] - a[0]) * co, dy = b[1] - a[1];
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+/* 🆕 18/08 — DỜI ĐIỂM NEO CỦA TỪNG TUYẾN.
+   Anh Tony: chấm neo callout Nguyễn Văn Cừ nằm sát cao tốc quá, thẻ bị đè.
+   Số = vị trí theo TỈ LỆ CHIỀU DÀI tuyến, tính từ điểm đầu (index 0).
+   0,5 = đúng giữa (mặc định) · lớn hơn = trượt về cuối tuyến.
+   🔴 Chỉnh ở đây, KHÔNG ghi cứng toạ độ — sửa hình học tuyến thì điểm neo
+      tự đi theo, khỏi phải nhớ cập nhật thêm chỗ nào. */
+const NEO_TI_LE = {
+  nvc: 0.78     /* nvc đi từ BẮC (gần cao tốc) xuống nam; 0,78 ≈ cách nút giao 4,5 km */
+};
+
+/* 🆕 18/08 — ĐẶT NHÃN Ở TOẠ ĐỘ CỤ THỂ, và cho phép MỘT TUYẾN CÓ NHIỀU NHÃN.
+   Anh Tony ghim tay. Tuyến nào có tên ở đây thì BỎ HẲN vị trí tính tự động,
+   dùng đúng danh sách toạ độ này — mỗi toạ độ sinh một thẻ.
+   Vì sao cần: s6 (Phan Thiết–Bảo Lộc–Gia Nghĩa) dài 152 km chạy chéo hết
+   khung nhìn; một nhãn ở giữa thì hai đầu tuyến không biết là đường gì. */
+const NEO_DIEM = {
+  s6: [ [107.87793, 11.46110],    /* phía Phan Thiết — cách tim tuyến 2 m */
+        [107.73760, 11.69880] ]   /* phía Gia Nghĩa  — cách tim tuyến 141 m */
+};
+
+function diemGiuaTheoDai(geom, tiLe){
+  /* Nhận cả LineString lẫn MultiLineString — dữ liệu hiện toàn Multi,
+     nhưng đừng để hỏng ngầm nếu sau này có tuyến kiểu khác. */
+  const ls = (geom.type === 'MultiLineString') ? geom.coordinates : [geom.coordinates];
+  let manh = null, daiNhat = -1;
+  ls.forEach(l=>{
+    if(!l || l.length < 2) return;
+    let d = 0;
+    for(let i = 1; i < l.length; i++) d += khoangCach(l[i-1], l[i]);
+    if(d > daiNhat){ daiNhat = d; manh = l; }
+  });
+  if(!manh) return (ls[0] && ls[0][0]) || [0,0];
+
+  const moc = daiNhat * (typeof tiLe === 'number' ? tiLe : 0.5);
+  let di = 0;
+  for(let i = 1; i < manh.length; i++){
+    const b = khoangCach(manh[i-1], manh[i]);
+    if(di + b >= moc){
+      const t = b ? (moc - di) / b : 0;
+      return [ manh[i-1][0] + (manh[i][0] - manh[i-1][0]) * t,
+               manh[i-1][1] + (manh[i][1] - manh[i-1][1]) * t ];
+    }
+    di += b;
+  }
+  return manh[manh.length - 1];
+}
+
+/* 🆕 18/08/2026 — HẠNG ƯU TIÊN CỦA NHÃN.
+   Số CÀNG NHỎ càng quan trọng. Dùng cho CẢ 2 việc:
+     (1) ngưỡng zoom mới cho hiện
+     (2) khi 2 nhãn đè nhau thì cái hạng lớn hơn tự ẩn
+   Thứ tự Anh Tony chốt: Dự án > Cao tốc > Quốc lộ > Đường ra cao tốc > Nội thị */
+const HANG = {
+  khaithac:1, thicong:1, dexuat:2,      /* cao tốc */
+  hienhuu:3,                            /* quốc lộ */
+  noicaotoc:4, vaotrungtam:4, vanphong:4, /* đường từ dự án ra cao tốc */
+  noithi:9                              /* nội thị — thấp nhất, đã thu thành chấm */
+};
+/* Zoom TỐI THIỂU để nhãn được phép hiện. Zoom xa thì chỉ còn cao tốc.
+   (Chấm nội thị không nằm ở đây — nó là layer circle, chặn bằng `minzoom`.) */
+const ZOOM_TOI_THIEU = { 1:0, 2:0, 3:8.6, 4:9.6, 9:11.4 };
+
+/* Danh sách MỌI nhãn tham gia cơ chế chống đè (chỉ chip HTML). */
+const NHAN = [];
+
+/* Điểm giữa của các đường nội thị — gom lại để vẽ bằng LAYER CIRCLE.
+   🔴 KHÔNG dùng Marker HTML cho mấy chấm này: xem ghi chú ở veChamNoiThi(). */
+const CHAM_NOITHI = { type:'FeatureCollection', features:[] };
+
+/* 🆕 18/08 — NHÃN KIỂU "CALLOUT" (chấm neo + đường dẫn chéo + thẻ chữ nghiêng).
+   Anh Tony đưa mẫu, chốt LÀM THỬ 1 CÁI trước ở tuyến "Vào trung tâm Bảo Lộc".
+   🔴 Callout to gấp ~5 lần chip thường (đo thật: 234×94 px so với 128×33 px)
+      -> KHÔNG áp đại trà. Thêm id vào tập này là tuyến đó đổi sang callout. */
+const DUNG_CALLOUT = new Set(['ttam','td','nvc','q20t']);
+const CALLOUT_FC = { type:'FeatureCollection', features:[] };
+
+/* 🆕 18/08 — KIỂU THỨ HAI: "CALLOUT BOX" cho tuyến CAO TỐC.
+   Ô icon + tiêu đề ở đầu, thân chữ mô tả, mũi tên chỉ xuống điểm neo.
+   Anh Tony chốt ý nghĩa icon: 🚗 = ĐÃ THÔNG TUYẾN · 🚧 = ĐANG XÂY DỰNG. */
+/* 🔴 18/08 Anh Tony chốt: THAY THẾ TẤT CẢ sang kiểu box.
+   `'*'` = mọi tuyến, TRỪ đường nội thị (đã thu thành chấm từ sáng). */
+const DUNG_BOX = new Set(['*']);
+const BOX_FC   = { type:'FeatureCollection', features:[] };
+/* 🔴 18/08 Anh Tony: "dùng icon facebook này phèn quá" — bỏ emoji, chuyển sang
+   ICON VẼ NÉT bằng canvas path. Được 3 thứ emoji không có:
+     · đơn sắc, nét mảnh -> nhìn sang, hợp bản đồ kỹ thuật
+     · GIỐNG NHAU trên mọi máy (emoji mỗi hệ điều hành vẽ một kiểu:
+       iPad ra emoji Apple, PC ra emoji Windows — không kiểm soát được)
+     · không phụ thuộc font hay CDN nào; cũng không dính bẫy đoán codepoint
+       của bộ icon font (bẫy 14/08 với Phosphor). */
+const BOX_ICON = {
+  khaithac:'xe', thicong:'xaydung', dexuat:'tailieu',   /* cao tốc — Anh chốt nghĩa */
+  hienhuu:'duong', noicaotoc:'renhanh', vaotrungtam:'thanhpho', vanphong:'toanha'
+};
+/* 🎨 Màu ô icon — Anh Tony chốt: "box màu trắng, icon xây dựng vàng,
+   xe chạy màu xanh". Lấy ĐÚNG bộ màu bộ VR 360 (`06-WEB\PGBL-web\index.html`
+   khối :root) chứ không tự pha: gold #BF9642 · lime #9BDC4C · teal #5FE5BE.
+   Bản đầu lấy màu tuyến (vàng nâu #B98200) -> Anh chê xỉn, đúng. */
+const BOX_MAU = {
+  khaithac:'#9BDC4C', thicong:'#BF9642', dexuat:'#5FE5BE',   /* bộ màu 360 */
+  hienhuu:'#E01B24', noicaotoc:'#6D28D9', vaotrungtam:'#0E9F9F', vanphong:'#0F172A'
+};
+
+/* 🔴 MÀU CHỮ PHẢI TỰ CHỌN THEO NỀN, không đặt cứng.
+   Dải tiêu đề nay chạy từ lime #9BDC4C (rất sáng) tới #0F172A (gần đen).
+   Đặt cứng chữ tối thì mất hút trên nền tím/đỏ/đen; đặt cứng chữ trắng
+   thì mất hút trên lime.
+
+   🔴 VÀ PHẢI TÍNH BẰNG TỈ SỐ TƯƠNG PHẢN WCAG, KHÔNG PHẢI NGƯỠNG ĐỘ SÁNG.
+   Đã thử ngưỡng đơn giản (Y' của YIQ > 0,6): gold #BF9642 ra 0,599 nên rơi
+   sang chữ TRẮNG — trong khi trắng trên gold chỉ đạt 2,9:1 còn chữ tối đạt
+   5,6:1. Tức ngưỡng đơn giản chọn ngược đúng cái tệ hơn, mà vẫn "chạy được"
+   nên không ai phát hiện. Cách đúng: đo tương phản với CẢ HAI màu, lấy cái cao hơn. */
+function chuHopNen(hex){
+  const kenh = v => { v /= 255; return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); };
+  const L = 0.2126*kenh(parseInt(hex.substr(1,2),16))
+          + 0.7152*kenh(parseInt(hex.substr(3,2),16))
+          + 0.0722*kenh(parseInt(hex.substr(5,2),16));
+  const L_TOI = 0.0155;                       /* độ sáng tương đối của #0D2620 */
+  const tuongPhanTrang = 1.05 / (L + 0.05);
+  const tuongPhanToi   = (L + 0.05) / (L_TOI + 0.05);
+  return tuongPhanToi >= tuongPhanTrang ? '#0D2620' : '#FFFFFF';
+}
+
 function addChipTuyen(){
   window.CAOTOC_TUYEN.features.forEach((f)=>{
     const p = f.properties, k = CHIP_KIEU[p.status]; if(!k) return;
-    /* Đặt chip ở GIỮA đoạn DÀI NHẤT của tuyến — chỗ dễ nhìn nhất */
-    const ls = f.geometry.coordinates;
-    let dai = ls[0];
-    ls.forEach(l=>{ if(l.length > dai.length) dai = l; });
-    const giua = dai[Math.floor(dai.length/2)];
+    /* Đặt nhãn ở giữa tuyến, trừ tuyến nào khai riêng trong NEO_TI_LE */
+    const giua = diemGiuaTheoDai(f.geometry, NEO_TI_LE[p.id]);
+    const ten  = CHIP_TEN[p.id] || p.ten;
+    const hang = HANG[p.status] || 5;
+
+    /* 🔴 ĐƯỜNG NỘI THỊ -> CHẤM, không phải chip (Anh Tony chốt 18/08).
+       Lý do đo được từ ảnh: 4 chip nội thị nằm đúng cụm trung tâm chật
+       nhất, cùng cỡ với CT.27, và cõng dòng phụ "ĐƯỜNG NỘI THỊ BẢO LỘC"
+       lặp y hệt 4 lần. Giá trị bán hàng thấp nhất mà tốn chỗ nhất. */
+    if(p.status === 'noithi'){
+      CHAM_NOITHI.features.push({
+        type:'Feature',
+        properties:{ ten:ten, phu:k.phu, dai:p.dai || '—', mau:k.mau },
+        geometry:{ type:'Point', coordinates:giua }
+      });
+      return;
+    }
+
+    /* 🔴 CALLOUT ĐƯỢC ƯU TIÊN HƠN BOX. Anh Tony chốt 18/08: 4 tuyến trong
+       DUNG_CALLOUT (2 lối lên cao tốc · vào trung tâm · QL20 tránh) GIỮ NGUYÊN
+       kiểu callout nghiêng, không đổi sang box.
+       Thứ tự 2 câu if này quyết định tất cả — `DUNG_BOX` có '*' nên nếu không
+       loại trừ ở đây thì box nuốt sạch, callout không bao giờ chạy tới. */
+    if((DUNG_BOX.has('*') || DUNG_BOX.has(p.id)) && !DUNG_CALLOUT.has(p.id)){
+      /* Một tuyến có thể sinh NHIỀU thẻ nếu khai trong NEO_DIEM */
+      (NEO_DIEM[p.id] || [giua]).forEach((toado)=>{
+      BOX_FC.features.push({
+        type:'Feature',
+        properties:{
+          icon:'box-' + p.id, ten:ten, mau:BOX_MAU[p.status] || k.nen || '#BF9642', hang:hang,
+          /* 🔴 18/08 Anh Tony chốt: "chỉ cần từng nấy thông tin thôi" —
+             thân thẻ CHỈ 1 DÒNG phụ đề, đúng như chip cũ. Bỏ hẳn km, tổng vốn,
+             mốc hoàn thành khỏi mặt bản đồ.
+             Được thêm 1 cái ngoài thẩm mỹ: số vốn và mốc thời gian là 2 thứ
+             nhạy nhất về NĐ 02/2022 — không phơi thường trực nữa, ai cần thì
+             BẤM vào xem (popup vẫn giữ đủ, xem `chiTiet`). */
+          dong:[ k.phu ],
+          chiTiet:[ (p.trangthai || '') + (p.dai ? ' · ' + p.dai : ''),
+                    p.von ? 'Tổng vốn ' + p.von : '',
+                    p.hoanthanh ? 'Hoàn thành: ' + p.hoanthanh : '' ].filter(Boolean),
+          bieu: BOX_ICON[p.status] || k.icon || '•'
+        },
+        geometry:{ type:'Point', coordinates:toado }
+      });
+      });
+      return;
+    }
+
+    if(DUNG_CALLOUT.has(p.id)){
+      CALLOUT_FC.features.push({
+        type:'Feature',
+        properties:{ icon:'callout-' + p.id, ten:ten, phu:k.phu, mau:k.mau, hang:hang },
+        geometry:{ type:'Point', coordinates:giua }
+      });
+      return;                                /* không dựng chip HTML nữa */
+    }
 
     const el = document.createElement('div');
     el.className = 'rd-chip';
     el.style.background = k.nen; el.style.color = k.chu;
     el.style.borderColor = k.mau;
-    el.innerHTML = `<b>${k.icon} ${CHIP_TEN[p.id] || p.ten}</b><i>${k.phu}</i>`;
-    const m = new maplibregl.Marker({element:el, anchor:'bottom', offset:[0,-6]})
+    el.innerHTML = `<b>${k.icon} ${ten}</b><i>${k.phu}</i>`;
+    new maplibregl.Marker({element:el, anchor:'bottom', offset:[0,-6]})
       .setLngLat(giua).addTo(map);
     hwLabels.push(el);
+    NHAN.push({ el:el, hang:hang });
   });
+
+  /* Pin dự án tham gia với tư cách CHIẾM CHỖ: chip khác phải né nó,
+     nhưng bản thân nó KHÔNG BAO GIỜ bị ẩn (hạng 0 + cờ batTu).
+     🔴 Đăng ký CẢ HAI phần: thân pin và thẻ tên. Thẻ tên nằm ngoài luồng
+        (position:absolute, tràn xuống dưới đáy pin) nên rect của .era-pin
+        KHÔNG bao gồm nó — chỉ đăng ký 1 cái là cái kia vẫn bị chip đè. */
+  document.querySelectorAll('.era-pin').forEach(el=>{
+    NHAN.push({ el:el, hang:0, batTu:true });
+    const ten = el.querySelector('.era-name');
+    if(ten) NHAN.push({ el:ten, hang:0, batTu:true });
+  });
+
+  NHAN.sort((a,b)=> a.hang - b.hang);
+  veChamNoiThi();
+  veCallout();
+  veCalloutBox();
+  xepLai();
 }
 
-const HW_LAYERS = ['ct-casing','d-noithi','d-noicaotoc-vien','d-noicaotoc',
-                   'd-trungtam-vien','d-trungtam','d-vanphong-vien','d-vanphong','ql-hienhuu',
-                   'ct-khaithac','ct-thicong','ct-dexuat-dai','ct-dexuat-tim','ct-nut-cham'];
+/* ============================================================
+   NHÃN "CALLOUT" — chấm neo · đường dẫn chéo · thẻ chữ nghiêng
+   (18/08/2026, theo mẫu Anh Tony đưa)
+
+   🔴 VẼ VÀO ẢNH + LAYER `symbol`, KHÔNG dùng Marker HTML. Bắt buộc, vì
+      callout có CHẤM NEO — thứ lộ ngay nếu lệch khỏi đường. Marker HTML
+      không bám địa hình 3D (bẫy sáng nay với 4 chấm nội thị), còn layer
+      `symbol` thì bám chuẩn như layer `line`.
+      Chữ nằm trong ảnh nên cũng không cần kho font `glyphs` (bẫy 13/08).
+
+   🔴 `icon-anchor:'bottom-left'` — chấm neo nằm ở GÓC DƯỚI-TRÁI của ảnh,
+      thẻ chữ nhô lên trên-phải. Để 'center' là cả cụm bị dìm lệch chỗ.
+   ============================================================ */
+function iconCallout(ten, phu, mau){
+  const R = 2, NGHIENG = 0.22;               /* độ xiên của hình bình hành */
+  const F1 = `italic 700 ${13*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
+  const F2 = `italic 700 ${9*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
+
+  /* Đo chữ trước — đặt cứng bề rộng thì máy có font khác là CẮT CỤT chữ */
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = F1; const w1 = m.measureText(ten).width;
+  m.font = F2; const w2 = m.measureText(phu).width;
+
+  const padx = 11*R, h1 = Math.round(21*R), h2 = Math.round(15*R);
+  const W1 = Math.ceil(w1 + padx*2), W2 = Math.ceil(w2 + padx*1.6);
+  const DX = 46*R, DY = 52*R;                /* độ dài đường dẫn chéo */
+  const W  = Math.ceil(Math.max(W1, W2 + 8*R) + DX + h1*NGHIENG + 7*R);
+  const H  = Math.ceil(h1 + h2 + DY + 9*R);
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+
+  const rCham = 4.5*R;
+  const cham = [rCham + R, H - rCham - R];   /* chấm ở GÓC DƯỚI-TRÁI */
+  const tx = DX, ty = 4*R;                   /* góc trên-trái thẻ chính */
+
+  function binhHanh(l, t, w, h){
+    x.beginPath();
+    x.moveTo(l + h*NGHIENG, t);
+    x.lineTo(l + w + h*NGHIENG, t);
+    x.lineTo(l + w, t + h);
+    x.lineTo(l, t + h);
+    x.closePath();
+  }
+
+  /* --- ĐƯỜNG DẪN: từ chấm lên góc dưới-trái thẻ phụ --- */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.75)'; x.shadowBlur = 3*R;
+  x.strokeStyle = '#FFFFFF'; x.lineWidth = 1.8*R; x.lineCap = 'round';
+  x.beginPath();
+  x.moveTo(cham[0], cham[1]);
+  x.lineTo(tx + 8*R, ty + h1 + h2);
+  x.stroke();
+  x.restore();
+
+  /* --- THẺ PHỤ (màu loại đường, Anh Tony chốt) — vẽ trước, nằm dưới --- */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 4*R; x.shadowOffsetY = 1.5*R;
+  binhHanh(tx + 8*R, ty + h1, W2, h2);
+  x.fillStyle = mau; x.fill();
+  x.restore();
+  x.font = F2; x.textAlign = 'left'; x.textBaseline = 'middle';
+  x.fillStyle = '#FFFFFF';
+  x.fillText(phu, tx + 8*R + padx*0.8 + h2*NGHIENG*0.5, ty + h1 + h2/2 + 0.5*R);
+
+  /* --- THẺ CHÍNH (nền trắng) --- */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 5*R; x.shadowOffsetY = 2*R;
+  binhHanh(tx, ty, W1, h1);
+  x.fillStyle = '#FFFFFF'; x.fill();
+  x.restore();
+  x.font = F1; x.fillStyle = '#111111';
+  x.fillText(ten, tx + padx + h1*NGHIENG*0.5, ty + h1/2 + 0.5*R);
+
+  /* --- CHẤM NEO (vẽ sau cùng để nằm trên đường dẫn) --- */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 3*R;
+  x.beginPath(); x.arc(cham[0], cham[1], rCham, 0, Math.PI*2);
+  x.fillStyle = '#FFFFFF'; x.fill();
+  x.restore();
+  x.lineWidth = 1.4*R; x.strokeStyle = mau; x.stroke();
+
+  return { anh:x.getImageData(0,0,W,H), cham:cham, H:H };
+}
+
+/* ============================================================
+   CALLOUT BOX — kiểu thứ hai, dành cho tuyến CAO TỐC (18/08/2026)
+   Bố cục theo mẫu Anh Tony đưa:
+      [icon] TIÊU ĐỀ      <- dải màu trạng thái, chữ trắng
+      thân chữ mô tả      <- nền trắng, chữ đen, nhiều dòng
+            ▼             <- mũi tên chỉ xuống điểm neo
+   🔴 `icon-anchor:'bottom'` (khác callout thường dùng 'bottom-left') vì
+      ở kiểu này mũi tên nằm giữa đáy. Đó là lý do phải tách LAYER RIÊNG:
+      trộn 2 anchor trong một layer là một trong hai kiểu sẽ lệch chỗ.
+   ============================================================ */
+/* ============================================================
+   BỘ ICON VẼ NÉT — đơn sắc, nét bo tròn, vẽ trong khung ảo 100×100
+   rồi thu về kích thước cần. Không dùng font, không tải gì.
+   ============================================================ */
+function veIconNet(x, ma, cx, cy, s, R){
+  x.save();
+  x.translate(cx - s/2, cy - s/2);
+  x.scale(s/100, s/100);
+  x.strokeStyle = '#0D2620'; x.fillStyle = '#0D2620';
+  x.lineWidth = 7; x.lineJoin = 'round'; x.lineCap = 'round';
+  const p = () => x.beginPath();
+
+  if(ma === 'xe'){                       /* ĐÃ THÔNG XE */
+    p(); x.moveTo(22,52); x.lineTo(32,30); x.lineTo(68,30); x.lineTo(78,52); x.stroke();
+    p(); x.moveTo(14,52); x.lineTo(86,52); x.lineTo(86,64); x.lineTo(14,64); x.closePath(); x.stroke();
+    p(); x.arc(32,66,8,0,Math.PI*2); x.stroke();
+    p(); x.arc(68,66,8,0,Math.PI*2); x.stroke();
+    p(); x.moveTo(50,30); x.lineTo(50,52); x.stroke();
+
+  }else if(ma === 'xaydung'){            /* ĐANG XÂY DỰNG — nón bảo hộ */
+    p(); x.moveTo(24,60); x.bezierCurveTo(24,26, 76,26, 76,60); x.stroke();
+    p(); x.moveTo(12,60); x.lineTo(88,60); x.stroke();
+    p(); x.moveTo(50,27); x.lineTo(50,60); x.stroke();
+    p(); x.moveTo(34,68); x.lineTo(66,68); x.stroke();
+
+  }else if(ma === 'tailieu'){            /* MỚI ĐỀ XUẤT — bản vẽ có góc gập */
+    p(); x.moveTo(28,14); x.lineTo(58,14); x.lineTo(74,32); x.lineTo(74,86);
+         x.lineTo(28,86); x.closePath(); x.stroke();
+    p(); x.moveTo(58,14); x.lineTo(58,32); x.lineTo(74,32); x.stroke();
+    p(); x.moveTo(38,48); x.lineTo(64,48); x.stroke();
+    p(); x.moveTo(38,62); x.lineTo(64,62); x.stroke();
+    p(); x.moveTo(38,74); x.lineTo(54,74); x.stroke();
+
+  }else if(ma === 'duong'){              /* QUỐC LỘ — mặt đường phối cảnh */
+    p(); x.moveTo(26,88); x.lineTo(40,16); x.stroke();
+    p(); x.moveTo(74,88); x.lineTo(60,16); x.stroke();
+    x.lineWidth = 8;
+    p(); x.moveTo(50,20); x.lineTo(50,34); x.stroke();
+    p(); x.moveTo(50,46); x.lineTo(50,60); x.stroke();
+    p(); x.moveTo(50,72); x.lineTo(50,86); x.stroke();
+
+  }else if(ma === 'renhanh'){            /* NỐI THẲNG CAO TỐC — nhánh rẽ */
+    p(); x.moveTo(34,88); x.lineTo(34,54); x.quadraticCurveTo(34,28, 62,28); x.stroke();
+    p(); x.moveTo(52,17); x.lineTo(66,28); x.lineTo(52,39); x.stroke();
+
+  }else if(ma === 'thanhpho'){           /* VÀO TRUNG TÂM — cụm nhà cao thấp */
+    p(); x.moveTo(14,88); x.lineTo(14,54); x.lineTo(36,54); x.stroke();
+    p(); x.moveTo(36,88); x.lineTo(36,28); x.lineTo(62,28); x.lineTo(62,88); x.stroke();
+    p(); x.moveTo(62,46); x.lineTo(86,46); x.lineTo(86,88); x.stroke();
+    p(); x.moveTo(10,88); x.lineTo(90,88); x.stroke();
+    x.lineWidth = 6;
+    p(); x.moveTo(44,42); x.lineTo(54,42); x.stroke();
+    p(); x.moveTo(44,58); x.lineTo(54,58); x.stroke();
+
+  }else if(ma === 'toanha'){             /* VP ERA — toà nhà văn phòng */
+    p(); x.moveTo(28,88); x.lineTo(28,16); x.lineTo(72,16); x.lineTo(72,88); x.stroke();
+    p(); x.moveTo(18,88); x.lineTo(82,88); x.stroke();
+    x.lineWidth = 6;
+    [32,50].forEach(yy=>{
+      p(); x.moveTo(38,yy); x.lineTo(46,yy); x.stroke();
+      p(); x.moveTo(54,yy); x.lineTo(62,yy); x.stroke();
+    });
+    p(); x.moveTo(44,88); x.lineTo(44,70); x.lineTo(56,70); x.lineTo(56,88); x.stroke();
+
+  }else{                                 /* dự phòng — chấm tròn */
+    p(); x.arc(50,50,14,0,Math.PI*2); x.fill();
+  }
+  x.restore();
+}
+
+function iconCalloutBox(ten, dong, bieu, mau){
+  const R = 2;
+  const F_TEN = `700 ${13*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
+  const F_MO  = `${9.5*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
+
+
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = F_TEN; const wTen = m.measureText(ten).width;
+  m.font = F_MO;
+  const wMo = dong.reduce((a,s)=> Math.max(a, m.measureText(s).width), 0);
+
+  const hHead = 30*R, padx = 10*R;
+  const hDong = 15*R, padTop = 6*R, padBot = 7*R;
+  const hThan = dong.length*hDong + padTop + padBot;
+  const hTong = hHead + hThan;
+  /* 🔴 18/08 Anh Tony: ô icon phải VUÔNG -> bề rộng = chiều cao cả thẻ.
+     Phải tính SAU hThan, không khai cứng 30*R như bản trước, nếu không
+     thêm/bớt dòng ở thân là ô méo ngay mà chẳng có lỗi nào báo. */
+  const oIcon = hTong;
+  const hMui  = 32*R;      /* 18/08 Anh Tony: chân cao gấp đôi (16 -> 32) */
+  /* Cả 2 dòng chữ đều nằm BÊN PHẢI ô icon -> bề rộng tính từ oIcon cho cả hai */
+  const W = Math.ceil(oIcon + Math.max(wTen, wMo) + padx*1.9 + 2*R);
+  const H = Math.ceil(hHead + hThan + hMui);
+
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const x = c.getContext('2d');
+
+  /* ============ BỐ CỤC (Anh Tony chốt 18/08, đợt 17) ============
+       ┌────────┬──────────────────────────┐
+       │        │  TÊN TUYẾN               │  <- nền MÀU trạng thái
+       │  icon  ├──────────────────────────┤
+       │ (trắng)│  phụ đề                  │  <- nền TRẮNG
+       └────────┴──────────────────────────┘
+     Ô icon nền TRẮNG, chiếm CẢ CHIỀU CAO. Hai dòng chữ căn cùng một lề
+     trái và căn giữa theo chiều dọc trong hàng của nó.
+     🔴 Chữ tiêu đề để TỐI (#0D2620) chứ không trắng: nền hàng trên có thể
+        là gold #BF9642 hoặc lime #9BDC4C — chữ trắng trên lime gần như
+        không đọc được (tương phản ~1,6:1), chữ tối đọc tốt trên CẢ HAI. */
+
+  /* Nền trắng toàn thẻ + bóng đổ */
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 6*R; x.shadowOffsetY = 2*R;
+  x.fillStyle = '#FFFFFF';
+  x.fillRect(0, 0, W, hTong);
+  x.restore();
+
+  /* Hàng TRÊN bên phải: nền màu trạng thái */
+  x.fillStyle = mau;
+  x.fillRect(oIcon, 0, W - oIcon, hHead);
+
+  /* Ô ICON: nền trắng, vạch ngăn bên phải cho tách khối */
+  x.fillStyle = '#FFFFFF';
+  x.fillRect(0, 0, oIcon, hTong);
+  x.strokeStyle = 'rgba(13,38,32,.28)'; x.lineWidth = 1.4*R;
+  x.beginPath(); x.moveTo(oIcon, 0); x.lineTo(oIcon, hTong); x.stroke();
+
+  veIconNet(x, bieu, oIcon/2, hTong/2, oIcon*0.58, R);   /* icon căn giữa cả 2 hàng */
+
+  /* Hai dòng chữ — CÙNG MỘT LỀ TRÁI, mỗi dòng căn giữa hàng của nó */
+  const leChu = oIcon + padx*0.9;
+  x.textAlign = 'left';
+  x.font = F_TEN; x.fillStyle = chuHopNen(mau);
+  x.fillText(ten, leChu, hHead/2 + R);
+  x.font = F_MO;  x.fillStyle = '#2C4038';
+  x.fillText(dong[0] || '', leChu, hHead + hThan/2 + R);
+
+  /* 🔴 Viền mảnh: thẻ TRẮNG trên ảnh vệ tinh có vùng sáng (đất trống, mây)
+     thì mép thẻ biến mất. Bóng đổ không đủ, phải có viền. */
+  x.strokeStyle = 'rgba(13,38,32,.35)'; x.lineWidth = 1.2*R;
+  x.strokeRect(0.6*R, 0.6*R, W - 1.2*R, hTong - 1.2*R);
+
+  /* --- MŨI TÊN CHỈ XUỐNG ĐIỂM NEO --- */
+  const cx = W/2, y0 = hHead + hThan;
+  x.save();
+  x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 3*R;
+  x.strokeStyle = '#FFFFFF'; x.lineWidth = 2.6*R; x.lineCap = 'round';
+  x.beginPath(); x.moveTo(cx, y0); x.lineTo(cx, H - 7*R); x.stroke();
+  x.beginPath();
+  x.moveTo(cx - 5.5*R, H - 8*R); x.lineTo(cx + 5.5*R, H - 8*R); x.lineTo(cx, H - R);
+  x.closePath(); x.fillStyle = '#FFFFFF'; x.fill();
+  x.restore();
+
+  return x.getImageData(0, 0, W, H);
+}
+
+function veCalloutBox(){
+  if(!BOX_FC.features.length) return;
+  BOX_FC.features.forEach(f=>{
+    const p = f.properties;
+    /* 🔴 Một tuyến nhiều thẻ thì dùng CHUNG một ảnh -> phải kiểm hasImage,
+       không thì nạp trùng id và MapLibre ném lỗi "already exists". */
+    if(map.hasImage(p.icon)) return;
+    try{ map.addImage(p.icon, iconCalloutBox(p.ten, p.dong, p.bieu, p.mau), { pixelRatio:2 }); }
+    catch(e){ console.warn('[callout box] không nạp được', p.icon, e.message); }
+  });
+  map.addSource('callout-box', { type:'geojson', data:BOX_FC });
+  map.addLayer({
+    id:'callout-box', type:'symbol', source:'callout-box',
+    minzoom:8.6,
+    layout:{
+      'icon-image':['get','icon'],
+      'icon-anchor':'bottom',
+      'icon-size':['interpolate',['linear'],['zoom'],8.6,0.5, 12,0.75, 16,1],
+      'icon-allow-overlap':false,
+      'icon-ignore-placement':false,
+      'symbol-sort-key':['get','hang']
+    }
+  });
+  map.on('click','callout-box',(e)=>{
+    const p = e.features[0].properties;
+    /* 🔴 MapLibre BIẾN MẢNG TRONG properties THÀNH CHUỖI JSON khi đi qua
+       source geojson — phải parse lại, không thì in ra nguyên dấu ngoặc. */
+    const ds = Array.isArray(p.chiTiet) ? p.chiTiet : JSON.parse(p.chiTiet || '[]');
+    new maplibregl.Popup({offset:14}).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>${p.ten}</b><br>${ds.join('<br>')}`).addTo(map);
+  });
+  map.on('mouseenter','callout-box',()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave','callout-box',()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+}
+
+function veCallout(){
+  if(!CALLOUT_FC.features.length) return;
+  let lech = [0,0];
+  CALLOUT_FC.features.forEach(f=>{
+    const p = f.properties;
+    try{
+      const r = iconCallout(p.ten, p.phu, p.mau);
+      map.addImage(p.icon, r.anh, { pixelRatio:2 });
+      /* Chấm không nằm sát mép ảnh -> kéo lại cho nó trùng đúng toạ độ.
+         Chia 2 vì ảnh vẽ @2x còn icon-offset tính theo pixel màn hình. */
+      lech = [ -r.cham[0]/2, (r.H - r.cham[1])/2 ];
+    }catch(e){ console.warn('[callout] không nạp được', p.icon, e.message); }
+  });
+
+  map.addSource('callout', { type:'geojson', data:CALLOUT_FC });
+  map.addLayer({
+    id:'callout', type:'symbol', source:'callout',
+    minzoom:9.6,
+    layout:{
+      'icon-image':['get','icon'],
+      'icon-anchor':'bottom-left',
+      'icon-offset':lech,
+      'icon-size':['interpolate',['linear'],['zoom'],9.6,0.55, 13,0.8, 16,1],
+      /* 🔴 Nay có 4 callout nên PHẢI cho tránh đè — callout to gấp ~5 lần chip,
+         để chồng nhau là không đọc được cái nào. */
+      'icon-allow-overlap':false,
+      'icon-ignore-placement':false,
+      /* Ai được chỗ trước khi chật: số NHỎ hơn thắng. Dùng luôn bảng hạng
+         (cao tốc 1-2 · quốc lộ 3 · đường ra cao tốc 4) -> nhãn quan trọng
+         hơn luôn giữ được chỗ, cái kém hơn tự nhường. */
+      'symbol-sort-key':['get','hang']
+    }
+  });
+  map.on('click','callout',(e)=>{
+    const p = e.features[0].properties;
+    new maplibregl.Popup({offset:14}).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>${p.ten}</b><br><span style="color:${p.mau};font-weight:600">${p.phu}</span>`).addTo(map);
+  });
+  map.on('mouseenter','callout',()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave','callout',()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+}
+
+/* ============================================================
+   CHẤM ĐƯỜNG NỘI THỊ — vẽ bằng LAYER CIRCLE, KHÔNG dùng Marker HTML
+   🔴 18/08 Anh Tony bắt lỗi: "4 chấm không ăn vào đường như của Phú Gia".
+      Toạ độ ĐÚNG (đo được: nằm chính xác 0,00 m trên đường) — lỗi là ở
+      CÁCH VẼ. Trang này bật `map.setTerrain({exaggeration:1.5})`:
+        · layer `line` được PHỦ lên mặt địa hình 3D (đúng độ cao × 1,5)
+        · Marker HTML chỉ được chiếu qua toạ độ, độ cao lấy từ DEM tile
+          đang tải, thô hơn lưới địa hình
+      Ở sườn đồi + `pitch 64°`, chênh độ cao vài trăm mét biến thành lệch
+      hàng chục pixel trên màn -> chấm trôi khỏi đường. Pin dự án nằm chỗ
+      tương đối bằng nên không lộ, vì vậy Anh thấy pin OK mà chấm thì lệch.
+   => Layer `circle` vẽ chung pipeline WebGL với layer `line` nên bám địa
+      hình y hệt. Cùng lý do mà `ct-nut-cham` (6 nút giao) xưa nay không lệch.
+   ============================================================ */
+function veChamNoiThi(){
+  if(!CHAM_NOITHI.features.length) return;
+  map.addSource('cham-noithi', { type:'geojson', data:CHAM_NOITHI });
+  map.addLayer({
+    id:'cham-noithi', type:'circle', source:'cham-noithi',
+    minzoom:10.5,                     /* zoom xa thì 4 chấm chụm thành cục vô nghĩa */
+    paint:{
+      'circle-radius':['interpolate',['linear'],['zoom'],10.5,4, 13,6, 16,8],
+      'circle-color':['get','mau'],
+      'circle-stroke-color':'#FFFFFF',
+      'circle-stroke-width':2,
+      'circle-opacity':0.95
+    }
+  });
+  map.on('click','cham-noithi',(e)=>{
+    const p = e.features[0].properties;
+    new maplibregl.Popup({offset:12}).setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>${p.ten}</b><br><span style="color:#83A08D">${p.phu}</span>
+                <br>Chiều dài: ${p.dai}`).addTo(map);
+  });
+  map.on('mouseenter','cham-noithi',()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave','cham-noithi',()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+}
+
+/* 🔴 18/08 Anh Tony: tách làm 2 nhóm tắt riêng — NHÃN và ĐƯỜNG.
+   Trước gộp chung 1 nút nên muốn xem đường trần (chụp ảnh, quay video)
+   là phải tắt luôn cả đường, thành ra tắt xong chẳng còn gì để xem. */
+const HW_DUONG = ['ct-casing','d-noithi','d-noicaotoc-vien','d-noicaotoc',
+                  'd-trungtam-vien','d-trungtam','d-vanphong-vien','d-vanphong','ql-hienhuu',
+                  'ct-khaithac','ct-thicong','ct-dexuat-dai','ct-dexuat-tim','ct-nut-cham'];
+const HW_NHAN  = ['callout','callout-box','nut-xuong','cham-noithi'];
+const HW_LAYERS = HW_DUONG.concat(HW_NHAN);
 
 /* 🔴 Lề khi bay phải tính THEO BỀ RỘNG MÀN.
    Bản cũ cứng left:290 (chừa chỗ panel bên trái) — trên điện thoại
@@ -910,14 +1858,6 @@ const boxLegend = document.getElementById('legend');
 document.getElementById('btnLegend').onclick = ()=> boxLegend.classList.toggle('open');
 document.getElementById('btnLegendClose').onclick = ()=> boxLegend.classList.remove('open');
 
-/* NEXT 14/08: THU GON / MO thanh cong cu (ca mobile lan desktop) */
-const boxTools = document.getElementById('tools');
-const btnToolsToggle = document.getElementById('btnToolsToggle');
-btnToolsToggle.onclick = ()=>{
-  const min = boxTools.classList.toggle('min');
-  btnToolsToggle.textContent = min ? '☰ Công cụ' : '— Thu gọn công cụ';
-};
-
 /* 🔴 BẬT / TẮT THẺ THÔNG TIN TUYẾN (Anh Tony đặt 14/08/2026)
    Mặc định TẮT — thẻ chỉ hiện khi Anh chủ động bật, không thường trực. */
 document.getElementById('btnInfo').onclick = (e)=>{
@@ -938,16 +1878,50 @@ document.getElementById('btnTinh').onclick = (e)=>{
   e.target.textContent = tinhOn ? '🗺 Tắt ranh giới tỉnh' : '🗺 Bật ranh giới tỉnh';
 };
 
-/* Bật / tắt cả lớp — chỉ đụng đúng 6 layer của mình, không đụng layer khác */
-let hwOn = true;
-document.getElementById('btnHwToggle').onclick = (e)=>{
-  hwOn = !hwOn;
-  HW_LAYERS.forEach(id=>{
-    if(map.getLayer(id)) map.setLayoutProperty(id,'visibility', hwOn?'visible':'none');
+/* ============================================================
+   LỚP CAO TỐC — nút chính mở MENU CON, 2 công tắc riêng
+   (Anh Tony đặt 18/08): tắt NHÃN · tắt ĐƯỜNG
+   ============================================================ */
+let hwDuongOn = true, hwNhanOn = true;
+
+function apDungHW(){
+  HW_DUONG.forEach(id=>{
+    if(map.getLayer(id)) map.setLayoutProperty(id,'visibility', hwDuongOn?'visible':'none');
   });
-  hwLabels.forEach(el=>{ el.style.display = hwOn ? '' : 'none'; });
-  e.target.textContent = hwOn ? '👁 Tắt lớp cao tốc' : '👁 Bật lớp cao tốc';
-  document.getElementById('legend').style.display = hwOn ? '' : 'none';
+  HW_NHAN.forEach(id=>{
+    if(map.getLayer(id)) map.setLayoutProperty(id,'visibility', hwNhanOn?'visible':'none');
+  });
+  /* hwLabels nay chỉ còn nhãn nút giao dạng HTML — xếp vào nhóm NHÃN */
+  hwLabels.forEach(el=>{ el.style.display = hwNhanOn ? '' : 'none'; });
+  /* Chú giải chỉ có nghĩa khi còn đường để đối chiếu màu */
+  document.getElementById('legend').style.display = hwDuongOn ? '' : 'none';
+}
+
+function dungNutHW(){
+  const hop = document.getElementById('nhomHW');
+  if(!hop) return;
+  const muc = [
+    { ten:'Nhãn cao tốc',  mau:'#BF9642', lay:()=>hwNhanOn,  dat:v=>{ hwNhanOn = v; } },
+    { ten:'Đường cao tốc', mau:'#E8730C', lay:()=>hwDuongOn, dat:v=>{ hwDuongOn = v; } }
+  ];
+  hop.innerHTML = '';
+  muc.forEach(m=>{
+    const b = document.createElement('button');
+    b.className = 'bat';
+    b.innerHTML = `<span class="cham" style="background:${m.mau}"></span>${m.ten}`;
+    b.onclick = ()=>{
+      m.dat(!m.lay());
+      b.classList.toggle('bat', m.lay());
+      apDungHW();
+    };
+    hop.appendChild(b);
+  });
+}
+dungNutHW();
+
+document.getElementById('btnHwToggle').onclick = (e)=>{
+  const mo = document.getElementById('nhomHW').classList.toggle('mo');
+  e.target.classList.toggle('gold', mo);
 };
 
 /* ============================================================
@@ -962,7 +1936,7 @@ function addMarkers(){
     el.className = 'era-pin';
     el.innerHTML =
       '<span class="era-halo"></span>' +
-      '<span class="era-drop"><span class="era-core"></span></span>' +
+      '<span class="era-anh"></span>' +
       `<span class="era-name">★ ${L.name}</span>`;
     new maplibregl.Marker({element:el, anchor:'bottom', offset:[0,2]})
       .setLngLat([L.lng, L.lat])
@@ -1068,11 +2042,17 @@ if(TOOLMODE) fetch('http://127.0.0.1:8091/ping')
 
 function capNhatNutGui(){
   const b = document.getElementById('btnSendPins');
+  const c = document.getElementById('btnChepGhim');
   const x = document.getElementById('btnClearPins');
-  if(!b || !x) return;
-  const hien = (TOOLMODE && dsGhim.length && window.__CAUNOI_OK) ? 'inline-block' : 'none';
-  b.style.display = hien; x.style.display = hien;
+  if(!b || !c || !x) return;
+  /* 🔴 Nút GỬI cần cầu nối 8091 đang chạy. Nút CHÉP thì KHÔNG —
+     nó chỉ ghi vào clipboard nên lúc nào có điểm ghim là dùng được. */
+  const coGhim = TOOLMODE && dsGhim.length;
+  b.style.display = (coGhim && window.__CAUNOI_OK) ? 'block' : 'none';
+  c.style.display = coGhim ? 'block' : 'none';
+  x.style.display = coGhim ? 'block' : 'none';
   b.textContent = `📤 Gửi ${dsGhim.length} điểm ghim`;
+  c.textContent = `📋 Chép ${dsGhim.length} toạ độ`;
 }
 
 /* Gửi thẳng sang CẦU NỐI 8091 (LAY-OSM.bat) -> ghi ra _osm\ghim.json.
@@ -1097,6 +2077,54 @@ document.getElementById('btnSendPins').onclick = async (e)=>{
   setTimeout(()=>{ e.target.textContent = cu; }, 3200);
 };
 
+/* ============================================================
+   📋 CHÉP TOẠ ĐỘ ĐIỂM GHIM RA CLIPBOARD  (18/08/2026)
+   Anh Tony chốt: "anh tự vẽ theo công cụ điểm để em sử dụng và chỉnh sửa".
+   Chép xong Anh dán thẳng vào chat, Em nhận là dùng được ngay.
+   🔴 PHẢI ĐỌC LẠI getLngLat() LÚC CHÉP, không dùng toạ độ lúc thả:
+      marker đặt draggable:true nên Anh kéo chỉnh lại là toạ độ đã khác.
+      (Bẫy này đã ghi 14/08 cho nút Gửi, nút Chép dính y hệt.)
+   ============================================================ */
+function vanBanGhim(){
+  const d = dsGhim.map((m,i)=>{
+    const l = m.getLngLat();
+    return { stt:i+1, lng:+l.lng.toFixed(6), lat:+l.lat.toFixed(6) };
+  });
+  const bang = d.map(p=> `${String(p.stt).padStart(2,' ')}  ${p.lng}, ${p.lat}`).join('\n');
+  const json = JSON.stringify(d.map(p=>[p.lng,p.lat]));
+  return `GHIM ${d.length} điểm · ${new Date().toLocaleString('vi-VN')}\n`
+       + `(thứ tự ghim = thứ tự nối đường)\n\n${bang}\n\n--- JSON ---\n${json}`;
+}
+
+document.getElementById('btnChepGhim').onclick = async (e)=>{
+  const chu = vanBanGhim();
+  const cu  = e.target.textContent;
+  let xong = false;
+  try{
+    /* Clipboard API chỉ chạy trên https hoặc localhost — Anh xem qua
+       127.0.0.1 nên OK. Vẫn có đường lùi cho trường hợp bị chặn. */
+    await navigator.clipboard.writeText(chu);
+    xong = true;
+  }catch(err){
+    const t = document.createElement('textarea');
+    t.value = chu;
+    t.style.cssText = 'position:fixed;left:-9999px;top:0;';
+    document.body.appendChild(t); t.select();
+    try{ xong = document.execCommand('copy'); }catch(e2){ xong = false; }
+    document.body.removeChild(t);
+  }
+  if(xong){
+    e.target.textContent = `✅ Đã chép ${dsGhim.length} điểm`;
+  }else{
+    /* 🔴 Không chép được thì PHẢI đưa chữ ra màn cho Anh tự bôi đen,
+       đừng im lặng báo lỗi rồi Anh mất công ghim lại từ đầu. */
+    e.target.textContent = '⚠️ Không chép được — xem Console';
+    console.log('%c=== TOẠ ĐỘ ĐIỂM GHIM (bôi đen rồi Ctrl+C) ===', 'font-weight:bold');
+    console.log(chu);
+  }
+  setTimeout(()=>{ e.target.textContent = cu; }, 3000);
+};
+
 /* Xoá hết điểm ghim để ghim lại từ đầu */
 document.getElementById('btnClearPins').onclick = ()=>{
   dsGhim.forEach(m=>m.remove());
@@ -1104,12 +2132,127 @@ document.getElementById('btnClearPins').onclick = ()=>{
   coordBox.style.display='none';
   capNhatNutGui();
 };
+
+/* ============================================================
+   🆕 18/08/2026 — CHỐNG ĐÈ NHÃN (2 lớp) + CHẾ ĐỘ MÀN NHỎ
+   Anh Tony chốt sau khi soi 3 ảnh thật: "làm cả hai".
+     Lớp THÔ  — ẩn theo mức zoom (bảng ZOOM_TOI_THIEU)
+     Lớp TINH — dò va chạm hình học, nhãn hạng thấp đè hạng cao thì tự ẩn
+   🔴 VÌ SAO PHẢI TỰ VIẾT: MapLibre có sẵn cơ chế tránh đè, nhưng CHỈ cho
+      layer 'symbol'. Trang này cố ý không dùng symbol (style viết tay,
+      không khai 'glyphs' -> chữ im lặng không hiện, bẫy 13/08) nên nhãn
+      là Marker HTML -> mất tính năng tránh đè, phải làm tay.
+   🔴 ẨN BẰNG 'visibility', KHÔNG DÙNG 'display': nút "Tắt lớp cao tốc"
+      đang dùng display cho cùng đám phần tử này. Hai cơ chế ghi 2 thuộc
+      tính khác nhau thì không giẫm chân nhau — tắt lớp rồi bật lại vẫn
+      đúng, không cần biết cái kia đang ẩn cái gì.
+   ============================================================ */
+let locReq = null;
+function xepLai(){
+  if(locReq) return;                       /* gộp nhiều sự kiện vào 1 khung hình */
+  locReq = requestAnimationFrame(()=>{ locReq = null; locNhan(); });
+}
+
+function deNhau(a, b, dem){
+  return !(a.right + dem < b.left || a.left - dem > b.right ||
+           a.bottom + dem < b.top  || a.top - dem  > b.bottom);
+}
+
+function locNhan(){
+  if(!NHAN.length) return;
+  const z   = map.getZoom();
+  const nho = document.documentElement.classList.contains('man-nho');
+  /* 🔴 Bù zoom cho màn nhỏ để 0,5 chứ KHÔNG phải 0,7: iPad DỌC vào trang ở
+     zoom 10,4 (HOME dùng 10,4 khi bề rộng < 820). Đặt 0,7 thì ngưỡng nhóm
+     "đường ra cao tốc" thành 10,3+ -> Nguyễn Văn Cừ / Vào trung tâm / VP ERA
+     bị ẩn ngay màn đầu, mất đúng thông điệp bán hàng chính. Việc dọn chỗ để
+     lớp dò va chạm lo, ngưỡng zoom chỉ chặn lúc nhìn toàn tuyến HCM–Đà Lạt. */
+  const buZoom = nho ? 0.5 : 0;
+  const dem    = nho ? 3 : 5;     /* khoảng hở tối thiểu giữa 2 nhãn (px) */
+
+  /* B1 — lọc thô theo zoom */
+  const song = [];
+  NHAN.forEach(n=>{
+    const nguong = (ZOOM_TOI_THIEU[n.hang] || 0) + buZoom;
+    const qua = z >= nguong;
+    n.el.style.visibility = qua ? '' : 'hidden';
+    if(qua) song.push(n);
+  });
+
+  /* B2 — ĐỌC hết kích thước TRƯỚC, GHI sau.
+     🔴 Đọc-ghi xen kẽ trong cùng vòng lặp ép trình duyệt tính lại layout
+        ở mỗi bước (layout thrashing) -> giật khi kéo bản đồ trên iPad. */
+  const hop = song.map(n=> n.el.getBoundingClientRect());
+  const giu = [];
+  song.forEach((n,i)=>{
+    const r = hop[i];
+    /* Hộp rỗng = đang bị nút "Tắt lớp cao tốc" cho display:none, hoặc
+       chưa vẽ xong. Bỏ qua lượt này, đừng ẩn nhầm cái khác vì nó. */
+    if(!r.width || !r.height) return;
+    if(n.batTu){ giu.push(r); return; }     /* pin dự án: chiếm chỗ, không ẩn */
+    if(giu.some(g=> deNhau(g, r, dem))) n.el.style.visibility = 'hidden';
+    else giu.push(r);
+  });
+}
+
+['move','zoom','rotate','pitch'].forEach(sk=> map.on(sk, xepLai));
+window.addEventListener('resize', xepLai);
+
+/* ------------------------------------------------------------
+   NHẬN DIỆN MÀN NHỎ
+   🔴 KHÔNG dùng media query bề rộng đơn thuần. Bằng chứng từ ảnh Anh gửi:
+      iPad NGANG rộng ~1180px nên lọt qua lưới 820px cũ -> bảng chú giải
+      hiện thường trực, tràn quá đáy màn và bị thanh nav che mất mục 8.
+      Phải xét cả CHIỀU CAO và CẢM ỨNG.
+   ------------------------------------------------------------ */
+function capNhatCoMan(){
+  const w = window.innerWidth, h = window.innerHeight;
+  let camUng = false;
+  try{ camUng = window.matchMedia('(pointer: coarse)').matches; }catch(e){}
+  const nho   = (w < 1200) || (h < 780) || camUng;
+  const truoc = document.documentElement.classList.contains('man-nho');
+  document.documentElement.classList.toggle('man-nho', nho);
+  /* Về màn to thì bỏ trạng thái "đang mở dạng phiếu trượt" cho sạch */
+  if(!nho){
+    const lg = document.getElementById('legend');
+    if(lg) lg.classList.remove('open');
+  }
+  if(truoc !== nho) xepLai();
+}
+capNhatCoMan();
+window.addEventListener('resize', capNhatCoMan);
+/* iPad báo kích thước mới CHẬM hơn sự kiện xoay màn -> phải chờ rồi mới đo */
+window.addEventListener('orientationchange', ()=> setTimeout(capNhatCoMan, 260));
+
+/* Bật / tắt lớp tiện ích + mở bảng công tắc nhóm */
+document.getElementById('btnTienIch').onclick = (e)=>{
+  if(!map.getLayer(TI_LAYER)){
+    e.target.textContent = '⚠️ Chưa có dữ liệu tiện ích';
+    setTimeout(()=>{ e.target.textContent = '🏙 Bật tiện ích'; }, 2600);
+    return;
+  }
+  tiOn = !tiOn;
+  map.setLayoutProperty(TI_LAYER, 'visibility', tiOn ? 'visible' : 'none');
+  e.target.classList.toggle('gold', tiOn);
+  e.target.textContent = tiOn ? '🏙 Tắt tiện ích' : '🏙 Bật tiện ích';
+  document.getElementById('nhomTI').classList.toggle('mo', tiOn);
+};
+
+/* Nút ẩn HẾT bảng — chỉ hiện trên màn nhỏ (Anh Tony đặt 18/08) */
+document.getElementById('btnAnHet').onclick = (e)=>{
+  const sach = document.documentElement.classList.toggle('sach');
+  e.target.textContent = sach ? '👁 Hiện lại bảng' : '🙈 Ẩn hết bảng';
+  if(sach){
+    const lg = document.getElementById('legend');
+    if(lg) lg.classList.remove('open');
+  }
+};
 </script>
 
 <!-- 🔴 14/08 Anh Tony chốt: KHÔNG dùng hiệu ứng chuyển động cho bản này.
      File caotoc-anim.js GIỮ NGUYÊN, chỉ ngắt dòng nạp. Bật lại = bỏ dấu chú thích. -->
 <!-- <script src="caotoc-anim.js?nc=20260814100000"></script> -->
 <!-- Thanh NAV chung cua web PGBL — them 14/08/2026 khi gan trang nay vao web ship -->
-<script src="/pgbl/assets/eranav.js?nc=20260814224500" data-active="hatang"></script>
+<script src="../assets/eranav.js?nc=20260814224500" data-active="hatang"></script>
 </body>
 </html>

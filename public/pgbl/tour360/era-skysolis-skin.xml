@@ -93,9 +93,9 @@
   era_btn(era_m_vitri,   rightbottom, 270, 20, 92,  42, 0x0C0C44, 101, 'Vi Tri');
     set(layer[era_m_vitri].bgalpha, 0.72); set(layer[era_m_vitri].onclick, 'era_toggle(era_pop_vitri)');
   era_btn(era_m_tienich, rightbottom, 170, 20, 96,  42, 0x0C0C44, 101, 'Tien Ich');
-    set(layer[era_m_tienich].bgalpha, 0.72); set(layer[era_m_tienich].onclick, 'openurl(../tienich/index.html, _blank)');
+    set(layer[era_m_tienich].bgalpha, 0.72); set(layer[era_m_tienich].onclick, 'openurl(/tienich/, _top)');
   era_btn(era_m_nhamau,  rightbottom, 16,  20, 150, 42, 0xC8102E, 101, 'Xem Giỏ Hàng');
-    set(layer[era_m_nhamau].onclick, 'openurl(../giohang/index.html, _blank)');
+    set(layer[era_m_nhamau].onclick, 'openurl(/giohang/, _top)');
 
   <!-- popup Vi Tri -->
   era_box(era_pop_vitri, rightbottom, 16, 72, 220, 60, 0xFFFFFF, 10, 104);

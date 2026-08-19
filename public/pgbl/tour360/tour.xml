@@ -1,7 +1,7 @@
 <krpano version="1.19" title="Virtual Tour">
 
 	<include url="skin/vtourskin.xml" />
-	<include url="era-txv-skin-pgbl.xml?nc=20260814211500" />
+	<include url="era-txv-skin-pgbl.xml?nc=20260814213000" />
 	<include url="era-media-pgbl.xml?nc=20260811223000" />
 	<include url="era-poi-360.xml?nc=20260811194108" />
 	<include url="era-lots-flycam.xml?nc=20260814190000" />
