@@ -1,6 +1,7 @@
 /* ERA · PGBL — Thanh NAV gim day trang dung chung cho moi trang web.
-   Cach dung:  <script src="/assets/eranav.js" data-active="gallery"></script>
-   data-active nhan 1 trong: tour360 | hientrang | giohang | tienich | hatang | ebro | nhamau | gallery
+   Cach dung:  <script src="../assets/eranav.js" data-active="gallery"></script>
+   data-active nhan 1 trong: tour360 | hientrang | giohang | tienich | hatang
+   (18/08 da BO 3 muc: ebro | nhamau | gallery — xem ghi chu o mang ITEMS)
    Dung duong dan tuyet doi (/...) -> chay dung khi goc site = 06-WEB/PGBL-web. */
 (function () {
   var me = document.currentScript;
@@ -18,26 +19,31 @@
        (1) day nay, (2) the o trang chu index.html, (3) thanh nav trong tour krpano
            (tour360\era-txv-skin-pgbl.xml, cac dong era_navitem).
      Quy tac: muc CHAY DUOC dung truoc, muc "SAP CO" don xuong CUOI.
-     Muc "Vi Tri" da BO HAN 14/08 — Ha tang bao gom vi tri roi. */
+     Muc "Vi Tri" da BO HAN 14/08 — Ha tang bao gom vi tri roi.
+
+     🔴 18/08 — Anh Tony chot BO HAN 3 MUC: E-Brochure · Nha Mau · Gallery.
+     Ly do phu: 8 muc lam thanh nav TRAN KHOI MAN iPad (anh Anh gui: chu bi cat
+     ca 2 dau). Con 5 muc thi vua khit moi thiet bi.
+     ⚠️ 3 THU MUC /ebro/ · /gallery/ VAN CON NGUYEN tren dia, chi go khoi menu.
+     BAT LAI = them lai dong tuong ung vao mang ITEMS duoi day:
+       { id:'ebro',    href:'/ebro/index.html',    icon:'ph-book-open',  label:'E-Brochure' }
+       { id:'nhamau',  href:'#',                   icon:'ph-house-line', label:'Nhà mẫu', soon:true }
+       { id:'gallery', href:'/gallery/index.html', icon:'ph-images',     label:'Gallery' }
+     Nho bat lai DONG THOI o ca 3 cho (mang nay · index.html · era-txv-skin-pgbl.xml). */
   var ITEMS = [
-    /* NEXT: href ve clean route cua app (iframe wrapper tu forward startscene) */
     { id: 'tour360',  href: '/tour360/?startscene=scene_matbang_flycam', icon: 'ph-mountains', label: 'Toàn cảnh' },
     { id: 'hientrang', href: '/tour360/?startscene=scene_02-toan-canh',  icon: 'ph-drone',     label: 'Flycam hiện trạng' },
     { id: 'giohang',  href: '/giohang/',   icon: 'ph-squares-four',    label: 'Mặt bằng' },
     { id: 'tienich',  href: '/tienich/',   icon: 'ph-map-trifold',     label: 'Tiện ích' },
-    { id: 'hatang',   href: '/hatang/',    icon: 'ph-road-horizon',    label: 'Hạ tầng' },
-    { id: 'ebro',     href: '/ebro/',      icon: 'ph-book-open',       label: 'E-Brochure' },
-    /* ==== 2 muc SAP CO, xep cuoi ====
-       BAT LAI Nha Mau = doi href ve trang that + bo 'soon: true'.
-       BAT LAI Gallery = doi href ve '/gallery/index.html' + bo 'soon: true'. Trang /gallery/ VAN CON. */
-    { id: 'nhamau',   href: '#',                     icon: 'ph-house-line',      label: 'Nhà mẫu', soon: true },
-    { id: 'gallery',  href: '#',                     icon: 'ph-images',          label: 'Gallery', soon: true }
+    { id: 'hatang',   href: '/hatang/',    icon: 'ph-road-horizon',    label: 'Hạ tầng' }
   ];
 
   var css = '' +
     '#era-nav{position:fixed;left:0;right:0;bottom:0;z-index:9000;display:flex;justify-content:center;' +
     'padding:8px 10px calc(8px + env(safe-area-inset-bottom));pointer-events:none;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}' +
-    '#era-nav .wrap{pointer-events:auto;display:flex;gap:2px;max-width:760px;width:100%;' +
+    /* 🔴 18/08 — con 5 muc nen ha max-width 760 -> 620px, khoi bi keo dan qua rong.
+       Doi so muc thi sua lai con so nay: uoc luong ~124px/muc. */
+    '#era-nav .wrap{pointer-events:auto;display:flex;gap:2px;max-width:620px;width:100%;' +
     'background:rgba(14,40,33,.82);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);' +
     'border:1px solid rgba(203,240,214,.18);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.42);padding:6px}' +
     '#era-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;' +
@@ -57,10 +63,8 @@
        Cach lam: mount() gan class 'trai' cho #era-nav khi data-active="giohang".
        => Sua vi tri o day KHONG anh huong 7 trang con lai. */
     '@media(min-width:821px){#era-nav.trai{justify-content:flex-start;padding-left:16px}' +
-    '#era-nav.trai .wrap{max-width:min(760px,72vw)}}' +
-    /* NEXT 14/08: mobile cho nhan dai ("Flycam hien trang") xuong 2 dong,
-       tranh overflow ngang khi co 8 muc. */
-    '@media(max-width:560px){#era-nav a span{font-size:8.8px;white-space:normal;text-align:center;line-height:1.15}#era-nav a i{font-size:19px}#era-nav a{padding:7px 2px 5px}#era-nav a .soon{display:none}}' +
+    '#era-nav.trai .wrap{max-width:min(620px,72vw)}}' +
+    '@media(max-width:560px){#era-nav a span{font-size:8.8px}#era-nav a i{font-size:19px}#era-nav a{padding:7px 2px 5px}#era-nav a .soon{display:none}}' +
     'body{padding-bottom:86px}';
 
   var st = document.createElement('style');
@@ -71,9 +75,7 @@
   var html = '<div class="wrap">';
   ITEMS.forEach(function (it) {
     var cls = it.id === active ? ' class="active"' : '';
-    /* NEXT: cac trang chay trong iframe -> link that phai target=_top de doi ca trang */
-    var target = it.href === '#' ? '' : ' target="_top"';
-    html += '<a href="' + it.href + '"' + target + cls + '>' +
+    html += '<a href="' + it.href + '" target="_top"' + cls + '>' +
       (it.soon ? '<span class="soon">Sắp có</span>' : '') +
       '<i class="ph-light ' + it.icon + '"></i>' +
       '<span>' + it.label + '</span></a>';
@@ -83,8 +85,8 @@
   function mount() {
     var nav = document.createElement('nav');
     nav.id = 'era-nav';
-    /* NEXT 14/08: BO canh trai rieng cho trang gio hang — nav luon can GIUA o moi trang.
-       (Khoi CSS .trai o tren giu lai, khong con cho nao gan class nay.) */
+    /* chi trang gio hang moi day nav sang trai — xem ghi chu o khoi @media */
+    if (active === 'giohang') nav.className = 'trai';
     nav.innerHTML = html;
     document.body.appendChild(nav);
   }
