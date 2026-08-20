@@ -183,15 +183,13 @@
   if(era_active_nav == %1, era_nav_gold(%1); , era_nav_white(%1); );
 </action>
 
+<!-- 🔴 19/08 . LAM RONG, NHUNG GIU NGUYEN TEN.
+     Menu chuyen sang HTML nen khong con lop nav de to sang. Phai giu ten vi
+     con 8 cho goi vao no (5 muc submenu Tien Ich + 3 muc submenu Nha Mau +
+     era_intro_enter + era_pgbl_build). Xoa han ten thi krpano bao loi
+     "unknown action" tren console moi lan bam submenu.
+     Ruot cu con nguyen trong .bak-truoc-menuhtml-20260819. -->
 <action name="era_nav_setactive">
-  if(era_active_nav !== null,
-    set(layer[get(era_active_nav)].bgalpha, 0);
-    era_nav_white(get(era_active_nav));
-  );
-  set(era_active_nav, %1);
-  set(layer[%1].bgcolor, get(era_c_lime));
-  set(layer[%1].bgalpha, 0.16);
-  era_nav_gold(%1);
 </action>
 
 <!-- ============ P2 SUBMENU (dark glass, chu sang) ============ -->
@@ -395,12 +393,11 @@
 
 <!-- bat/tat toan bo shell (nav + chrome + panel) -->
 <action name="era_shell_set">
-  set(layer[era_nav_bg].visible, %1);
-  set(layer[era_n_toancanh].visible, %1); set(layer[era_n_toancanh_ic].visible, %1); set(layer[era_n_toancanh_tx].visible, %1);
-  set(layer[era_n_hientrang].visible, %1); set(layer[era_n_hientrang_ic].visible, %1); set(layer[era_n_hientrang_tx].visible, %1);
-  set(layer[era_n_matbang].visible, %1); set(layer[era_n_matbang_ic].visible, %1); set(layer[era_n_matbang_tx].visible, %1);
-  set(layer[era_n_tienich].visible, %1); set(layer[era_n_tienich_ic].visible, %1); set(layer[era_n_tienich_tx].visible, %1);
-  set(layer[era_n_hatang].visible, %1); set(layer[era_n_hatang_ic].visible, %1); set(layer[era_n_hatang_tx].visible, %1);
+  <!-- 🔴 19/08 . DA GO 6 dong (era_nav_bg + 15 lop cua 5 muc nav), vi thanh nav
+       nay khong con duoc tao nua . menu chuyen sang HTML (assets\eranav.js).
+       Giu lai o day thi krpano tu de ra 16 layer rong, im lang, khong bao loi.
+       BAT LAI = tra 6 dong nay cung luc voi 5 dong era_navitem trong
+       era_pgbl_build. Xem .bak-truoc-menuhtml-20260819 de chep lai nguyen van. -->
   <!-- 🔴 18/08: DA XOA 3 dong cua era_n_nhamau / era_n_gallery / era_n_ebro.
        BAT BUOC xoa cung luc voi era_navitem — set(layer[...]) vao ten KHONG
        CON DUOC TAO thi krpano tu de ra layer rong, im lang, khong bao loi. -->
@@ -481,34 +478,33 @@
   set(layer[skin_title].visible, false);
   set(layer[skin_splitter_bottom].visible, false);
 
-  <!-- nen thanh nav full-width (dark glass) -->
-  addlayer(era_nav_bg);
-    set(layer[era_nav_bg].type, text); set(layer[era_nav_bg].align, bottom); set(layer[era_nav_bg].edge, bottom);
-    set(layer[era_nav_bg].x, 0); set(layer[era_nav_bg].y, 0); set(layer[era_nav_bg].width, '100%'); set(layer[era_nav_bg].height, 64);
-    set(layer[era_nav_bg].bg, true); set(layer[era_nav_bg].bgcolor, get(era_c_mid)); set(layer[era_nav_bg].bgalpha, 0.82);
-    set(layer[era_nav_bg].enabled, false); set(layer[era_nav_bg].zorder, 205);
-    set(layer[era_nav_bg].keep, true); set(layer[era_nav_bg].visible, true);
+  <!-- ================================================================
+       🔴 19/08 . ANH TONY CHOT: BO HAN THANH NAV VE BANG XML.
+       Tu nay menu la HTML, dung chung 1 nguon duy nhat voi 5 trang web con
+       lai:  assets\eranav.js  (nap tu tour.html, data-active="auto").
+       Ly do: menu XML dat moc x CUNG roi tu co gian theo `stagewidth`
+       (scale 0.633..1.0). Tren man hep chu van to va bi CAT CUT 2 dau .
+       Anh Tony bao 2 lan bang anh chup (18/08 iPad ngang, 19/08 cua so hep).
+       CSS lam viec do dung hon va khong phai bao tri 3 noi.
+       ✅ LOI ICH KEO THEO: doi menu tu nay CHI SUA 1 FILE eranav.js,
+          khong con phai dong bo 3 cho (eranav.js . index.html . file nay).
 
-  <!-- 5 muc: icon Phosphor + chu co dau. -->
-  <!-- 🔴 18/08 Anh Tony chot BO HAN 3 muc: E-Brochure · Nha Mau · Gallery.
-       Ly do phu — LOI VI TRI Anh bat bang anh chup iPad: 8 muc x 150 = 1200 px
-       be ngang, ma nguong an bot lai dat 1080 => iPad (~1180 px) hien DU 8 muc
-       nhung TRAN KHOI MAN, chu bi cat ca 2 dau. Nay con 5 muc = 750 px, vua khit.
-       Moc x doi -525..525 (buoc 150) THANH -300..300 (buoc 150) de CAN GIUA lai.
-       ⚠️ Doi so muc thi PHAI dat lai moc x, khong thi menu lech mot ben.
-       Thu muc /ebro/ va /gallery/ VAN CON tren dia, chi go khoi menu.
-       BAT LAI = tra lai 3 dong era_navitem (+ era_navdim cho 2 muc SAP CO),
-       tra 3 dong vao era_shell_set, va dat lai moc x cho du 8 muc. -->
-  era_navitem(era_n_toancanh, -300, '&#xe7ae;', 'Toàn cảnh',  'era_nav_setactive(era_n_toancanh); era_go_toancanh()');
-  era_navitem(era_n_hientrang,-150, '&#xed74;', 'Flycam hiện trạng', 'era_nav_setactive(era_n_hientrang); era_go_live()');
-  era_navitem(era_n_matbang,     0, '&#xe464;', 'Mặt bằng',   'era_nav_setactive(era_n_matbang); era_go_giohang()');
-  era_navitem(era_n_tienich,   150, '&#xe6a2;', 'Mặt bằng tiện ích', 'era_nav_setactive(era_n_tienich); era_go_tienich()');
-  <!-- 🔴 Glyph &#xe838; = ph-road-horizon cua Phosphor 2.1.1 (light).
-       DA TRA THANG TRONG FILE CSS CDN roi moi dat, KHONG doan:
-       doi chieu nguoc ca 7 glyph cu deu khop (e7ae=mountains, e316=map-pin,
-       e464=squares-four, e2c4=house-line, e6a2=sparkle, e834=images-square,
-       e0e6=book-open). Dat sai codepoint thi krpano ve O VUONG RONG, khong bao loi. -->
-  era_navitem(era_n_hatang,    300, '&#xe838;', 'Hạ tầng',    'era_nav_setactive(era_n_hatang); era_go_hatang()');
+       DA GO KHOI KHOI TAO (con nguyen trong .bak-truoc-menuhtml-20260819):
+         addlayer(era_nav_bg) + 7 dong thuoc tinh cua no
+         era_navitem(era_n_toancanh, -300, '&#xe7ae;', 'Toan canh',  '...era_go_toancanh()');
+         era_navitem(era_n_hientrang,-150, '&#xed74;', 'Flycam hien trang', '...era_go_live()');
+         era_navitem(era_n_matbang,     0, '&#xe464;', 'Mat bang',   '...era_go_giohang()');
+         era_navitem(era_n_tienich,   150, '&#xe6a2;', 'Mat bang tien ich', '...era_go_tienich()');
+         era_navitem(era_n_hatang,    300, '&#xe838;', 'Ha tang',    '...era_go_hatang()');
+
+       🔴 GO 5 DONG TREN THI PHAI GO DONG THOI MOI CHO GHI VAO TEN LOP DO,
+          neu khong krpano TU DE RA LAYER RONG, im lang, rat kho lan ra
+          (bay 11/08 + 12/08 + 18/08). Da go dong bo tai 3 cho:
+            (1) era_shell_set   . 6 dong .visible
+            (2) era_responsive  . era_navx x5 + era_navsmall + era_navlabels
+            (3) era_nav_setactive . lam RONG (van giu ten vi submenu goi vao)
+       BAT LAI = tra 5 dong tren + era_nav_bg, roi bo dau chu thich o ca 3 cho.
+       ================================================================ -->
 
   <!-- ==== 18/08: DA GO 3 muc E-Brochure (x=225) · Nha Mau (x=375) · Gallery (x=525).
        Cac action dich VAN CON NGUYEN, khong xoa, de bat lai la chay ngay:
@@ -573,28 +569,21 @@
          ⚠️ Doi so nut thi phai sua CA so chia 5 LAN he so -2..2 ben duoi.
          ⚠️ TUYET DOI khong go 2 dau gach ngang lien nhau vao comment XML —
             file se khong parse duoc (Em vua dinh 18/08). -->
-    set(era_navstep, calc((stagewidth - 16) / 5));
-    if(era_navstep GT 150, set(era_navstep, 150));
-
-    era_navx(era_n_toancanh,  calc(-2 * era_navstep));
-    era_navx(era_n_hientrang, calc(-1 * era_navstep));
-    era_navx(era_n_matbang,   0);
-    era_navx(era_n_tienich,   calc(1 * era_navstep));
-    era_navx(era_n_hatang,    calc(2 * era_navstep));
-
-    <!-- submenu Tien Ich phai bam theo nut Tien Ich -->
-    set(layer[era_pop_tienich].x, get(era_navstep));
-    set(layer[era_st1].x, get(era_navstep)); set(layer[era_st2].x, get(era_navstep));
-    set(layer[era_st3].x, get(era_navstep)); set(layer[era_st4].x, get(era_navstep));
-    set(layer[era_st5].x, get(era_navstep));
-
-    set(era_navsc, calc(era_navstep / 150));
-    if(era_navsc GT 1.0,   set(era_navsc, 1.0));
-    if(era_navsc LT 0.633, set(era_navsc, 0.633));
-    era_navsmall(calc(1 * era_navsc));
-
-    if(era_navstep LT 95, era_navlabels(false); , era_navlabels(true); );
-    <!-- 🔴 11/08: bo era_crumb + era_vp_* (da go han) -->
+    <!-- 🔴 19/08 . DA GO TOAN BO PHEP CO GIAN THANH NAV.
+         Day chinh la thu Anh Tony yeu cau bo: "tinh toan loai cach zoom vi
+         qua to va de len nhau". Cong thuc cu:
+             buoc = min(150, (stagewidth - 16) / 5)
+             x    = -2*buoc .. +2*buoc
+             scale= buoc/150, chan [0.633 .. 1.0]
+             buoc < 95  =>  an chu, chi con hang icon
+         Nay menu la HTML nen CSS lo phan nay (flex + @media 821/560 px),
+         khong con con so nao phai canh tay.
+         ⚠️ 3 hanh dong era_navx / era_navsmall / era_navlabels VAN CON dinh
+            nghia ben tren nhung KHONG con cho nao goi . co y giu de bat lai.
+         Submenu Tien Ich (era_pop_tienich + era_st1..5) van duoc tao nhung
+         khong con nut nao mo duoc no, va no vao doi mac dinh visible=false.
+         BAT LAI = tra nguyen khoi nay tu .bak-truoc-menuhtml-20260819.
+         era_responsive VAN GIU (onresize goi vao) . de san cho viec sau. -->
   );
 </action>
 

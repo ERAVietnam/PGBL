@@ -2,31 +2,70 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<title>Tiện ích nội khu — ELC_PV_02 | ERA VIETNAM</title>
+<title>27 Tiện ích nội khu — Phú Gia Bảo Lộc | ERA VIETNAM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--red:#C8102E;--navy:#0C0C44;--green:#6DA544;--dgreen:#14361c;--soft:#F5F5F5;--mid:#EEE;--f:'Inter',sans-serif}
+/* Mau lay bang PIXEL tu anh brochure Anh Tony gui 20/08, khong doan:
+   nen the #FFF8E9 · vien #C19B6B · PHU QUY #0E572D · GIA AN #354DA0 */
+:root{--red:#C8102E;--navy:#0C0C44;--pq:#0E572D;--ga:#354DA0;
+      --kem:#FFF8E9;--vien:#C19B6B;--vach:#E7D9B8;
+      --soft:#F5F5F5;--mid:#EEE;--f:'Inter',sans-serif}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
 body{font-family:var(--f);background:var(--soft);color:#111;display:flex;flex-direction:column}
-#wrap{flex:1;display:flex;min-height:0}
+#wrap{flex:1;display:flex;min-height:0;position:relative}
 #pano{flex:1;position:relative;min-width:0;background:#e9ede6}
-#side{width:312px;min-width:312px;background:#fff;border-left:1px solid var(--mid);overflow-y:auto;display:flex;flex-direction:column}
-.sh{padding:13px 16px 9px;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--navy);border-bottom:1px solid var(--mid);position:sticky;top:0;background:#fff;z-index:2}
-.sh small{display:block;font-weight:600;letter-spacing:0;text-transform:none;color:#888;margin-top:2px;font-size:11px}
-.trow{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;border-bottom:1px solid #f4f4f4}
-.trow:hover{background:#F4FAEF}
-.trow img{width:26px;height:33px;object-fit:contain;flex-shrink:0}
-.trow .nm{font-size:12.5px;font-weight:600;line-height:1.25}
-.trow .np{margin-left:auto;font-size:9px;font-weight:800;color:#2c7a2c;background:#eef7ea;border-radius:5px;padding:2px 6px;white-space:nowrap}
-.trow .no{margin-left:auto;font-size:9px;font-weight:800;color:#C8102E;background:#fdeaed;border-radius:5px;padding:2px 6px;white-space:nowrap}
+
+/* ==== COT DANH SACH BEN PHAI + TAB AN/HIEN ======================
+   20/08/2026 (dot 4) - Anh Tony: "hoc lai cach the hien ben the mat bang"
+   + "doc icon ben phai, co nut an".
+   🔴 Ban 2 cot ngang noi goc tren-phai (lam sang 20/08) DA BO. Ly do do
+   tren MAY THAT cua Anh, khong phai suy doan:
+     . iPad ngang 1180: the chiem 44% be ngang nhung chu xuong dong nhieu
+       -> the cao gan het man, CHE MAT phan lon phan khu Gia An.
+     . iPhone: ban do bi ep con dai mong ~205px, gim chong len nhau khong
+       doc noi; bang thi dai le the phai cuon 2 man.
+   ✅ Nay ap Y NGUYEN khuon cua trang MAT BANG (giohang/index.html):
+     . >=821px  : cot doc 280px ben phai + TAB DOC an/hien (truot ngang)
+       (326px -> 280px ngay 20/08: do that ten dai nhat chi 181px,
+        cot 326 thua 53px trong. 280 van du 1 dong cho ca 27 muc.)
+     . <=820px  : NGAN KEO truot tu day + nen mo + nut noi
+   Diem ngat 821/560 lay DUNG theo eranav.js va giohang, khong dat moc moi.
+   ============================================================== */
+#side{width:280px;min-width:280px;background:#fff;border-left:1px solid var(--mid);
+  overflow-y:auto;display:flex;flex-direction:column;
+  padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+/* 🔴 padding duoi 96px: thanh nav eranav.js cao 86px la position:fixed, nam
+   DE LEN cot. Khong chua cho la cuon het thi may dong cuoi bi nav che.
+   Dung loi da dinh o trang giohang 19/08 (BAY 18). */
+.pkhd{position:sticky;top:0;z-index:2;padding:9px 14px;font-size:10px;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;color:#fff}
+.trow{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;
+  border-bottom:1px solid #f4f4f4}
+.trow img{width:24px;height:31px;object-fit:contain;flex-shrink:0}
+.trow .so{flex:0 0 20px;width:20px;height:20px;border-radius:50%;color:#fff;
+  font-size:9.5px;font-weight:800;line-height:20px;text-align:center}
+.trow .nm{font-size:12.5px;font-weight:600;line-height:1.25;transition:color .12s ease}
+.trow[data-pk="pq"]:hover .nm{color:var(--pq)}
+.trow[data-pk="ga"]:hover .nm{color:var(--ga)}
+.trow[data-pk="pq"]:hover{background:#F1F7F2}
+.trow[data-pk="ga"]:hover{background:#F0F2FA}
+.trow .np{margin-left:auto;font-size:9px;font-weight:800;color:#8a7a5c;
+  background:#F6F0E2;border-radius:5px;padding:2px 6px;white-space:nowrap}
+/* cham do "chua cham" CHI hien o che do cong cu (?tool=1) */
+.trow .cx{margin-left:auto;display:none;width:7px;height:7px;border-radius:50%;background:var(--red)}
+body.tool-mode .trow.chua .cx{display:block}
+
+/* 3 thanh phan cua ngan keo: MAC DINH TAT o ban rong */
+#sideTop,#tiNen,#fabTi{display:none}
+
 /* hover info box */
-#ib{position:absolute;z-index:20;width:260px;background:#fff;border-radius:12px;box-shadow:0 12px 34px rgba(12,12,68,.28);
+#ib{position:absolute;z-index:30;width:260px;background:#fff;border-radius:12px;box-shadow:0 12px 34px rgba(12,12,68,.28);
    border:1px solid #e5e5e5;overflow:hidden;display:none;pointer-events:none}
 #ib .hd{display:flex;align-items:center;gap:11px;padding:12px 14px 8px}
 #ib .hd img{width:38px;height:48px;object-fit:contain}
-#ib .zn{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+#ib .zn{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 #ib h3{font-size:15.5px;font-weight:800;color:var(--navy);line-height:1.15;margin-top:2px}
 #ib p{font-size:12px;line-height:1.55;color:#555;padding:0 14px 13px}
 /* ==== TOOL CHAM VI TRI ====
@@ -52,18 +91,108 @@ body{font-family:var(--f);background:var(--soft);color:#111;display:flex;flex-di
 .pk:hover{background:#F4FAEF}
 .pk img{width:24px;height:30px;object-fit:contain}
 .pk b{font-size:12.5px;font-weight:600}
-.pk .dc{margin-left:auto;font-size:10px;font-weight:700;color:var(--green)}
+.pk .dc{margin-left:auto;font-size:10px;font-weight:700;color:#2c7a2c}
+.pkhd{padding:7px 10px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:6px;margin-top:6px}
 #mdExp{width:min(660px,94vw)}
 #mdExp textarea{width:100%;height:240px;font-family:Consolas,monospace;font-size:11.5px;border:1px solid #ddd;border-radius:9px;padding:10px;resize:vertical}
 
-/* ===== NEXT 14/08: mobile layout ===== */
+/* ==================================================================
+   🔴 KHOI @media PHAI NAM CUOI <style> — DUNG DOI LEN TREN
+   ------------------------------------------------------------------
+   Bai hoc BAY 16 (18/08, trang gio hang): rule cho #side / #pano viet
+   SAU khoi nay se DE NGUOC lai no vi cung do uu tien #id, va trinh duyet
+   KHONG bao mot dong loi nao. Them rule moi cho #side/#pano/#ib/#tool
+   thi them PHIA TREN khoi nay.
+   Diem ngat 821 / 560 lay DUNG theo eranav.js va giohang. Khong dat moc moi.
+     . <=820px = dien thoai + iPad DOC   |  >=821px = iPad NGANG + may tinh
+   ================================================================== */
 @media (max-width:820px){
+  /* ---- 1. ban do chiem TRON phan con lai ----
+     🔴 Ban 20/08 sang ep #pano{height:52.6vw} cho vua dung ty le anh.
+     Do tren iPhone that: khung con ~205px, 27 gim chong len nhau khong
+     bam duoc. Ty le anh dep khong bang ban do du to de bam. Nay tra ve
+     flex:1 nhu trang mat bang; phan thua tren/duoi la dai mau be, chap nhan. */
   #wrap{flex-direction:column}
-  #pano{flex:1;min-height:0}
-  #side{width:100%;min-width:0;height:38vh;min-height:220px;border-left:none;border-top:1px solid var(--mid)}
-  .trow{padding:9px 13px}
-  #ib{width:min(260px,calc(100vw - 16px));left:50%;transform:translateX(-50%);right:auto}
-  #tool{right:10px;bottom:calc(96px + env(safe-area-inset-bottom))}
+  #pano{width:auto;flex:1;min-height:0;height:auto}
+
+  /* ---- 2. cot danh sach -> NGAN KEO truot tu day len ----
+     z-index co y THAP HON #era-nav (9000) de thanh nav luon bam duoc. */
+  #side{position:fixed;left:0;right:0;bottom:0;z-index:8900;
+        width:auto;min-width:0;max-height:80vh;max-height:80dvh;
+        border-left:none;border-top:1px solid var(--mid);
+        border-radius:18px 18px 0 0;box-shadow:0 -9px 30px rgba(12,12,68,.24);
+        padding:0 0 calc(96px + env(safe-area-inset-bottom));
+        transform:translateY(102%);transition:transform .28s ease;
+        overscroll-behavior:contain}
+  #side.open{transform:none}
+
+  #sideTop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+        position:sticky;top:0;z-index:3;background:#fff;
+        padding:9px 14px 10px;border-bottom:1px solid var(--mid)}
+  /* tay nam: line-height:0 de o cao dung 4px, khong phinh theo line-height
+     mac dinh (BAY 20, 19/08) */
+  #sideTop i{flex:0 0 100%;height:4px;max-width:42px;margin:0 auto 3px;
+        border-radius:4px;background:#D5D5D5;line-height:0}
+  #sideTop #sideSo{flex:1;font-size:12px;font-weight:800;color:var(--pq)}
+  #sideTop button{font-family:var(--f);font-size:11.5px;font-weight:800;cursor:pointer;
+        border:none;border-radius:8px;padding:8px 15px;background:var(--pq);color:#fff}
+  .pkhd{top:44px}          /* dai phan khu dinh ngay duoi #sideTop */
+
+  #tiNen{display:block;position:fixed;inset:0;z-index:8890;
+        background:rgba(12,12,68,.44);opacity:0;pointer-events:none;transition:opacity .25s}
+  #tiNen.on{opacity:1;pointer-events:auto}
+
+  #fabTi{display:inline-flex;align-items:center;gap:7px;position:fixed;z-index:8880;
+        right:13px;bottom:calc(94px + env(safe-area-inset-bottom));
+        font-family:var(--f);font-size:12.5px;font-weight:800;cursor:pointer;
+        border:none;border-radius:99px;padding:11px 17px;color:#fff;
+        background:var(--pq);box-shadow:0 4px 14px rgba(12,12,68,.32);
+        transition:opacity .2s,transform .2s}
+  #fabTi b{background:#9BDC4C;color:var(--pq);border-radius:99px;padding:1px 8px;font-size:11.5px}
+  #fabTi.hide{opacity:0;pointer-events:none;transform:translateY(10px)}
+
+  /* bang thong tin: khong de no rong hon man */
+  #ib{width:min(260px,calc(100vw - 20px))}
+  /* nut cong cu: day len khoi thanh nav */
+  #tool{bottom:calc(96px + env(safe-area-inset-bottom))}
+}
+
+/* ==================================================================
+   NUT AN/HIEN COT — CHI BAN MAN RONG (>=821px)
+   ------------------------------------------------------------------
+   Chep dung cach cua trang mat bang (giohang 19/08):
+   KHONG dung width/display (giat + phai tinh lai flex) ma dung
+   "margin-right: -280px" -> be ngang NGOAI cua flex item ve 0 nen #pano
+   TU NO gian ra, con ban than cot thi truot han ra ngoai man
+   (body da overflow:hidden nen khong sinh thanh cuon ngang).
+   Mac dinh van MO -> khong ai bi bat ngo.
+   ================================================================== */
+#tabTi{display:none}
+
+@media (min-width:821px){
+  #side{transition:margin-right .28s ease}
+  html.an-ti #side{margin-right:-280px}
+
+  #tabTi{display:flex;align-items:center;justify-content:center;gap:7px;
+        position:fixed;z-index:8880;top:50%;right:280px;transform:translateY(-50%);
+        writing-mode:vertical-rl;
+        font-family:var(--f);font-size:11px;font-weight:800;letter-spacing:.12em;
+        text-transform:uppercase;cursor:pointer;color:var(--pq);
+        border:1px solid var(--mid);border-right:none;background:#fff;
+        border-radius:11px 0 0 11px;padding:15px 8px;
+        box-shadow:-4px 2px 14px rgba(12,12,68,.13);
+        transition:right .28s ease,background .15s,color .15s,border-color .15s}
+  #tabTi:hover{background:var(--pq);border-color:var(--pq);color:#fff}
+  #tabTi .mui{writing-mode:horizontal-tb;font-size:13px;line-height:1;transition:transform .28s ease}
+  html.an-ti #tabTi{right:0}
+  html.an-ti #tabTi .mui{transform:rotate(180deg)}
+}
+
+@media (max-width:560px){
+  #side{max-height:84vh;max-height:84dvh}
+  .trow .nm{font-size:12px}
+  #fabTi{font-size:11.5px;padding:10px 15px}
 }
 </style>
 </head>
@@ -80,50 +209,217 @@ body{font-family:var(--f);background:var(--soft);color:#111;display:flex;flex-di
       <button id="tBase">CHẤM VỊ TRÍ (V)</button>
     </div>
   </div>
-  <div id="side"><div class="sh">Danh sách tiện ích <small>30 tiện ích · rê chuột gim / bấm 1 dòng → nổi bảng thông tin</small></div><div id="list"></div></div>
+
+  <div id="side">
+    <div id="sideTop"><i></i><span id="sideSo">27 tiện ích nội khu</span><button type="button" id="tiXong">Xong</button></div>
+    <div id="list"></div>
+  </div>
 </div>
+</div>
+<!-- ==== 3 THANH PHAN DIEU KHIEN COT (hoc theo giohang) ==============
+     #tabTi  : tab chu DOC ben phai, chi hien >=821px, bam de an/hien cot
+     #tiNen  : nen mo cua ngan keo, chi hien <=820px
+     #fabTi  : nut noi mo ngan keo, chi hien <=820px
+     Ca 3 nam NGOAI #wrap de khong bi flex cua #wrap keo di. -->
+<button type="button" id="tabTi"><span class="mui">&#9656;</span><span id="tabChu">Danh sách</span></button>
+<div id="tiNen"></div>
+<button type="button" id="fabTi">&#9776; Danh sách <b>27</b></button>
 <script src="pano.js"></script>
 <script>
-const TI={"1":{"n":"Cafe Đôi Dép Phú Gia","d":"Quán cafe biểu tượng của khu, không gian gặp gỡ giữa cảnh quan xanh."},"2":{"n":"Sales Gallery","d":"Nhà mẫu & trung tâm giao dịch, nơi tiếp đón và tư vấn khách hàng."},"3":{"n":"Bãi đậu xe","d":"Bãi đậu xe nội khu, thuận tiện cho cư dân và khách tham quan."},"4":{"n":"Trạm sạc","d":"Trạm sạc xe điện phục vụ nhu cầu di chuyển xanh của cư dân."},"5":{"n":"Cupid garden","d":"Vườn chủ đề tình yêu, điểm check-in lãng mạn giữa khu đô thị."},"6":{"n":"Khu BBQ","d":"Khu tiệc nướng ngoài trời cho gia đình và nhóm bạn."},"7":{"n":"Khu vui chơi trẻ em","d":"Sân chơi an toàn với nhiều trò vận động cho trẻ nhỏ."},"8":{"n":"Khu mê cung","d":"Mê cung cây xanh, không gian khám phá thú vị cho mọi lứa tuổi."},"9":{"n":"Cánh cổng thời gian","d":"Tiểu cảnh cổng biểu tượng — điểm nhấn nghệ thuật để check-in."},"10":{"n":"Tiểu cảnh tượng Cupid & Psyche","d":"Cụm tượng nghệ thuật Cupid & Psyche giữa vườn cảnh quan."},"11":{"n":"Trường mẫu giáo","d":"Trường mầm non nội khu, thuận tiện cho cư dân có con nhỏ."},"12":{"n":"Vườn cây đặc hữu","d":"Vườn sưu tập cây bản địa Bảo Lộc, giữ mảng xanh đặc trưng cao nguyên."},"13":{"n":"Khu vườn ánh sáng bồ công anh","d":"Vườn nghệ thuật ánh sáng chủ đề bồ công anh, lung linh về đêm."},"14":{"n":"Khu vực để xe đạp","d":"Trạm gửi và thuê xe đạp phục vụ di chuyển xanh trong nội khu."},"15":{"n":"Khu thể thao - Pickleball","d":"Sân Pickleball tiêu chuẩn, môn thể thao đang được ưa chuộng."},"16":{"n":"Khu tiện ích công cộng","d":"Cụm tiện ích công cộng phục vụ sinh hoạt hằng ngày của cư dân."},"17":{"n":"Trung tâm chăm sóc sức khoẻ","d":"Trung tâm chăm sóc sức khoẻ và làm đẹp cho cư dân nội khu."},"18":{"n":"Eden Garden","d":"Vườn Eden xanh mát, không gian thư giãn giữa thiên nhiên."},"19":{"n":"Cầu Firenzi","d":"Cây cầu biểu tượng phong cách Firenzi bắc qua cảnh quan."},"20":{"n":"Minerva Garden","d":"Vườn Minerva chủ đề nữ thần trí tuệ — điểm nhấn cảnh quan."},"21":{"n":"Japanese Garden","d":"Vườn Nhật với hồ cá Koi, tiểu cảnh đá và cây cắt tỉa tinh tế."},"22":{"n":"Sân bóng rổ","d":"Sân bóng rổ tiêu chuẩn phục vụ thể thao cộng đồng."},"23":{"n":"Nhà vệ sinh công cộng","d":"Nhà vệ sinh công cộng bố trí tại các khu cảnh quan chính."},"24":{"n":"Quảng trường / Rạp chiếu phim ngoài trời","d":"Quảng trường trung tâm kết hợp rạp chiếu phim ngoài trời cho cộng đồng."},"25":{"n":"Tháp nghiêng Pisa","d":"Biểu tượng tháp nghiêng Pisa — điểm check-in nổi bật của khu."},"26":{"n":"Lamb Cà phê","d":"Quán cà phê thứ hai trong khu, phục vụ cư dân phía Gia An."},"27":{"n":"Eden Dream","d":"Vườn mơ Eden — tiểu cảnh nghệ thuật lãng mạn."},"28":{"n":"Apolo Garden","d":"Vườn Apollo chủ đề thần mặt trời, quảng trường cây xanh."},"29":{"n":"Vườn rau","d":"Vườn rau cộng đồng, cư dân tự trồng và thu hoạch rau sạch."},"30":{"n":"An ninh 24/7","d":"Chốt an ninh trực 24/7 tại cổng và các nút giao, đảm bảo an toàn."}};
-const NTI=30, LKEY='eratienich_elc_v2';   /* doi key -> bo han ban nhap lech cu */
+/* ================================================================
+   DANH SACH 27 TIEN ICH  (brochure 20/08/2026)
+   ================================================================
+   🔴 SO THU TU CHAY LAI THEO TUNG PHAN KHU: Phu Quy 01..16, Gia An 1..11.
+   Nen KHOA phai co tien to (pq1.. / ga1..), KHONG dung so tran 1..27.
+   Ly do: 3 muc TRUNG TEN o ca 2 phan khu (Khu BBQ · Nha ve sinh cong cong ·
+   An ninh 24/7). De so tran la chung de len nhau trong ban nhap localStorage
+   va trong bang tra, im lang khong bao loi.
+     n  = ten hien thi     pk = phan khu     so = so in tren brochure
+   ================================================================ */
+const TI={
+"pq1":{"so":1,"pk":"pq","n":"Cà phê Đôi Dép","d":"Quán cà phê biểu tượng của khu, không gian gặp gỡ giữa cảnh quan xanh."},
+"pq2":{"so":2,"pk":"pq","n":"Sales Gallery","d":"Nhà mẫu & trung tâm giao dịch, nơi tiếp đón và tư vấn khách hàng."},
+"pq3":{"so":3,"pk":"pq","n":"Bãi đậu xe","d":"Bãi đậu xe nội khu, thuận tiện cho cư dân và khách tham quan."},
+"pq4":{"so":4,"pk":"pq","n":"Trạm sạc","d":"Trạm sạc xe điện phục vụ nhu cầu di chuyển xanh của cư dân."},
+"pq5":{"so":5,"pk":"pq","n":"Cupid garden","d":"Vườn chủ đề tình yêu, điểm check-in lãng mạn giữa khu đô thị."},
+"pq6":{"so":6,"pk":"pq","n":"Khu BBQ","d":"Khu tiệc nướng ngoài trời cho gia đình và nhóm bạn."},
+"pq7":{"so":7,"pk":"pq","n":"Khu vui chơi trẻ em","d":"Sân chơi an toàn với nhiều trò vận động cho trẻ nhỏ."},
+"pq8":{"so":8,"pk":"pq","n":"Vườn mê cung","d":"Mê cung cây xanh, không gian khám phá thú vị cho mọi lứa tuổi."},
+"pq9":{"so":9,"pk":"pq","n":"Trường mẫu giáo","d":"Trường mầm non nội khu, thuận tiện cho cư dân có con nhỏ."},
+"pq10":{"so":10,"pk":"pq","n":"Vườn cây đặc hữu","d":"Vườn sưu tập cây bản địa Bảo Lộc, giữ mảng xanh đặc trưng cao nguyên."},
+"pq11":{"so":11,"pk":"pq","n":"Khu thể thao đa năng","d":"Sân thể thao đa năng phục vụ nhiều bộ môn cho cư dân mọi lứa tuổi."},
+"pq12":{"so":12,"pk":"pq","n":"Khu tiện ích cộng đồng","d":"Cụm tiện ích cộng đồng phục vụ sinh hoạt hằng ngày của cư dân."},
+"pq13":{"so":13,"pk":"pq","n":"Trung tâm chăm sóc sức khoẻ","d":"Trung tâm chăm sóc sức khoẻ và làm đẹp cho cư dân nội khu."},
+"pq14":{"so":14,"pk":"pq","n":"Nhà vệ sinh công cộng","d":"Nhà vệ sinh công cộng bố trí tại các khu cảnh quan chính."},
+"pq15":{"so":15,"pk":"pq","n":"Vườn cảnh quan","d":"Vườn cảnh quan xanh mát, không gian thư giãn giữa thiên nhiên."},
+"pq16":{"so":16,"pk":"pq","n":"An ninh 24/7","d":"Chốt an ninh trực 24/7 tại cổng và các nút giao, đảm bảo an toàn."},
+"ga1":{"so":1,"pk":"ga","n":"Fern Garden","d":"Vườn dương xỉ mát rượi, mảng xanh đặc trưng khí hậu cao nguyên."},
+"ga2":{"so":2,"pk":"ga","n":"Rose Garden","d":"Vườn hồng rực rỡ, điểm check-in được yêu thích của cư dân."},
+"ga3":{"so":3,"pk":"ga","n":"Sân bóng rổ","d":"Sân bóng rổ tiêu chuẩn phục vụ thể thao cộng đồng."},
+"ga4":{"so":4,"pk":"ga","n":"Japanese Garden","d":"Vườn Nhật với hồ cá Koi, tiểu cảnh đá và cây cắt tỉa tinh tế."},
+"ga5":{"so":5,"pk":"ga","n":"Nhà vệ sinh công cộng","d":"Nhà vệ sinh công cộng bố trí tại các khu cảnh quan chính."},
+"ga6":{"so":6,"pk":"ga","n":"Đồi thông","d":"Đồi thông tự nhiên, điểm cao ngắm toàn cảnh và không khí trong lành."},
+"ga7":{"so":7,"pk":"ga","n":"Khu BBQ","d":"Khu tiệc nướng ngoài trời cho gia đình và nhóm bạn."},
+"ga8":{"so":8,"pk":"ga","n":"Tiện ích F&B","d":"Cụm tiện ích ăn uống phục vụ cư dân phân khu Gia An."},
+"ga9":{"so":9,"pk":"ga","n":"Mimosa Garden","d":"Vườn mimosa vàng rực — sắc hoa đặc trưng của cao nguyên Lâm Đồng."},
+"ga10":{"so":10,"pk":"ga","n":"Vườn rau hữu cơ","d":"Vườn rau hữu cơ cộng đồng, cư dân tự trồng và thu hoạch rau sạch."},
+"ga11":{"so":11,"pk":"ga","n":"An ninh 24/7","d":"Chốt an ninh trực 24/7 tại cổng và các nút giao, đảm bảo an toàn."}
+};
+const IDS=Object.keys(TI);                 /* thu tu hien thi, thay cho vong lap 1..NTI */
+const NTI=IDS.length;                      /* 27 */
+const PK={pq:{t:'Phân khu Phú Quý',c:'#0E572D',bg:'#E7F0E9'},
+          ga:{t:'Phân khu Gia An', c:'#354DA0',bg:'#E8EBF7'}};
+/* 🔴 DOI LKEY MOI LAN DOI DU LIEU GOC. Giu key cu thi trinh duyet cua Anh
+   Tony khoi phuc ban nhap cu tu localStorage va BO QUA hotspot tinh trong
+   tour.xml -> gim roi sai cho tren anh moi, khong bao mot dong loi nao.
+   Lich su: eratienich_elc_v2 -> _pgbl24_v1 -> _pgbl27_v1 (nay). */
+const LKEY='eratienich_pgbl27_v1';
+/* 🔴 Bat che do cong cu bang ?tool=1 - khoa CUNG ca phim tat, khong chi an nut.
+   Khai o day (som) vi bang chu giai dung no de quyet co hien cham "chua cham". */
+var TOOLMODE = /[?&]tool=1(?:&|$)/.test(location.search);
+
 let kp=null, lastX=140, lastY=120, hideT=null, editOn=false, addMode=false, order=[];
 const g=id=>document.getElementById(id);
 const pano=g('pano'), ib=g('ib');
-const pinSrc=id=>'pins30/pin-ti-'+id+'.png';
-pano.addEventListener('mousemove',e=>{const r=pano.getBoundingClientRect();lastX=e.clientX-r.left;lastY=e.clientY-r.top;});
+const pinSrc=id=>'pins27/pin-'+id+'.png';
+/* Nghe tren CA TRANG chu khong chi tren #pano: tu 20/08 bang chu giai nam
+   DE LEN ban do, re chuot vao 1 dong thi con tro dang o tren the, neu chi
+   nghe tren #pano thi lastX/lastY la toa do cu -> bang thong tin nhay ra
+   dung mot cho tu lan re truoc. */
+document.addEventListener('mousemove',e=>{const r=pano.getBoundingClientRect();
+  lastX=e.clientX-r.left;lastY=e.clientY-r.top;});
 
-/* ================= DANH SACH BEN PHAI ================= */
+/* ================= BANG CHU GIAI 2 PHAN KHU ================= */
 function buildList(){
-  let h='';
-  for(let i=1;i<=NTI;i++){
-    const t=TI[i]; const chua=(t.ath===undefined);
-    h+='<div class="trow" onmouseenter="tiOver('+i+')" onmouseleave="tiOut()" onclick="flyTo('+i+')">'
-      +'<img src="'+pinSrc(i)+'"><div class="nm">'+i+'. '+t.n+'</div>'
-      +(chua?'<span class="no">chưa chấm</span>'
-             :(t.np>1?'<span class="np">'+t.np+' điểm</span>':''))+'</div>';
-  }
+  let h='', pkTruoc='';
+  IDS.forEach(id=>{
+    const t=TI[id], chua=(t.ath===undefined), p=PK[t.pk];
+    /* dai tieu de moi khi doi phan khu (16 muc Phu Quy roi 11 muc Gia An) */
+    if(t.pk!==pkTruoc){ pkTruoc=t.pk;
+      h+='<div class="pkhd" style="background:'+p.c+'">'+p.t+'</div>'; }
+    h+='<div class="trow'+(chua?' chua':'')+'" data-id="'+id+'" data-pk="'+t.pk+'">'
+      +'<img src="'+pinSrc(id)+'" alt="">'
+      +'<span class="so" style="background:'+p.c+'">'+t.so+'</span>'
+      +'<span class="nm">'+t.n+'</span>'
+      +(t.np>1?'<span class="np">'+t.np+' điểm</span>':'')
+      +'<span class="cx"></span></div>';
+  });
   g('list').innerHTML=h;
+  /* gan su kien 1 lan, khong nhet onclick vao chuoi HTML.
+     KHONG gan onmouseenter: re chuot chi doi mau chu (CSS lo) — Anh Tony
+     chot 20/08. `tiOver` VAN GIU vi krpano goi no khi re vao GIM tren ban do. */
+  document.querySelectorAll('#list .trow').forEach(el=>{
+    el.onclick=()=>{ const id=el.getAttribute('data-id');
+      if(window.matchMedia('(max-width:820px)').matches) moNganKeo(false);  /* dong ngan keo de con thay gim nhay */
+      flyTo(id); };
+  });
 }
-function placeBox(){const pr=pano.getBoundingClientRect();let x=lastX+16,y=lastY-40;
-  x=Math.min(x,pr.width-272);x=Math.max(8,x);y=Math.min(y,pr.height-150);y=Math.max(8,y);
-  ib.style.left=x+'px';ib.style.top=y+'px';}
-function fill(id){const t=TI[id];g('ibIc').src=pinSrc(id);g('ibZ').textContent='Tiện ích nội khu';
-  g('ibN').textContent=id+'. '+t.n;g('ibD').textContent=t.d;}
-function tiOver(id){if(editOn)return;clearTimeout(hideT);fill(id);placeBox();ib.style.display='block';}
-function tiOut(){hideT=setTimeout(()=>ib.style.display='none',120);}
+
+/* ================= COT PHAI: TAB AN/HIEN + NGAN KEO =================
+   Chep khuon trang mat bang (giohang). Hai co che TACH BACH:
+     >=821px : class `an-ti` tren <html>  -> cot truot ngang ra ngoai
+     <=820px : class `open` tren #side    -> ngan keo truot tu day len
+   Khong dung chung mot class cho ca hai, de doi man hinh khong bi ket. */
+function moNganKeo(v){
+  g('side').classList.toggle('open',v);
+  g('tiNen').classList.toggle('on',v);
+  g('fabTi').classList.toggle('hide',v);
+  if(v) ib.style.display='none';
+}
+g('fabTi').onclick=()=>moNganKeo(true);
+g('tiNen').onclick=()=>moNganKeo(false);
+g('tiXong').onclick=()=>moNganKeo(false);
+g('tabTi').onclick=()=>{
+  const an=document.documentElement.classList.toggle('an-ti');
+  g('tabChu').textContent = an ? 'Hiện danh sách' : 'Danh sách';
+};
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') moNganKeo(false); });
+/* vuot xuong tay nam de dong (touch-action de trinh duyet khong cuop cu vuot) */
+(function(){ const gp=g('sideTop'); let y0=null;
+  gp.style.touchAction='none';
+  gp.addEventListener('pointerdown',e=>{ y0=e.clientY; });
+  gp.addEventListener('pointerup',e=>{ if(y0!==null && e.clientY-y0>44) moNganKeo(false); y0=null; });
+  gp.addEventListener('pointercancel',()=>{ y0=null; });
+})();
+
+/* ================================================================
+   BẢNG THÔNG TIN BÁM THEO GIM        (Anh Tony chốt 20/08, đợt 3)
+   ================================================================
+   Trước đây box dán cứng ở giữa-trên khung, không liên quan gì tới chỗ
+   cái gim đang đứng. Nay nó phải nằm ngay cạnh gim và ĐI THEO gim khi
+   phóng to / kéo bản đồ.
+
+   🔴 KHÔNG DÙNG ĐƯỢC `krpano.spheretoscreen()`:
+   trên `pano.js` của trang này hàm CÓ TỒN TẠI (`typeof` = "function")
+   nhưng gọi ra trả về **{x:null, y:null}** — đo thật 3 gim đều null.
+   => Có tên hàm KHÔNG có nghĩa là dùng được. Cùng họ BẪY 4.
+
+   ✅ Ảnh nền là ảnh PHẲNG (`image type="CYLINDER" hfov="1.0"` chuẩn hoá)
+   nên phép chiếu là TUYẾN TÍNH, tự tính chính xác bằng 3 dòng:
+       S = bề_rộng_khung / view.fov      (số pixel cho 1 đơn vị ath/atv)
+       x = W/2 + (ath - view.hlookat) * S
+       y = H/2 + (atv - view.vlookat) * S
+   (ath,atv) là MŨI GIM vì hotspot đặt `edge="bottom"`.
+   ⚠️ Công thức này chỉ đúng với ảnh phẳng. Đổi sang pano 360 thật thì
+      phải tính lại bằng lượng giác, không dùng lại được.
+   ================================================================ */
+const PIN_W=220, PIN_H=281;          /* cỡ gốc file gim, để suy ra cỡ trên màn */
+let boxId=null, boxT=0;
+
+function viTriGim(id){
+  if(!kp) return null;
+  const hs=hotspotsOf(id); if(!hs.length) return null;
+  const nm=hs[0];                                   /* mục nhiều điểm -> bám điểm đầu */
+  const ath=parseFloat(kp.get('hotspot['+nm+'].ath'));
+  const atv=parseFloat(kp.get('hotspot['+nm+'].atv'));
+  const fov=parseFloat(kp.get('view.fov'));
+  const hl=parseFloat(kp.get('view.hlookat'))||0;
+  const vl=parseFloat(kp.get('view.vlookat'))||0;
+  if(!isFinite(ath)||!isFinite(atv)||!isFinite(fov)||fov<=0) return null;
+  const r=pano.getBoundingClientRect(), S=r.width/fov;
+  const sc=parseFloat(kp.get('ti_sc'))||0.17;
+  return {x:r.width/2+(ath-hl)*S, y:r.height/2+(atv-vl)*S,
+          W:r.width, H:r.height, pw:PIN_W*sc, ph:PIN_H*sc};
+}
+function placeBox(){
+  if(!boxId) return;
+  const p=viTriGim(boxId);
+  if(!p){ ib.style.display='none'; return; }
+  /* gim bị kéo ra ngoài khung thì giấu box luôn, đừng để nó dính mép trỏ vào chỗ trống */
+  if(p.x<-60||p.x>p.W+60||p.y<-60||p.y>p.H+60){ ib.style.display='none'; return; }
+  const bw=ib.offsetWidth||260, bh=ib.offsetHeight||120;
+  let x=p.x+p.pw*0.55+8;                    /* mặc định: bên phải gim */
+  if(x+bw>p.W-8) x=p.x-p.pw*0.55-bw-8;      /* hết chỗ bên phải -> lật sang trái */
+  let y=p.y-p.ph*0.61-bh/2;                 /* canh giữa theo đầu gim (đĩa tròn) */
+  x=Math.max(8,Math.min(x,p.W-bw-8));
+  y=Math.max(8,Math.min(y,p.H-bh-8));
+  ib.style.left=x+'px'; ib.style.top=y+'px'; ib.style.transform='';
+}
+/* 🔴 setInterval, KHÔNG rAF — tab chạy nền là rAF dừng hẳn (đo được 0 khung/500ms). */
+function batTheoDoi(){ clearInterval(boxT); boxT=setInterval(()=>{
+  if(ib.style.display==='none'||!boxId){ clearInterval(boxT); boxT=0; return; }
+  placeBox();
+},90); }
+function moBox(id){ boxId=id; fill(id); ib.style.display='block'; placeBox(); batTheoDoi(); }
+function fill(id){const t=TI[id],p=PK[t.pk]||PK.pq;
+  g('ibIc').src=pinSrc(id);
+  g('ibZ').textContent=p.t; g('ibZ').style.color=p.c;
+  g('ibN').textContent=t.so+'. '+t.n;g('ibD').textContent=t.d;}
+/* krpano goi tiOver khi re chuot vao GIM tren ban do (ti_over_fx).
+   Dong bang chu giai KHONG goi ham nay nua (20/08, Anh Tony chot). */
+function tiOver(id){if(editOn)return;clearTimeout(hideT);moBox(id);}
+function tiOut(){hideT=setTimeout(()=>{ib.style.display='none';boxId=null;},120);}
 function tiClick(id){flyTo(id);}
 /* ================================================================
    BẤM 1 TIỆN ÍCH  ->  GIM CỦA NÓ PHÓNG TO + NHẢY  (Anh Tony chốt 11/08)
    ================================================================
    🔴 VÌ SAO KHÔNG BAY/ZOOM NỮA — bản cũ `lookto(...,0.42,...)`:
    (a) fov 0.42 nhỏ hơn giới hạn zoom thật của krpano
-       ( fov_min = bề_rộng_khung / (ảnh_rộng_px × maxpixelzoom)
-         = 2248 / (3456 × 1.2) = 0.542 ),
+       ( fov_min = bề_rộng_khung / (ảnh_rộng_px × maxpixelzoom) ),
    (b) `lookto` là blocking action, gọi lúc trang vừa nạp là krpano
        NGỪNG VẼ luôn.
    Cả hai đều làm CẢ KHUNG 360 TRẮNG BỆCH và krpano KHÔNG báo lỗi gì.
    Bỏ hẳn việc đổi tầm nhìn thì né sạch cả nhóm lỗi này.
-   Ảnh nền vẫn vừa khung ở fov mặc định nên không cần bay tới đâu cả.
    ================================================================ */
 /* 🔴 DÙNG setInterval, KHÔNG dùng requestAnimationFrame:
    rAF bị trình duyệt DỪNG HẲN khi tab không nằm ở trước (đo được: 0 khung
@@ -141,6 +437,91 @@ function eraFirstPaint(){
     if(p>=1) clearInterval(paintT);
   },TICK);
 }
+
+/* ================================================================
+   MAN NHO — MO TRANG RA LA DA ZOOM SAN CHO ANH LAP DAY KHUNG
+   ================================================================
+   Anh Tony gui anh chup iPhone kem cau "do lon bang vay".
+   🔴 EM SUY LUAN SAI MOT LAN, GHI LAI DE KHONG LAP:
+   Em tuong `limitview="fullrange"` tu ep anh phu kin khung. DO THAT bang
+   iframe 390x758: view.fov VAN LA 0.995, chieu cao thay duoc 1.93 trong
+   khi anh chi cao 0.526 -> tuc la CON DAI TRONG rat lon, anh be ti.
+   Cai anh chup to la vi ANH TU PINCH-ZOOM vao roi moi chup.
+   => `fullrange` chi chan KHONG CHO KEO ra ngoai anh, no KHONG tu zoom.
+
+   ✅ Nen phai tu dat muc zoom luc nap. Cong thuc "lap day khung" (cover):
+        thay duoc ngang = fov          -> lap day ngang khi fov <= 1.0
+        thay duoc doc   = fov * (H/W)  -> lap day doc  khi fov <= vfov*(W/H)
+        => fov_lapday = min(1.0, vfov * W / H)
+      iPhone 390x758 -> 0.271 · iPad doc 820x1094 -> 0.394
+      Luon <= 1.0 nen KHONG dung tran fovmax, khong phai sua fovmax.
+
+   ⚠️ Phai goi SAU eraFirstPaint (no nhich fov *0.995 de ep krpano ve
+      khung dau tien) - goi truoc thi bi no de len.
+
+   🔴 20/08 (dot 7) - AP CHO MOI MAN, khong con gioi han <=820px.
+   Anh Tony: "Em can giup anh cai man hinh luc quay ngang, zoom co tren
+   man hinh, vua dep" - noi ve iPad. Da do: ap cho ca may tinh cung an
+   toan, vi tren man 2560 cua Anh fov chi doi tu 0.995 -> 0.984 (1%),
+   mat thuong khong thay, ma het han dai trong o day khung.
+     iPad gen9 NGANG  khung 800x634  -> fov 0.664  (truoc 0.995, trong 35%)
+     iPad gen9 DOC    khung 810x894  -> fov 0.476
+     iPhone 14        khung 390x672  -> fov 0.305
+     PC cua Anh       khung 2280x1219-> fov 0.984
+   ================================================================ */
+const HL_LECH = -0.15;     /* mo ra thay PHAN KHU PHU QUY (16/27 tien ich);
+                              khach keo sang phai xem Gia An. */
+const HL_NGUONG = 0.5;     /* CHI lech khi fov < 0.5 (thay duoi 50% be ngang
+                              anh -> buoc phai chon 1 phia). Rong hon thi de
+                              giua cho thay ca 2 phan khu: iPad gen9 ngang
+                              fov 0.664 va PC 0.984 deu giu hlookat = 0. */
+/* ================================================================
+   CỠ GIM — TÍNH THEO ĐƠN VỊ BẢN ĐỒ, KHÔNG THEO PIXEL
+   ================================================================
+   🔴 Anh Tony 20/08: *"máy tính icon quá nhỏ, điện thoại icon quá to,
+      nó bị ngược"*. Đo lại đúng y: để cỡ gim bằng px tuyệt đối thì tỷ lệ
+      so với bề ngang khung chạy ngược nhau —
+        iPhone 6,5% · iPad dọc 3,1% · iPad ngang 2,5% · PC 1,0%
+      Màn càng to gim trông càng bé. Càng chỉnh càng hỏng một trong hai đầu.
+
+   ✅ Cách đúng: gim luôn phủ MỘT VÙNG THẬT cố định trên bản đồ.
+        ti_k = K_GIM × bề_ngang_khung_px / 281
+      Vì `ti_sc = ti_k / fov` và số px trên màn = `281 × ti_sc`, suy ra
+        chiều cao gim (px) = K_GIM × (bề_ngang_khung / fov) = K_GIM × S
+      → bố cục gim GIỐNG HỆT nhau, **số cặp đè bằng nhau (4) trên mọi màn**.
+      PC 38×48px (to lên) · iPad ngang 20×25px (giữ nguyên — Anh đã duyệt) ·
+      iPhone 21×27px (nhỏ đi). Đúng cả 3 yêu cầu.
+   ⚠️ Đổi ảnh nền tỷ lệ khác thì KHÔNG phải sửa K_GIM — nó theo đơn vị ảnh.
+   ================================================================ */
+const K_GIM = 0.02075;   /* chiều cao gim, tính bằng ĐƠN VỊ BẢN ĐỒ.
+                            To/nhỏ đều tay trên mọi máy thì chỉnh 1 số này.
+                            0.016 -> 0 cặp đè · 0.02075 -> 4 · 0.026 -> 6 */
+function capNhatCoGim(){
+  if(!kp) return;
+  const r=pano.getBoundingClientRect();
+  if(!r.width||!r.height) return;
+  const k=K_GIM*r.width/281;
+  kp.set('ti_k', k);
+  const vf=parseFloat(kp.get('image.vfov'))||0.52588;
+  const fovLap=Math.min(1.0, vf*(r.width/r.height));
+  kp.set('ti_tmax', (k/fovLap)*2.0);   /* zoom sâu tối đa gấp đôi cỡ lúc phủ kín */
+  kp.call('ti_rescale()');
+}
+
+function fovLapDay(){
+  if(!kp) return;
+  const r=pano.getBoundingClientRect();
+  if(!r.width||!r.height) return;
+  const vf=parseFloat(kp.get('image.vfov'))||0.52588;
+  const f=Math.min(1.0, vf*(r.width/r.height));
+  if(!isFinite(f)||f<=0.02) return;
+  kp.set('view.fov', f);
+  kp.set('view.hlookat', f<HL_NGUONG ? HL_LECH : 0);
+  kp.set('view.vlookat', 0);
+  capNhatCoGim();                       /* PHAI goi sau khi doi fov */
+}
+let xoayT=0;
+window.addEventListener('resize',()=>{ clearTimeout(xoayT); xoayT=setTimeout(fovLapDay,220); });
 
 let hopT=0, hopHS=[];
 function eraStopHop(){
@@ -182,15 +563,23 @@ function eraHop(id){
 }
 
 function flyTo(id){const t=TI[id];
-  if(t.ath===undefined){msg('Tiện ích '+id+' chưa được chấm vị trí');return;}
+  if(t.ath===undefined){msg('Tiện ích '+t.so+' ('+t.n+') chưa được chấm vị trí');return;}
   eraHop(id);
-  clearTimeout(hideT);fill(id);
-  ib.style.left='50%';ib.style.top='16px';ib.style.transform='translateX(-50%)';ib.style.display='block';
-  setTimeout(()=>{ib.style.transform='';},1600);}
+  clearTimeout(hideT);
+  moBox(id);          /* box nhay ra NGAY CANH GIM, khong dan cung giua-tren nua */
+}
+
+/* 🔴 20/08 - dong `g('bTop').onclick = ...` cua the noi cu DA XOA O DAY.
+   Go the `#bang` ma quen go cho GHI VAO no thi `g('bTop')` tra ve null ->
+   "Cannot set properties of null" -> **CA KHOI SCRIPT CHET NGAY DONG DO**,
+   nhung dong sau khong chay: `buildList()` khong duoc goi, danh sach RONG
+   TRON. Trang van hien ban do binh thuong nen rat de tuong la khong sao.
+   Dung ho BAY 1 "go layer ma quen go cho ghi vao ten no" (lap lan thu 5).
+   => Cach kiem re: sau khi go 1 the, grep TEN ID do tren toan file. */
 
 /* ================= TOOL CHAM VI TRI ================= */
 function msg(s){const m=g('tMsg');m.textContent=s;m.style.display=s?'block':'none';}
-function doneCount(){let n=0;for(let i=1;i<=NTI;i++) if(TI[i].ath!==undefined) n++; return n;}
+function doneCount(){let n=0;IDS.forEach(id=>{ if(TI[id].ath!==undefined) n++; }); return n;}
 function toolBtns(v){['tAdd','tDel','tWipe','tExp'].forEach(id=>g(id).classList.toggle('thide',!v));}
 
 function editToggle(){
@@ -226,7 +615,7 @@ function tiCollected(mode,data){
   String(data||'').split('###').forEach(l=>{ if(!l)return; const p=l.split('|'); if(p.length<4)return;
     rows.push({id:p[0],ath:p[1],atv:p[2],name:p[3]}); });
   order = rows.map(r=>r.name);
-  for(let i=1;i<=NTI;i++) TI[i].np=0;
+  IDS.forEach(id=>{ TI[id].np=0; });
   rows.forEach(r=>{ if(TI[r.id]){ TI[r.id].ath=parseFloat(r.ath); TI[r.id].atv=parseFloat(r.atv); TI[r.id].np=(TI[r.id].np||0)+1; } });
   if(mode==='save'){
     try{ localStorage.setItem(LKEY, rows.map(r=>[r.id,r.ath,r.atv,r.name].join('|')).join('###')); }catch(e){}
@@ -234,20 +623,36 @@ function tiCollected(mode,data){
     /* 🔴 VẼ KHUNG HÌNH ĐẦU TIÊN.
        krpano 1.19 chỉ vẽ lại màn khi có đổi tầm nhìn. Lúc mới nạp, nếu
        không ai chạm vào thì nó vẽ đúng 1 khung — khung đó thường rơi vào
-       lúc 30 ảnh gim chưa về kịp => nền có mà gim thì trống trơn, phải rê
-       chuột mới hiện (đã đo, nạp lại 3 lần ra 3 kiểu).
-       Đây là mốc chắc ăn nhất: krpano vừa trả đủ toạ độ => 30 gim đã đăng
-       ký xong. Nhích fov 0,5% trong 0,6s (mắt không thấy) để krpano vẽ
-       liên tục vài chục khung. Chạy đúng 1 lần lúc nạp trang. */
-    if(!firstPainted){ firstPainted=true; setTimeout(eraFirstPaint,250); }
+       lúc ảnh gim chưa về kịp => nền có mà gim thì trống trơn, phải rê
+       chuột mới hiện. Nhích fov 0,5% trong 0,6s (mắt không thấy). */
+    if(!firstPainted){ firstPainted=true; setTimeout(eraFirstPaint,250);
+      /* 1200ms = sau khi eraFirstPaint (250 + 600) chay xong, khong bi no de len */
+      setTimeout(fovLapDay,1200); }
     if(editOn) msg('Đã lưu · tổng '+rows.length+' gim · kéo gim để chỉnh');
   }else{
-    const xml=rows.map(r=>'  <hotspot name="'+r.name+'" style="ti_pin" url="pins30/pin-ti-'+r.id
+    const xml=rows.map(r=>'  <hotspot name="'+r.name+'" style="ti_pin" url="pins27/pin-'+r.id
       +'.png" tid="'+r.id+'" ath="'+r.ath+'" atv="'+r.atv+'" zorder="30" />').join('\n');
     g('expTa').value=xml;
     g('mdExp').style.display='block';
     g('expTa').select();
   }
+}
+/* 🔴🔴 20/08/2026 — XOÁ GIM PHẢI LÀM Ở JS, KHÔNG DÙNG ĐƯỢC `ti_wipe()` TRONG XML.
+   Action `ti_wipe` viết `removehotspot(get(hotspot[j].name))`. Đo thật trên máy
+   Anh Tony: gọi xong `hotspot.count` VẪN NGUYÊN 3 — krpano 1.19 không nhận
+   `get(...)` làm tham số cho `removehotspot`, và **không báo một dòng lỗi nào**.
+   Lỗi này CÓ SẴN từ lâu, chỉ chưa lộ vì nút "XOÁ HẾT GIM" hiếm khi bấm.
+   ✅ Cách chạy được (đã đo, 3/3 gim biến mất): đọc tên ra JS rồi gọi
+      `removehotspot(<tên dán thẳng vào chuỗi>)` — đúng cách `ti_remove` vẫn dùng. */
+function wipeKrpano(){
+  if(!kp) return 0;
+  const n=parseInt(kp.get('hotspot.count'))||0, ten=[];
+  for(let i=0;i<n;i++){
+    const nm=kp.get('hotspot['+i+'].name');
+    if(nm && kp.get('hotspot['+i+'].tid')!=null) ten.push(nm);
+  }
+  ten.forEach(nm=>kp.call('removehotspot('+nm+')'));
+  return ten.length;
 }
 function tiSaveDraft(){ if(kp) kp.call("ti_collect_save()"); }
 function tiExport(){ if(kp) kp.call("ti_collect_export()"); }
@@ -255,7 +660,7 @@ function tiExport(){ if(kp) kp.call("ti_collect_export()"); }
 function tiRestore(){
   let s=''; try{ s=localStorage.getItem(LKEY)||''; }catch(e){}
   if(!s){ tiSaveDraft(); return; }          /* chua co nhap -> gom tu hotspot tinh trong tour.xml */
-  kp.call('ti_wipe()'); order=[];
+  wipeKrpano(); order=[];
   s.split('###').forEach(l=>{ if(!l)return; const p=l.split('|'); if(p.length<4)return;
     addPin(p[1],p[2],p[0],p[3]); });
   tiSaveDraft();
@@ -267,9 +672,10 @@ function delLast(){
 }
 function wipeAll(){
   if(!confirm('Xoá toàn bộ gim tiện ích để chấm lại từ đầu?')) return;
-  kp.call('ti_clear_all()'); order=[];
-  for(let i=1;i<=NTI;i++){ delete TI[i].ath; delete TI[i].atv; }
-  buildList(); msg('Đã xoá hết · bấm + CHẤM ĐIỂM để bắt đầu');
+  const n=wipeKrpano(); order=[];
+  IDS.forEach(id=>{ delete TI[id].ath; delete TI[id].atv; });
+  tiSaveDraft();                    /* ghi lai ban nhap RONG, khong thi F5 la gim quay ve */
+  buildList(); msg('Đã xoá '+n+' gim · bấm + CHẤM ĐIỂM để bắt đầu');
 }
 
 /* cua so chon tien ich sau khi click len anh */
@@ -279,21 +685,23 @@ function tiPickPlace(ath,atv){
   if(!isFinite(ath)||!isFinite(atv)){ alert('Chưa lấy được vị trí — bấm + CHẤM ĐIỂM rồi click lại.'); return; }
   g('pkPos').textContent='vị trí ath '+ath+' · atv '+atv;
   const draw=q=>{
-    q=(q||'').toLowerCase().trim(); let h='';
-    for(let i=1;i<=NTI;i++){
-      const t=TI[i]; if(q && (i+'. '+t.n).toLowerCase().indexOf(q)<0) continue;
-      h+='<div class="pk" data-id="'+i+'"><img src="'+pinSrc(i)+'"><b>'+i+'. '+t.n+'</b>'
+    q=(q||'').toLowerCase().trim(); let h='', pkTruoc='';
+    IDS.forEach(id=>{
+      const t=TI[id]; if(q && (t.so+'. '+t.n).toLowerCase().indexOf(q)<0) return;
+      /* dai phan khu chi in khi doi nhom TRONG SO MUC CON HIEN -> khong ra dai rong */
+      if(t.pk!==pkTruoc){ pkTruoc=t.pk; const p=PK[t.pk];
+        h+='<div class="pkhd" style="color:'+p.c+';background:'+p.bg+'">'+p.t+'</div>'; }
+      h+='<div class="pk" data-id="'+id+'"><img src="'+pinSrc(id)+'"><b>'+t.so+'. '+t.n+'</b>'
         +(t.ath!==undefined?'<span class="dc">đã có '+(t.np||1)+' điểm · thêm nữa</span>':'')+'</div>';
-    }
+    });
     g('pkList').innerHTML=h||'<div style="color:#999;font-size:12px;padding:8px">Không tìm thấy</div>';
     [].forEach.call(document.querySelectorAll('#pkList .pk'),el=>{
       el.onclick=()=>{ const id=el.getAttribute('data-id');
         addPin(ath,atv,id); tiSaveDraft();
         g('mdPick').style.display='none';
-        /* CHAM LIEN TUC: tu bat lai che do cham de click tiep ngay,
-           khong phai bam "+ CHAM DIEM" lai 30 lan */
+        /* CHAM LIEN TUC: tu bat lai che do cham de click tiep ngay */
         arm();
-        msg('Đã chấm '+id+'. '+TI[id].n+((TI[id].np||1)>1?' (điểm thứ '+TI[id].np+')':'')+'  ·  '+doneCount()+'/'+NTI
+        msg('Đã chấm '+TI[id].so+'. '+TI[id].n+((TI[id].np||1)>1?' (điểm thứ '+TI[id].np+')':'')+'  ·  '+doneCount()+'/'+NTI
             +' — CLICK tiếp lên ảnh để chấm mục sau (bấm XONG để dừng)'); };
     });
   };
@@ -306,9 +714,7 @@ g('tAdd').onclick=arm;
 g('tDel').onclick=delLast;
 g('tWipe').onclick=wipeAll;
 g('tExp').onclick=tiExport;
-/* 🔴 Bat che do cong cu bang ?tool=1 — khoa CUNG ca phim tat, khong chi an nut */
-var TOOLMODE = /[?&]tool=1(?:&|$)/.test(location.search);
-if(TOOLMODE) g('tool').classList.add('tool-on');
+if(TOOLMODE){ g('tool').classList.add('tool-on'); document.body.classList.add('tool-mode'); }
 document.addEventListener('keydown',e=>{ if(!TOOLMODE) return; if(e.key==='v'||e.key==='V'){ if(!/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) editToggle(); } });
 
 buildList();
@@ -330,7 +736,7 @@ embedpano({swf:"pano.swf", xml:"tour.xml?v="+Date.now(), target:"pano", html5:"o
 <div class="md" id="mdPick">
   <div style="font-size:15px;font-weight:800;color:#0C0C44">Chọn tiện ích cho điểm vừa bấm</div>
   <div id="pkPos" style="font-size:11px;color:#888;margin:4px 0 11px"></div>
-  <input id="pkQ" placeholder="Gõ tên tiện ích, vd: bbq / pickleball / rau">
+  <input id="pkQ" placeholder="Gõ tên tiện ích, vd: bbq / rose / rau">
   <div id="pkList"></div>
   <button onclick="document.getElementById('mdPick').style.display='none';arm();"
     style="margin-top:12px;background:#eee;border:0;border-radius:9px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit">Bỏ điểm này, chấm lại</button>
@@ -343,12 +749,12 @@ embedpano({swf:"pano.swf", xml:"tour.xml?v="+Date.now(), target:"pano", html5:"o
     <span style="cursor:pointer;font-size:22px;line-height:1;padding:0 6px"
       onclick="document.getElementById('mdExp').style.display='none'">&times;</span>
   </div>
-  <div style="font-size:11px;color:#888;margin:4px 0 10px">Dán khối này thay cho khối &lt;hotspot&gt; ở cuối file <b>tour.xml</b> rồi lưu file.</div>
+  <div style="font-size:11px;color:#888;margin:4px 0 10px">Dán khối này thay cho khối hotspot ở cuối file <b>tour.xml</b> rồi lưu file.</div>
   <textarea id="expTa"></textarea>
   <button onclick="var t=document.getElementById('expTa');t.select();document.execCommand('copy');this.innerText='ĐÃ COPY';"
     style="margin-top:10px;background:#1B9E5A;color:#fff;border:0;border-radius:9px;padding:10px 18px;font-weight:700;cursor:pointer;font-family:inherit">COPY</button>
 </div>
 
-<script src="../assets/eranav.js?nc=20260814224500" data-active="tienich"></script>
+<script src="/assets/eranav.js?nc=20260820103000" data-active="tienich"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<krpano version="1.19" title="ERA Tien ich ELC - mat bang phang">
+<krpano version="1.19" title="ERA Tien ich Phu Gia Bao Loc - 27 tien ich noi khu">
 
   <view hlookat="0" vlookat="0" fovtype="HFOV" fov="1.0" fovmin="0.08" fovmax="1.0" maxpixelzoom="1.2" limitview="fullrange" />
 
@@ -18,8 +18,26 @@
        dinh (da do nhieu lan). Da go bo. Muon dung multires that thi phai
        chay droplet krpano tren may Windows.
        ============================================================ -->
-  <preview url="tienich-elc-v2.jpg" />
-  <image type="CYLINDER" hfov="1.0" vfov="0.6479" voffset="0.0"><cylinder url="tienich-elc-2048.jpg" /></image>
+  <!-- 20/08/2026 - ANH NEN BAN NOI NGANG, TY LE 1.90.
+       Nguon: 03-SAN-XUAT\A-mat-bang\01_source\mat bang tien ich\
+              Tien-ich-noi-khu-PGBL-20.08.jpg   8900 x 4680  (ty le 1.90171)
+
+       VI SAO PHAI NOI NGANG (do that 19/08 tren may Anh Tony):
+       khung xem #pano = 2248 x 1219 = ty le 1.844. Ban cu ty le 1.544
+       "cao" hon khung nen bi cat mat 16.3% chieu cao, va fovmax="1.0"
+       CHAN khong cho thu nho them de lot phan thieu => phai keo chuot.
+       Ty le 1.90 cho du 3.1% tren khung 1.844 (1.85 chi du 0.3%, thu
+       thap cua so mot chut la hut lai).
+
+       🔴 vfov PHAI BANG chieu cao / chieu ngang cua CHINH file 2048
+       dang dung: 1077 / 2048 = 0.52588. Doi anh ma quen doi so nay thi
+       ANH VAN HIEN BINH THUONG nhung TOAN BO GIM LECH CHO, khong bao loi.
+
+       Ten file co ngay thang de trinh duyet khong an ban cache cu.
+       Anh cu (tienich-elc-*.jpg, tienich-pgbl-v1.jpg, tienich-pgbl-2048.jpg)
+       GIU NGUYEN tren dia, khong xoa. -->
+  <preview url="tienich-pgbl-20260820-prev.jpg" />
+  <image type="CYLINDER" hfov="1.0" vfov="0.52588" voffset="0.0"><cylinder url="tienich-pgbl-20260820-2048.jpg" /></image>
 
   <style name="ti_pin" edge="bottom" distorted="false" zoom="false" scale="0.17" scale.mobile="0.22"
          onover="ti_over_fx();" onout="ti_out_fx();"
@@ -35,23 +53,79 @@
 
        fov = fovmax (anh vua man)  -> gim NHO NHAT  = base
        zoom vao                    -> gim to dan, cham tran tmax roi dung
-       Mobile dung base/tran rieng (ngon tay to hon con tro chuot).
+
+       🔴🔴🔴 20/08 (dot 8) - CACH TINH CO GIM DOI HAN. ĐỌC KỸ TRƯỚC KHI SỬA.
+       Anh Tony: "may tinh icon qua nho, dien thoai icon qua to, NO BI NGUOC".
+       Do lai bang so, dung y: co gim tinh bang PX TUYET DOI thi ti le so
+       voi be ngang khung chay nguoc nhau:
+         iPhone 6.5%  ·  iPad doc 3.1%  ·  iPad ngang 2.5%  ·  PC 1.0%
+       Man cang to, gim trong cang be. Cang chinh cang hong 1 trong 2 dau.
+
+       ✅ CACH DUNG: dat co gim theo DON VI BAN DO, khong theo px.
+          ti_k (= tb cu) nay do JS TINH VA SET, theo be ngang khung:
+              ti_k = K_GIM * be_ngang_khung_px / 281        (K_GIM = 0.02075)
+          Vi ti_sc = ti_k / fov  va  so px tren man = 281 * ti_sc,
+          suy ra chieu cao gim = K_GIM * (be_ngang_khung / fov) = K_GIM * S,
+          tuc gim LUON phu dung 0.02075 don vi ban do tren MOI man.
+          => Bo cuc gim giong het nhau, SO CAP DE NHAU BANG NHAU (4 cap).
+          Ket qua: PC 38x48px (to len) · iPad ngang 20x25px (giu nguyen,
+          Anh da duyet) · iPhone 21x27px (nho di). Dung 3 yeu cau cua Anh.
+
+       ⚠️ ti_k / ti_tmax do `capNhatCoGim()` trong index.html set vao.
+          2 dong `ifnot(... GT 0, ...)` ben duoi la DUONG LUI phong khi JS
+          chua kip chay - de gim khong bao gio to bang anh goc.
+       ⚠️ Nhanh `device.mobile` DA BO HAN: cong thuc moi tu thich ung theo
+          be ngang khung nen khong con can tach mobile/desktop nua.
+
+       🔴🔴 Lich su 2 lan sua truoc trong ngay, ghi de khong lap lai:
+       Lan 1 Em dat tb = tmax = 0.17 cho mobile (gim CO DINH 37x48px moi
+       muc zoom). SAI: dat tb = tmax la PHA MAT co che "gim nho khi zoom
+       ra, to khi zoom vao" - dung cai co che sinh ra de chong chen chuc.
+       Anh Tony chup iPad ngang: gim van "to qua, de len nhau".
+
+       ⚠️ SU THAT DO DUOC, DUNG CO GANG CHUA BANG CACH DOI CO GIM:
+       O muc TOAN CANH (fov ~1) tren iPad ngang, khung ban do 900px thi
+       cap gim gan nhau nhat chi cach 12 px (ti_pq16 vs ti_ga11b - 2 chot
+       An ninh 2 phan khu, Anh cham sat nhau o cho giao). Cum Sales Gallery
+       (pq1..pq4 + pq16b) la 5 gim nam gon trong o 32x33 px.
+       => KHONG CO CO GIM NAO vua bam duoc vua het de o muc toan canh.
+          Cach duy nhat la de gim NHO khi zoom ra, khach zoom vao thi
+          khoang cach gian ra va gim to dan len - dung cong thuc tb/fov.
+
+       🔴 THIET BI TU VAN CHINH LA iPad GEN 9 (2021) - Anh Tony chot 20/08.
+       Man 10.2 inch, 2160 x 1620 px @2x  =>  CSS 1080 x 810 pt.
+       Ngang: khung ban do 800 x 634 (tru cot 280 + Safari ~90 + nav 86).
+       Doc  : khung ban do 810 x 894.
+       MOI LAN CHINH CO GIM PHAI TINH THEO 2 CON SO NAY TRUOC, dung lay
+       iPad Pro 1180 hay may tinh lam chuan.
+
+       Lan 2 (dot 6) dat 0.075/0.13; Anh van thay to -> ha tiep 0.060/0.115.
+       Do o muc da zoom phu kin khung:
+         iPad gen9 NGANG  gim 20 x 25 px   4 cap de   2.5% be ngang
+         iPad gen9 DOC    gim 25 x 32 px   1 cap de   3.1%
+         iPhone 14        gim 25 x 32 px   6 cap de   6.5%
+         PC cua Anh       gim 23 x 30 px   0 cap de   1.0%
+
+       So chot (do bang script dem so cap de nhau tren 6 co man):
+                          CU 0.17/0.17   MOI 0.105/0.24 · 0.075/0.13
+         PC cua Anh       38x48px  4 cap    23x30px  0 cap
+         iPad ngang       37x48px 34 cap    17x21px  4 cap
+         iPad doc (zoom)  37x48px  4 cap    29x37px  1 cap
+         iPhone (zoom)    37x48px 14 cap    29x37px  6 cap
+       Zoom sau them 1 nac tren iPhone: 0 cap de, gim van 29x37px
+       (da cham tran nen khong to them, chi khoang cach gian ra).
        ========================================================== -->
   <action name="ti_rescale">
-    set(tb,   0.17);
-    set(tmax, 0.30);
-    if(device.mobile,
-      set(tb,   0.22);
-      set(tmax, 0.38);
-    );
     set(tf, get(view.fov));
     ifnot(tf GT 0, set(tf, 1.0); );
-    set(ti_sc, calc(tb * 1.0 / tf));
-    if(ti_sc GT tmax, set(ti_sc, get(tmax)); );
-    if(ti_sc LT 0.05, set(ti_sc, get(tb)); );
+    ifnot(ti_k GT 0,    set(ti_k,    0.105); );
+    ifnot(ti_tmax GT 0, set(ti_tmax, 0.24);  );
+    set(ti_sc, calc(ti_k * 1.0 / tf));
+    if(ti_sc GT ti_tmax, set(ti_sc, get(ti_tmax)); );
+    if(ti_sc LT 0.02, set(ti_sc, 0.02); );
     set(ti_sc_over, calc(ti_sc * 1.18));
     for(set(i,0), i LT hotspot.count, inc(i),
-      if(hotspot[get(i)].tid,
+      if(hotspot[get(i)].tid != null,
         set(hotspot[get(i)].scale, get(ti_sc));
       );
     );
@@ -72,14 +146,34 @@
     if(ti_edit_on == true, js( tiSaveDraft() ); );
   </action>
 
-  <!-- tao 1 gim:  ti_add( ath , atv , id , ten_hotspot )
+  <!-- 20/08/2026 - dong tren doi tu "if(hotspot[i].tid," sang
+       "if(hotspot[i].tid != null,". Tu 20/08 tid la CHUOI CO CHU
+       (pq1..pq16 / ga1..ga11) chu khong con la so 1..24. krpano co the
+       ep chuoi co chu ve so -> NaN -> coi la sai -> vong lap bo qua het,
+       gim se KHONG co gian theo muc zoom nua ma khong bao mot dong loi.
+       Cach kiem "!= null" la cach ma ti_gather va ti_wipe van dung.
+
+       🔴🔴 20/08/2026 - BAY: calc() KHONG NOI DUOC CHUOI CO CHU.
+       Dong cu la  set(url, calc('pins27/pin-' + %3 + '.png'))  va no chay
+       tot suot thoi tid con la SO (1..24). Tu khi tid thanh pq1 / ga2 thi
+       krpano coi pq1 la TEN BIEN chu khong phai chuoi -> bien do khong ton
+       tai -> url ra dung chu  "pins27/pin-undefined.png".
+       Gim hien ra o dung toa do nhung LA O TRONG, khong mot dong loi nao.
+       (Da do that tren may Anh Tony: 9/9 gim deu ra pin-undefined.png.)
+       ✅ Cach dung: set(tid) TRUOC, roi txtadd(...) voi get(tid).
+          txtadd noi chuoi that; get() tra ve GIA TRI da luu chu khong dien
+          giai lai thanh ten bien.
+       ⚠️ Khoi hotspot TINH dan tay ben duoi KHONG dinh bay nay vi url viet
+          san trong the. Bay chi dinh gim tao luc chay bang ti_add.
+
+       tao 1 gim:  ti_add( ath , atv , id , ten_hotspot )
        Gan .style luc chay KHONG an tren krpano 1.19, phai set thang
        tung thuoc tinh, neu khong gim to bang anh goc vi scale = 1.0.
        KHONG dat comment ben trong than action. -->
   <action name="ti_add">
     addhotspot(%4);
-    set(hotspot[%4].url, calc('pins30/pin-ti-' + %3 + '.png'));
     set(hotspot[%4].tid, %3);
+    txtadd(hotspot[%4].url, 'pins27/pin-', get(hotspot[%4].tid), '.png');
     set(hotspot[%4].ath, %1);
     set(hotspot[%4].atv, %2);
     set(hotspot[%4].zorder, 30);
@@ -169,52 +263,53 @@
   <events name="ti_events" keep="true" onclick="ti_click_add();" />
 
   <!-- ==== VI TRI GIM - DAN O DAY ==============================
-       Dang TRONG: Tony cham lai toan bo 30 tien ich tu dau (10/08).
-       Cach lam: bam CHAM VI TRI (V) roi CHAM DIEM roi click len anh
-       roi chon tien ich. Cham xong 30 muc thi bam XUAT XML va dan
-       khoi hotspot vao ngay ben duoi dong nay, roi luu file.
+       19/08/2026 - DANG TRONG CO Y. Anh Tony cham lai toan bo 24 tien
+       ich tren ANH NEN MOI. Toa do cu (37 gim ngay 11/08) da bi bo vi
+       anh nen doi hoan toan - giu lai la gim roi sai cho, con te hon
+       de trong. Ban cu con nguyen trong tour.xml.bak-truoc-24tienich-20260819.
+
+       CACH CHAM:
+         1. Mo  http://127.0.0.1:8080/tienich/index.html?tool=1
+            (KHONG co ?tool=1 thi nut cong cu bi an - dung y 14/08)
+         2. Bam CHAM VI TRI (hoac phim V)  ->  + CHAM DIEM
+         3. Click len anh dung cho tien ich  ->  chon ten trong danh sach
+         4. 1 tien ich duoc phep cham NHIEU DIEM (vd Cupid garden 3 cho)
+         5. Cham du thi bam XUAT XML, copy khoi hotspot va dan vao
+            NGAY DUOI dong nay, roi luu file.
        CHU Y: tuyet doi khong go dau ngoac nhon trong comment krpano.
        ========================================================= -->
 
-  <!-- ==== 37 GIM · 30 tien ich (Anh Tony cham 11/08 tren anh moi tienich-elc-v2.jpg) ====
-       Gim phu dung chung tid: 5b 5c · 20b · 27b · 30b 30c 30d
-       ================================================================================== -->
-  <hotspot name="ti_1" style="ti_pin" url="pins30/pin-ti-1.png" tid="1" ath="-0.40748" atv="-0.26211" zorder="30" />
-  <hotspot name="ti_2" style="ti_pin" url="pins30/pin-ti-2.png" tid="2" ath="-0.38568" atv="-0.26745" zorder="30" />
-  <hotspot name="ti_3" style="ti_pin" url="pins30/pin-ti-3.png" tid="3" ath="-0.4146" atv="-0.21985" zorder="30" />
-  <hotspot name="ti_4" style="ti_pin" url="pins30/pin-ti-4.png" tid="4" ath="-0.38435" atv="-0.21807" zorder="30" />
-  <hotspot name="ti_5" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.15659" atv="-0.02902" zorder="30" />
-  <hotspot name="ti_5b" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.03915" atv="-0.08863" zorder="30" />
-  <hotspot name="ti_5c" style="ti_pin" url="pins30/pin-ti-5.png" tid="5" ath="-0.07651" atv="-0.06861" zorder="30" />
-  <hotspot name="ti_6" style="ti_pin" url="pins30/pin-ti-6.png" tid="6" ath="-0.18817" atv="-0.02279" zorder="30" />
-  <hotspot name="ti_7" style="ti_pin" url="pins30/pin-ti-7.png" tid="7" ath="-0.17127" atv="-0.00143" zorder="30" />
-  <hotspot name="ti_8" style="ti_pin" url="pins30/pin-ti-8.png" tid="8" ath="-0.06317" atv="-0.07439" zorder="30" />
-  <hotspot name="ti_9" style="ti_pin" url="pins30/pin-ti-9.png" tid="9" ath="-0.13835" atv="-0.03435" zorder="30" />
-  <hotspot name="ti_10" style="ti_pin" url="pins30/pin-ti-10.png" tid="10" ath="-0.14927" atv="-0.04811" zorder="30" />
-  <hotspot name="ti_11" style="ti_pin" url="pins30/pin-ti-11.png" tid="11" ath="-0.22354" atv="0.0223" zorder="30" />
-  <hotspot name="ti_12" style="ti_pin" url="pins30/pin-ti-12.png" tid="12" ath="-0.03304" atv="-0.08838" zorder="30" />
-  <hotspot name="ti_13" style="ti_pin" url="pins30/pin-ti-13.png" tid="13" ath="-0.08512" atv="-0.04835" zorder="30" />
-  <hotspot name="ti_14" style="ti_pin" url="pins30/pin-ti-14.png" tid="14" ath="-0.09887" atv="-0.05799" zorder="30" />
-  <hotspot name="ti_15" style="ti_pin" url="pins30/pin-ti-15.png" tid="15" ath="-0.02074" atv="-0.07295" zorder="30" />
-  <hotspot name="ti_16" style="ti_pin" url="pins30/pin-ti-16.png" tid="16" ath="-0.09417" atv="0.15329" zorder="30" />
-  <hotspot name="ti_17" style="ti_pin" url="pins30/pin-ti-17.png" tid="17" ath="-0.06326" atv="0.1231" zorder="30" />
-  <hotspot name="ti_18" style="ti_pin" url="pins30/pin-ti-18.png" tid="18" ath="-0.0327" atv="0.04762" zorder="30" />
-  <hotspot name="ti_19" style="ti_pin" url="pins30/pin-ti-19.png" tid="19" ath="0.03738" atv="0.09219" zorder="30" />
-  <hotspot name="ti_20" style="ti_pin" url="pins30/pin-ti-20.png" tid="20" ath="0.07261" atv="0.0638" zorder="30" />
-  <hotspot name="ti_20b" style="ti_pin" url="pins30/pin-ti-20.png" tid="20" ath="0.0532" atv="0.1116" zorder="30" />
-  <hotspot name="ti_21" style="ti_pin" url="pins30/pin-ti-21.png" tid="21" ath="0.15312" atv="0.19031" zorder="30" />
-  <hotspot name="ti_22" style="ti_pin" url="pins30/pin-ti-22.png" tid="22" ath="0.12983" atv="0.19451" zorder="30" />
-  <hotspot name="ti_23" style="ti_pin" url="pins30/pin-ti-23.png" tid="23" ath="0.17676" atv="0.2103" zorder="30" />
-  <hotspot name="ti_24" style="ti_pin" url="pins30/pin-ti-24.png" tid="24" ath="0.20088" atv="0.19363" zorder="30" />
-  <hotspot name="ti_25" style="ti_pin" url="pins30/pin-ti-25.png" tid="25" ath="0.20702" atv="0.10767" zorder="30" />
-  <hotspot name="ti_26" style="ti_pin" url="pins30/pin-ti-26.png" tid="26" ath="0.27719" atv="0.12258" zorder="30" />
-  <hotspot name="ti_27" style="ti_pin" url="pins30/pin-ti-27.png" tid="27" ath="0.32104" atv="0.13223" zorder="30" />
-  <hotspot name="ti_27b" style="ti_pin" url="pins30/pin-ti-27.png" tid="27" ath="0.38288" atv="0.14013" zorder="30" />
-  <hotspot name="ti_28" style="ti_pin" url="pins30/pin-ti-28.png" tid="28" ath="0.19386" atv="0.12872" zorder="30" />
-  <hotspot name="ti_29" style="ti_pin" url="pins30/pin-ti-29.png" tid="29" ath="0.36577" atv="0.0796" zorder="30" />
-  <hotspot name="ti_30" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="0.00044" atv="0.04916" zorder="30" />
-  <hotspot name="ti_30b" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="0.04678" atv="0.07222" zorder="30" />
-  <hotspot name="ti_30c" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="-0.367" atv="-0.24622" zorder="30" />
-  <hotspot name="ti_30d" style="ti_pin" url="pins30/pin-ti-30.png" tid="30" ath="-0.18773" atv="0.21063" zorder="30" />
+  <!-- 30 GIM · 27 tien ich (Anh Tony cham 20/08/2026 tren anh ty le 1,90)
+       Gim phu dung chung tid:  pq16b · ga9b · ga11b  -->
+  <hotspot name="ti_pq1" style="ti_pin" url="pins27/pin-pq1.png" tid="pq1" ath="-0.30313" atv="-0.19551" zorder="30" />
+  <hotspot name="ti_pq2" style="ti_pin" url="pins27/pin-pq2.png" tid="pq2" ath="-0.2836" atv="-0.20176" zorder="30" />
+  <hotspot name="ti_pq3" style="ti_pin" url="pins27/pin-pq3.png" tid="pq3" ath="-0.30469" atv="-0.1666" zorder="30" />
+  <hotspot name="ti_pq4" style="ti_pin" url="pins27/pin-pq4.png" tid="pq4" ath="-0.27969" atv="-0.16582" zorder="30" />
+  <hotspot name="ti_pq5" style="ti_pin" url="pins27/pin-pq5.png" tid="pq5" ath="-0.10391" atv="-0.02598" zorder="30" />
+  <hotspot name="ti_pq6" style="ti_pin" url="pins27/pin-pq6.png" tid="pq6" ath="-0.12461" atv="-0.01582" zorder="30" />
+  <hotspot name="ti_pq7" style="ti_pin" url="pins27/pin-pq7.png" tid="pq7" ath="-0.11016" atv="-0.0123" zorder="30" />
+  <hotspot name="ti_pq8" style="ti_pin" url="pins27/pin-pq8.png" tid="pq8" ath="-0.05899" atv="-0.0459" zorder="30" />
+  <hotspot name="ti_pq9" style="ti_pin" url="pins27/pin-pq9.png" tid="pq9" ath="-0.15664" atv="0.00449" zorder="30" />
+  <hotspot name="ti_pq10" style="ti_pin" url="pins27/pin-pq10.png" tid="pq10" ath="-0.02734" atv="-0.06426" zorder="30" />
+  <hotspot name="ti_pq11" style="ti_pin" url="pins27/pin-pq11.png" tid="pq11" ath="-0.01445" atv="-0.04981" zorder="30" />
+  <hotspot name="ti_pq12" style="ti_pin" url="pins27/pin-pq12.png" tid="pq12" ath="-0.06211" atv="0.10762" zorder="30" />
+  <hotspot name="ti_pq13" style="ti_pin" url="pins27/pin-pq13.png" tid="pq13" ath="-0.04024" atv="0.08653" zorder="30" />
+  <hotspot name="ti_pq14" style="ti_pin" url="pins27/pin-pq14.png" tid="pq14" ath="-0.00313" atv="-0.04004" zorder="30" />
+  <hotspot name="ti_pq15" style="ti_pin" url="pins27/pin-pq15.png" tid="pq15" ath="-0.01953" atv="0.03145" zorder="30" />
+  <hotspot name="ti_pq16" style="ti_pin" url="pins27/pin-pq16.png" tid="pq16" ath="0.00703" atv="0.03652" zorder="30" />
+  <hotspot name="ti_pq16b" style="ti_pin" url="pins27/pin-pq16.png" tid="pq16" ath="-0.27032" atv="-0.18301" zorder="30" />
+  <hotspot name="ti_ga1" style="ti_pin" url="pins27/pin-ga1.png" tid="ga1" ath="0.04766" atv="0.04121" zorder="30" />
+  <hotspot name="ti_ga2" style="ti_pin" url="pins27/pin-ga2.png" tid="ga2" ath="0.02891" atv="0.06778" zorder="30" />
+  <hotspot name="ti_ga3" style="ti_pin" url="pins27/pin-ga3.png" tid="ga3" ath="0.08672" atv="0.1334" zorder="30" />
+  <hotspot name="ti_ga4" style="ti_pin" url="pins27/pin-ga4.png" tid="ga4" ath="0.11094" atv="0.12793" zorder="30" />
+  <hotspot name="ti_ga5" style="ti_pin" url="pins27/pin-ga5.png" tid="ga5" ath="0.12188" atv="0.14512" zorder="30" />
+  <hotspot name="ti_ga6" style="ti_pin" url="pins27/pin-ga6.png" tid="ga6" ath="0.13907" atv="0.07637" zorder="30" />
+  <hotspot name="ti_ga7" style="ti_pin" url="pins27/pin-ga7.png" tid="ga7" ath="0.15508" atv="0.09356" zorder="30" />
+  <hotspot name="ti_ga8" style="ti_pin" url="pins27/pin-ga8.png" tid="ga8" ath="0.19219" atv="0.0877" zorder="30" />
+  <hotspot name="ti_ga9" style="ti_pin" url="pins27/pin-ga9.png" tid="ga9" ath="0.23047" atv="0.08574" zorder="30" />
+  <hotspot name="ti_ga9b" style="ti_pin" url="pins27/pin-ga9.png" tid="ga9" ath="0.27344" atv="0.08613" zorder="30" />
+  <hotspot name="ti_ga10" style="ti_pin" url="pins27/pin-ga10.png" tid="ga10" ath="0.2625" atv="0.05176" zorder="30" />
+  <hotspot name="ti_ga11" style="ti_pin" url="pins27/pin-ga11.png" tid="ga11" ath="0.26836" atv="0.19981" zorder="30" />
+  <hotspot name="ti_ga11b" style="ti_pin" url="pins27/pin-ga11.png" tid="ga11" ath="0.01641" atv="0.0459" zorder="30" />
 
 </krpano>

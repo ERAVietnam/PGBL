@@ -1,0 +1,37 @@
+BAN SAO TOA DO GIM — 27 TIEN ICH PHU GIA BAO LOC
+=================================================
+Anh Tony cham xong 20/08/2026. DA DAN VAO tour.xml roi (cuoi file).
+File nay chi la ban du phong, xoa cung duoc.
+
+30 hotspot / 27 tien ich.  Muc co 2 diem: pq16 (An ninh Phu Quy) ·
+ga9 (Mimosa Garden) · ga11 (An ninh Gia An).
+  <hotspot name="ti_pq1" style="ti_pin" url="pins27/pin-pq1.png" tid="pq1" ath="-0.30313" atv="-0.19551" zorder="30" />
+  <hotspot name="ti_pq2" style="ti_pin" url="pins27/pin-pq2.png" tid="pq2" ath="-0.2836" atv="-0.20176" zorder="30" />
+  <hotspot name="ti_pq3" style="ti_pin" url="pins27/pin-pq3.png" tid="pq3" ath="-0.30469" atv="-0.1666" zorder="30" />
+  <hotspot name="ti_pq4" style="ti_pin" url="pins27/pin-pq4.png" tid="pq4" ath="-0.27969" atv="-0.16582" zorder="30" />
+  <hotspot name="ti_pq5" style="ti_pin" url="pins27/pin-pq5.png" tid="pq5" ath="-0.10391" atv="-0.02598" zorder="30" />
+  <hotspot name="ti_pq6" style="ti_pin" url="pins27/pin-pq6.png" tid="pq6" ath="-0.12461" atv="-0.01582" zorder="30" />
+  <hotspot name="ti_pq7" style="ti_pin" url="pins27/pin-pq7.png" tid="pq7" ath="-0.11016" atv="-0.0123" zorder="30" />
+  <hotspot name="ti_pq8" style="ti_pin" url="pins27/pin-pq8.png" tid="pq8" ath="-0.05899" atv="-0.0459" zorder="30" />
+  <hotspot name="ti_pq9" style="ti_pin" url="pins27/pin-pq9.png" tid="pq9" ath="-0.15664" atv="0.00449" zorder="30" />
+  <hotspot name="ti_pq10" style="ti_pin" url="pins27/pin-pq10.png" tid="pq10" ath="-0.02734" atv="-0.06426" zorder="30" />
+  <hotspot name="ti_pq11" style="ti_pin" url="pins27/pin-pq11.png" tid="pq11" ath="-0.01445" atv="-0.04981" zorder="30" />
+  <hotspot name="ti_pq12" style="ti_pin" url="pins27/pin-pq12.png" tid="pq12" ath="-0.06211" atv="0.10762" zorder="30" />
+  <hotspot name="ti_pq13" style="ti_pin" url="pins27/pin-pq13.png" tid="pq13" ath="-0.04024" atv="0.08653" zorder="30" />
+  <hotspot name="ti_pq14" style="ti_pin" url="pins27/pin-pq14.png" tid="pq14" ath="-0.00313" atv="-0.04004" zorder="30" />
+  <hotspot name="ti_pq15" style="ti_pin" url="pins27/pin-pq15.png" tid="pq15" ath="-0.01953" atv="0.03145" zorder="30" />
+  <hotspot name="ti_pq16" style="ti_pin" url="pins27/pin-pq16.png" tid="pq16" ath="0.00703" atv="0.03652" zorder="30" />
+  <hotspot name="ti_pq16b" style="ti_pin" url="pins27/pin-pq16.png" tid="pq16" ath="-0.27032" atv="-0.18301" zorder="30" />
+  <hotspot name="ti_ga1" style="ti_pin" url="pins27/pin-ga1.png" tid="ga1" ath="0.04766" atv="0.04121" zorder="30" />
+  <hotspot name="ti_ga2" style="ti_pin" url="pins27/pin-ga2.png" tid="ga2" ath="0.02891" atv="0.06778" zorder="30" />
+  <hotspot name="ti_ga3" style="ti_pin" url="pins27/pin-ga3.png" tid="ga3" ath="0.08672" atv="0.1334" zorder="30" />
+  <hotspot name="ti_ga4" style="ti_pin" url="pins27/pin-ga4.png" tid="ga4" ath="0.11094" atv="0.12793" zorder="30" />
+  <hotspot name="ti_ga5" style="ti_pin" url="pins27/pin-ga5.png" tid="ga5" ath="0.12188" atv="0.14512" zorder="30" />
+  <hotspot name="ti_ga6" style="ti_pin" url="pins27/pin-ga6.png" tid="ga6" ath="0.13907" atv="0.07637" zorder="30" />
+  <hotspot name="ti_ga7" style="ti_pin" url="pins27/pin-ga7.png" tid="ga7" ath="0.15508" atv="0.09356" zorder="30" />
+  <hotspot name="ti_ga8" style="ti_pin" url="pins27/pin-ga8.png" tid="ga8" ath="0.19219" atv="0.0877" zorder="30" />
+  <hotspot name="ti_ga9" style="ti_pin" url="pins27/pin-ga9.png" tid="ga9" ath="0.23047" atv="0.08574" zorder="30" />
+  <hotspot name="ti_ga9b" style="ti_pin" url="pins27/pin-ga9.png" tid="ga9" ath="0.27344" atv="0.08613" zorder="30" />
+  <hotspot name="ti_ga10" style="ti_pin" url="pins27/pin-ga10.png" tid="ga10" ath="0.2625" atv="0.05176" zorder="30" />
+  <hotspot name="ti_ga11" style="ti_pin" url="pins27/pin-ga11.png" tid="ga11" ath="0.26836" atv="0.19981" zorder="30" />
+  <hotspot name="ti_ga11b" style="ti_pin" url="pins27/pin-ga11.png" tid="ga11" ath="0.01641" atv="0.0459" zorder="30" />
