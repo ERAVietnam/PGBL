@@ -1001,5 +1001,53 @@ window.eraPoiExport = function(code){
 })();
 </script>
 
+<!-- ================================================================
+     ERA · 19/08 — THANH MENU DUNG CHUNG (HTML), thay cho menu ve bang
+     XML trong era-txv-skin-pgbl.xml.
+     Ly do doi: menu XML dung moc x cung + tu co gian theo `stagewidth`
+     (scale 0.633..1.0). Tren man hep chu van to va bi CAT CUT 2 dau
+     (anh Anh Tony gui 18/08 va 19/08). CSS lam viec nay dung hon.
+     `data-active="auto"` -> eranav.js tu do ?startscene= de biet dang o
+     muc nao. File nay phuc vu CA 2 muc menu:
+        ?startscene=scene_matbang_flycam  -> To&#224;n c&#7843;nh
+        ?startscene=scene_02-toan-canh    -> Flycam hi&#7879;n tr&#7841;ng
+     GO BO = xoa khoi <script> nay den het khoi <style>/<script> ben duoi,
+     roi bo dau chu thich quanh cac dong era_navitem trong file skin.
+     ================================================================ -->
+<script src="/assets/eranav.js?nc=20260819" data-active="auto"></script>
+
+<!-- ERA · 19/08 — CHONG DE NHAN POI. ADDITIVE: go 1 dong nay la tour ve y nhu cu.
+     Khong dung `visible` (era-layers-360.xml da chiem) — chi dung `alpha`. -->
+<script src="era-poi-declutter.js?nc=20260819"></script>
+<style>
+	/* eranav.js dat body{padding-bottom:86px} cho cac trang cuon duoc.
+	   Trang nay body{height:100%;overflow:hidden} va #pano cao 100% ->
+	   padding do la thua, de nguyen se lam lech phep tinh chieu cao.
+	   Thanh nav noi de len anh 360 (dung nhu menu XML cu). */
+	body { padding-bottom: 0 !important; }
+	/* Chua cho thanh nav o day duoi, khoi de len la ban krpano goc phai. */
+	#era-nav { pointer-events: none; }
+	#era-nav .wrap { pointer-events: auto; }
+</style>
+<script>
+/* 🔴 BAY DA LUONG TRUOC — TOAN MAN HINH LAM MAT THANH NAV.
+   Menu cu ve BEN TRONG krpano nen bam ⛶ van con. Menu HTML nam ngoai
+   #pano -> khi krpano goi Fullscreen API len #pano thi trinh duyet CHI ve
+   cay con cua #pano, thanh nav bien mat, KHONG bao loi gi.
+   Cach chua: nghe su kien fullscreenchange, chuyen #era-nav vao dung phan
+   tu dang toan man hinh, thoat thi tra ve <body>. */
+(function () {
+	function chuyenNav() {
+		var nav = document.getElementById('era-nav');
+		if (!nav) return;
+		var fs = document.fullscreenElement || document.webkitFullscreenElement || null;
+		var dich = fs || document.body;
+		if (nav.parentNode !== dich) dich.appendChild(nav);
+	}
+	document.addEventListener('fullscreenchange', chuyenNav);
+	document.addEventListener('webkitfullscreenchange', chuyenNav);
+})();
+</script>
+
 </body>
 </html>

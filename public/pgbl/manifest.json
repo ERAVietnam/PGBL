@@ -1,0 +1,19 @@
+{
+  "name": "Phú Gia Bảo Lộc — Mặt bằng phân lô | ERA VIETNAM",
+  "short_name": "PGBL Mặt bằng",
+  "description": "Sa bàn phân lô, bộ lọc sản phẩm và tour 360 Khu đô thị Phú Gia Bảo Lộc.",
+  "lang": "vi",
+  "dir": "ltr",
+  "start_url": "/giohang/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0D2620",
+  "theme_color": "#0D2620",
+  "orientation": "any",
+  "icons": [
+    { "src": "/assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

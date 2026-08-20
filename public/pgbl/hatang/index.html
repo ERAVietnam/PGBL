@@ -8,6 +8,13 @@
 <!-- MapLibre GL JS (free, open-source) -->
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<!-- 🆕 18/08 — SINH ĐƯỜNG ĐỒNG MỨC TẠI CHỖ từ chính DEM đang tải.
+     Anh Tony: "chỉ cần cái đường đồng mức thôi, cho gọn".
+     OpenTopoMap là ẢNH BẸT — chữ "Thôn", tên đường, ranh giới đã nung sẵn
+     vào tile, không tách ra được. Thư viện này dựng contour dạng VECTOR nên
+     vẽ được mỗi đường, không kèm chữ nào. Bỏ luôn được OpenTopoMap ->
+     hết luôn rủi ro giấy phép cấm dùng thương mại. -->
+<script src="https://unpkg.com/maplibre-contour@0.0.5/dist/index.min.js"></script>
 
 <!-- Dữ liệu tuyến cao tốc (ước lượng) — nhúng bằng script src để mở file:// vẫn chạy -->
 <script src="caotoc-data.js?nc=20260814171500"></script>
@@ -81,6 +88,13 @@
   #tools button.gold{background:var(--gold);color:#0D2620;border-color:transparent;}
   #tools button.gold:hover{background:#D3A94E;color:#0D2620;}
   #tools button.ghost{background:rgba(255,255,255,.04);color:var(--text2);}
+  /* 🔴 18/08 — BẮT BUỘC ĐỂ SAU `.ghost`. Nút công tắc mang CẢ HAI lớp
+     `ghost gold`; hai rule `.gold` và `.ghost` cùng độ ưu tiên nên rule
+     viết SAU thắng -> `.ghost` đè mất nền vàng, bật/tắt KHÔNG NHÌN THẤY GÌ
+     (đo được: nền vẫn là rgba(255,255,255,.04) dù đã có class `gold`).
+     Rule 2 lớp dưới đây độ ưu tiên cao hơn nên thắng chắc chắn. */
+  #tools button.ghost.gold{background:var(--gold);color:#0D2620;border-color:transparent;}
+  #tools button.ghost.gold:hover{background:#D3A94E;color:#0D2620;}
 
   /* Ô hiển thị toạ độ khi ghim */
   #coord{
@@ -123,24 +137,70 @@
   #legend .sw.vp{border-top:5px solid #0F172A;}
   #legend .sw.tt{border-top:5px solid #0E9F9F;}
 
+  /* ===== 🆕 18/08 — BẢNG 2: DANH SÁCH 8 TUYẾN (Anh Tony chốt tách riêng) =====
+     Nằm ĐÈ LÊN chỗ bảng chú giải, z-index cao hơn 1 nấc. Cố ý không đặt cạnh
+     nhau: đặt cạnh thì trên iPad dọc là tràn ngang, phải tính lại toàn bộ. */
+  #legend .mo-ds{
+    display:block;width:100%;margin:10px 0 0;padding:7px 9px;cursor:pointer;
+    font:inherit;font-size:11px;font-weight:700;color:#0D2620;
+    background:#F1F5F2;border:1px solid rgba(13,38,32,.12);border-radius:9px;
+    text-align:left;transition:.14s;
+  }
+  #legend .mo-ds:hover{background:#E4EDE7;border-color:rgba(13,38,32,.28);}
+  #dstuyen{
+    position:absolute;top:16px;right:16px;z-index:6;
+    width:246px;max-height:calc(100% - 32px);overflow-y:auto;overscroll-behavior:contain;
+    background:#FFFFFF;border:1px solid rgba(13,38,32,.10);border-radius:16px;padding:11px 13px;
+    box-shadow:0 10px 34px rgba(0,0,0,.34);font-size:12px;color:#2C4038;
+  }
+  #dstuyen[hidden]{display:none;}
+  #dstuyen h2{font-size:12px;margin:0 0 8px;padding-right:22px;text-transform:uppercase;
+    letter-spacing:.4px;color:#0D2620;}
+  #dstuyen .grp{margin:10px 0 3px;font-size:10px;font-weight:700;letter-spacing:.3px;color:#7C8E85;}
+  #dstuyen ol{margin:0;padding-left:19px;}
+  #dstuyen li{margin-bottom:4px;line-height:1.45;}
+  #dstuyen .dong{
+    position:absolute;top:9px;right:10px;width:22px;height:22px;padding:0;cursor:pointer;
+    font:inherit;font-size:14px;line-height:20px;text-align:center;color:#5B6E65;
+    background:#F1F5F2;border:1px solid rgba(13,38,32,.12);border-radius:50%;
+  }
+  #dstuyen .dong:hover{background:#E4EDE7;color:#0D2620;}
+
+  /* ===== 🆕 18/08 — GHIM VINCOM BẢO LỘC (định vị trung tâm thành phố) =====
+     LUÔN HIỆN, không phụ thuộc nút "Lớp tiện ích". Toạ độ lấy từ
+     tienich-data.js (điểm Anh Tony tự đánh dấu), KHÔNG đoán. */
+  .vc-pin{display:flex;flex-direction:column;align-items:center;pointer-events:none;}
+  /* 🔴 BẮT BUỘC khai font ở đây. Marker của MapLibre nằm trong container riêng
+     và maplibre-gl.css có đặt font lên đó -> thẻ con KHÔNG thừa hưởng
+     'Segoe UI' của trang, rơi về font mặc định trình duyệt, dấu tiếng Việt
+     dựng rất xấu. Mọi chip khác trong file (.rd-chip, .era-name) đều khai lại. */
+  .vc-chip{
+    font-family:'Segoe UI',system-ui,Arial,sans-serif;color:#fff;
+    border:2px solid rgba(255,255,255,.85);border-radius:8px;
+    padding:3px 8px;white-space:nowrap;text-align:center;line-height:1.15;
+    box-shadow:0 3px 10px rgba(0,0,0,.45);
+  }
+  .vc-chip b{display:block;font-size:11.5px;font-weight:700;letter-spacing:.2px;}
+  .vc-chip i{display:block;font-style:normal;font-size:9px;opacity:.92;margin-top:1px;}
+  /* gạch nối + chấm neo: chấm nằm ĐÚNG toạ độ, chip nhô lên trên cho khỏi đè đường */
+  .vc-noi{width:2px;height:11px;background:rgba(255,255,255,.92);
+    box-shadow:0 0 4px rgba(0,0,0,.55);}
+  .vc-cham{width:9px;height:9px;border-radius:50%;border:2px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.6);}
+  /* biến thể NHỎ (Anh Tony đặt cho Núi Đại Bình): chip 1 dòng, cỡ nhẹ hơn
+     -> mốc phụ không cạnh tranh sự chú ý với dự án và với Vincom */
+  .vc-pin.nho .vc-chip{padding:2px 7px;border-width:1.5px;border-radius:7px;}
+  .vc-pin.nho .vc-chip b{font-size:10px;letter-spacing:.1px;}
+  .vc-pin.nho .vc-noi{height:8px;}
+  .vc-pin.nho .vc-cham{width:7px;height:7px;border-width:1.5px;}
+
+  /* màn nhỏ: thu gọn y hệt .rd-chip */
+  html.man-nho .vc-chip{padding:2px 6px;border-width:1.5px;}
+  html.man-nho .vc-chip b{font-size:10.5px;}
+  html.man-nho .vc-chip i{display:none;}
+
   /* ===== THẺ THÔNG TIN TUYẾN (rê chuột) — thêm 14/08/2026 =====
      Mặc định TẮT. Bật bằng nút "ⓘ Thông tin tuyến". */
-  #rdInfo{
-    position:fixed; z-index:60; pointer-events:none; display:none;
-    max-width:290px; background:rgba(13,38,32,.95); color:var(--text);
-    border:1px solid var(--line); border-radius:14px;
-    padding:11px 13px; font-size:12.5px; line-height:1.5;
-    box-shadow:0 10px 30px rgba(0,0,0,.45);
-  }
-  #rdInfo b.tt{display:block;font-size:13.5px;margin-bottom:5px;letter-spacing:.2px;color:var(--accent);}
-  #rdInfo .tag{display:inline-block;padding:1px 8px;border-radius:999px;
-    font-size:10.5px;font-weight:700;margin-bottom:7px;}
-  #rdInfo dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;}
-  #rdInfo dt{color:var(--dim);font-size:11.5px;white-space:nowrap;}
-  #rdInfo dd{margin:0;font-weight:600;}
-  #rdInfo .ct{margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.13);
-    color:#FCA5A5;font-size:10.5px;font-weight:400;}
-  @media (max-width:820px){ #rdInfo{max-width:76vw;font-size:12px;} }
   #legend .note{margin:5px 0 0;font-size:10.5px;line-height:1.45;color:#444;
                 background:#F4F1FB;border-left:3px solid #8B5CF6;padding:6px 8px;border-radius:4px;}
   #legend ol{margin:7px 0 0;padding-left:16px;font-size:11px;line-height:1.5;color:#44584F;}
@@ -253,6 +313,64 @@
     font:600 10px/1 'Segoe UI',system-ui,Arial,sans-serif;
     color:#fff; text-shadow:0 1px 3px #000; pointer-events:none;
   }
+
+  /* ===== 🆕 18/08 — THANG MÀU ĐỘ CAO =====
+     Thay cho việc ghi số mét lên đường (đã thử 3 vòng, không ra).
+     🔴 Neo theo `--nav-h` để bản web ship không bị thanh nav ERA che. */
+  /* 🔴 ĐẶT GÓC TRÁI DƯỚI, KHÔNG phải phải-dưới: góc phải-dưới đã có QUẢ CẦU
+     điều hướng (cao 92px + nhãn số) — để bên đó là đè lên nhau. Góc trái dưới
+     trống vì thanh công cụ neo ở trái TRÊN. */
+  #thangCao{
+    position:absolute; left:16px; bottom:calc(var(--nav-h) + 20px); z-index:5;
+    display:none; padding:10px 12px; border-radius:12px;
+    background:rgba(14,40,33,.93); border:1px solid var(--line);
+    box-shadow:0 8px 26px rgba(0,0,0,.45);
+    font:600 11px/1.25 'Segoe UI',system-ui,Arial,sans-serif; color:var(--text2);
+  }
+  #thangCao.mo{ display:block; }
+  #thangCao b{
+    display:block; margin-bottom:7px; font-size:10px; letter-spacing:.5px;
+    text-transform:uppercase; color:var(--gold);
+  }
+  #thangCao .hang{ display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  #thangCao .hang:last-child{ margin-bottom:0; }
+  #thangCao .o{ width:24px; height:4px; border-radius:2px; flex:0 0 24px; }
+  @media (max-width:820px){
+    #thangCao{ left:10px; bottom:calc(var(--nav-h) + 14px); padding:8px 10px; font-size:10px; }
+    #thangCao .o{ width:18px; flex:0 0 18px; }
+  }
+
+  /* ===== 🆕 18/08 — NÚT THU NHỎ cho thanh công cụ và bảng chú giải =====
+     Anh Tony: 2 bảng này chiếm chỗ khi cần nhìn địa thế / chụp ảnh. */
+  .nut-gon{
+    position:absolute; z-index:2; width:24px; height:24px; padding:0;
+    border:1px solid var(--line); border-radius:50%; cursor:pointer;
+    font:700 13px/22px 'Segoe UI',system-ui,Arial,sans-serif; text-align:center;
+    background:rgba(255,255,255,.10); color:var(--text2);
+    transition:transform .18s ease, background .18s ease;
+  }
+  .nut-gon:hover{ background:rgba(255,255,255,.20); color:var(--text); }
+
+  #tools{ position:absolute; }            /* để nút gọn neo được */
+  #btnGonTools{ top:8px; right:8px; }
+  #tools.gon{ width:auto; padding:8px; gap:0; overflow:visible; }
+  /* 🔴 Ẩn MỌI phần tử con trừ chính nút gọn — kể cả các <div> menu con
+     (#nhomTI/#nhomHW/#nhomLN), không thì thu gọn xong vẫn còn một cụm
+     nút con lơ lửng. */
+  #tools.gon > *:not(#btnGonTools){ display:none !important; }
+  #tools.gon #btnGonTools{ position:static; }
+  #tools.gon #btnGonTools, #legend.gon #btnGonLegend{ transform:rotate(180deg); }
+
+  #btnGonLegend{
+    top:9px; right:10px;
+    background:#EDF2EF; color:#2C4038; border-color:rgba(13,38,32,.14);
+  }
+  #btnGonLegend:hover{ background:#DCE6E0; color:#0D2620; }
+  #legend h2{ padding-right:32px; }
+  /* Thu gọn chú giải: giữ lại đúng tiêu đề + nút, giấu phần còn lại */
+  #legend.gon > *:not(h2):not(#btnGonLegend){ display:none !important; }
+  #legend.gon h2{ margin:0; }
+  #legend.gon{ padding-bottom:11px; }
 
   /* Nút mở chú giải — CHỈ hiện trên điện thoại */
   #btnLegend{display:none;}
@@ -374,15 +492,15 @@
   html.man-nho .rd-chip i{ display:none; }
 
   /* --- Công tắc con (tiện ích + lớp cao tốc) trong thanh công cụ --- */
-  #nhomTI, #nhomHW{ display:none; flex-direction:column; gap:4px; margin:-2px 0 2px; padding-left:8px; }
-  #nhomTI.mo, #nhomHW.mo{ display:flex; }
-  #nhomTI button, #nhomHW button{
+  #nhomTI, #nhomHW, #nhomLN{ display:none; flex-direction:column; gap:4px; margin:-2px 0 2px; padding-left:8px; }
+  #nhomTI.mo, #nhomHW.mo, #nhomLN.mo{ display:flex; }
+  #nhomTI button, #nhomHW button, #nhomLN button{
     text-align:left; padding:7px 10px; font-size:12px; border-radius:9px;
     border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--dim);
     cursor:pointer; display:flex; align-items:center; gap:7px;
   }
-  #nhomTI button .cham, #nhomHW button .cham{ width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#555; }
-  #nhomTI button.bat, #nhomHW button.bat{ color:var(--text); background:rgba(255,255,255,.07); }
+  #nhomTI button .cham, #nhomHW button .cham, #nhomLN button .cham{ width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#555; }
+  #nhomTI button.bat, #nhomHW button.bat, #nhomLN button.bat{ color:var(--text); background:rgba(255,255,255,.07); }
 
   /* --- Nút ẩn/hiện TẤT CẢ bảng (chỉ có trên màn nhỏ) --- */
   #btnAnHet{ display:none; }
@@ -391,10 +509,6 @@
   html.sach #tools > button:not(#btnAnHet){ display:none; }
   html.sach #legend, html.sach #globe, html.sach #coord{ display:none !important; }
   html.sach #tools{ width:auto; background:transparent; border-color:transparent; box-shadow:none; padding:4px; }
-
-  /* NEXT 18/08: day controls MapLibre + attribution len tren nav ERA tren mobile */
-  .maplibregl-ctrl-bottom-left,
-  .maplibregl-ctrl-bottom-right{ bottom: calc(var(--nav-h) + 8px) !important; }
 </style>
 </head>
 <body>
@@ -408,6 +522,7 @@
 </div>
 
 <div id="legend">
+  <button class="nut-gon" id="btnGonLegend" title="Thu nhỏ chú giải">–</button>
   <button class="dong" id="btnLegendClose" aria-label="Đóng chú giải">✕</button>
   <h2>Bảo Lộc — giao 2 trục cao tốc</h2>
 
@@ -426,6 +541,16 @@
   <div class="row"><span class="sw vp"></span> <b>VP ERA Vietnam → cao tốc</b> (3,8 km)</div>
 
   <div class="row"><span class="sw rg"></span> Ranh giới tỉnh</div>
+
+  <!-- 🆕 18/08 (Anh Tony chốt): danh sách 8 tuyến TÁCH sang bảng riêng bên dưới.
+       Bảng chú giải cũ dài ~90 dòng, trên điện thoại phải cuộn mãi mới hết. -->
+  <button id="btnDsTuyen" class="mo-ds">▾ Danh sách 8 tuyến</button>
+</div>
+
+<!-- 🆕 18/08: BẢNG 2 — danh sách tuyến. Mặc định ĐÓNG, mở bằng nút trong chú giải. -->
+<div id="dstuyen" hidden>
+  <button class="dong" id="btnDsClose" aria-label="Đóng danh sách tuyến">✕</button>
+  <h2>8 tuyến đường qua Bảo Lộc</h2>
 
   <p class="grp">ĐƯỜNG HIỆN HỮU</p>
   <ol>
@@ -446,23 +571,30 @@
   <ol start="8">
     <li><b>Phan Thiết – Bảo Lộc – Gia Nghĩa</b> · 143,81 km · <b>đề xuất quy hoạch</b></li>
   </ol>
-
-
 </div>
 
 <div id="tools">
-  <button class="gold" id="btnSpin">↻ Xoay 360°</button>
-  <button id="btnReset">⌂ Về tổng quan</button>
+  <!-- 🆕 18/08: nút thu nhỏ. Luôn là phần tử ĐẦU TIÊN — khi thu gọn, mọi
+       phần tử khác bị ẩn, chỉ còn đúng nó để bấm mở lại. -->
+  <button class="nut-gon" id="btnGonTools" title="Thu nhỏ bảng công cụ">–</button>
+  <!-- 18/08: BỎ nút "↻ Xoay 360°" theo yêu cầu Anh Tony (gạch X trên ảnh). -->
+  <button id="btnReset">⌂ Về Dự án</button>
   <button class="gold" id="btnLegend">ⓘ Chú giải</button>
   <button class="ghost" id="btnPin">📍 Bật ghim điểm</button>
-  <button class="ghost" id="btnHighway">🛣 Toàn tuyến cao tốc</button>
-  <button class="ghost" id="btnInfo">ⓘ Thông tin tuyến</button>
-  <button class="ghost" id="btnTinh">🗺 Tắt ranh giới tỉnh</button>
+  <button class="ghost" id="btnHighway">🛣 View toàn tuyến cao tốc</button>
+  <!-- 18/08: nhãn nay CỐ ĐỊNH, trạng thái bật/tắt báo bằng nút sáng màu (.gold) -->
+  <button class="ghost gold" id="btnTinh">🗺 Ranh giới tỉnh</button>
   <button class="ghost" id="btnHwToggle">🛣 Lớp cao tốc</button>
   <div id="nhomHW"></div>
   <!-- 🆕 18/08: lớp tiện ích + công tắc từng nhóm (Anh Tony đặt) -->
-  <button class="ghost" id="btnTienIch">🏙 Bật tiện ích</button>
+  <button class="ghost" id="btnTienIch">🏙 Lớp tiện ích</button>
   <div id="nhomTI"></div>
+  <!-- 🆕 18/08: lớp bản đồ đường chồng lên ảnh vệ tinh + đo cao độ -->
+  <button class="ghost" id="btnLopNen">🗺 Lớp nền</button>
+  <div id="nhomLN"></div>
+  <!-- 🆕 18/08 Anh Tony: tách đường đồng mức ra NGANG CẤP menu lớn, đổi tên
+       "Xem cao độ" cho khách dễ hiểu hơn thuật ngữ "đường đồng mức". -->
+  <button class="ghost" id="btnCaoDo">⛰ Xem cao độ</button>
   <!-- 🆕 18/08: chỉ hiện trên màn nhỏ — Anh Tony: "màn nhỏ thì tất cả
        cái gì hiển thị đều có nút ẩn đi" -->
   <button class="ghost" id="btnAnHet">🙈 Ẩn hết bảng</button>
@@ -473,7 +605,9 @@
   <button class="ghost" id="btnClearPins" style="display:none">🗑 Xoá ghim</button>
 </div>
 
-<div id="rdInfo"></div>
+
+<!-- 🆕 18/08: thang màu độ cao — CHỈ hiện khi bật lớp Đường đồng mức -->
+<div id="thangCao"></div>
 
 <div id="coord">Điểm ghim: <b id="coordVal">—</b></div>
 
@@ -518,15 +652,43 @@ const HOME = { center:[107.7641912, 11.5215856],
                zoom: MOBI ? 10.4 : 11.6,
                pitch: MOBI ? 55 : 64, bearing:-25 };
 
+/* 🔴 Độ phóng đại địa hình — khai MỘT CHỖ vì `queryTerrainElevation()`
+   trả về độ cao ĐÃ NHÂN hệ số này, muốn ra mét thật phải chia lại. */
+const EXAG = 1.5;
+
 /* ============================================================
    2) KHỞI TẠO BẢN ĐỒ — nguồn tile MIỄN PHÍ, không cần API key
    - Ảnh vệ tinh: Esri World Imagery
    - Địa hình 3D (DEM): AWS Terrarium
    ============================================================ */
+/* 🔴 PHẢI ĐĂNG KÝ TRƯỚC KHI TẠO MAP — thư viện cài một "protocol" riêng
+   cho MapLibre; đăng ký sau thì source contour xin tile qua protocol chưa
+   tồn tại, KHÔNG có đường nào hiện mà cũng KHÔNG báo lỗi.
+   🔴 Bọc try/catch + cờ CO_CONTOUR: CDN chết là cả trang trắng nếu không
+   chặn — bản đồ vẫn phải chạy, chỉ mất riêng lớp đường đồng mức. */
+let CO_CONTOUR = false, demContour = null;
+try{
+  if(typeof mlcontour !== 'undefined'){
+    demContour = new mlcontour.DemSource({
+      url:'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png',
+      encoding:'terrarium', maxzoom:15
+    });
+    demContour.setupMaplibre(maplibregl);
+    CO_CONTOUR = true;
+  }else{
+    console.warn('[đồng mức] không nạp được maplibre-contour — bỏ qua lớp này.');
+  }
+}catch(e){ console.warn('[đồng mức] lỗi khởi tạo:', e.message); }
+
 const map = new maplibregl.Map({
   container:'map',
   style:{
     version:8,
+    /* 🔴 KHÔNG khai `glyphs` — trang này CỐ Ý không vẽ chữ bằng layer nào cả.
+       Đã thử ghi số mét lên đường đồng mức và THẤT BẠI 3 vòng (sai tên font,
+       rồi `text-max-angle` quá chặt, rồi vẫn không ra). Anh Tony chốt chuyển
+       sang TÔ MÀU THEO ĐỘ CAO + bảng thang màu -> hết cần chữ, hết cần kho
+       font, hết một phụ thuộc CDN. Xem ghi chú ở lớp đồng mức. */
     sources:{
       satellite:{
         type:'raster',
@@ -562,7 +724,7 @@ map.addControl(new maplibregl.ScaleControl({unit:'metric'}));
 
 map.on('load', ()=>{
   /* Bật địa hình 3D + phóng đại để thấy khối núi/đồi rõ */
-  map.setTerrain({ source:'terrainDEM', exaggeration:1.5 });
+  map.setTerrain({ source:'terrainDEM', exaggeration:EXAG });
 
   /* Bầu trời — tạo cảm giác 3D điện ảnh như GEOlayers */
   map.setSky({
@@ -574,6 +736,7 @@ map.on('load', ()=>{
     'fog-ground-blend':0.4
   });
 
+  veLopNen();                  /* lớp bản đồ đường chồng lên ảnh vệ tinh */
   addMarkers();
   buildLocList();
   addHighway();
@@ -746,7 +909,6 @@ function addHighway(){
     map.on('mouseleave', id, ()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
   });
 
-  addTheThongTin();
   veTienIch();
   veNutXuongCaoToc();
 }
@@ -938,6 +1100,160 @@ function veNutXuongCaoToc(){
 }
 
 /* ============================================================
+   LỚP NỀN — bản đồ đường chồng lên ảnh vệ tinh  (18/08/2026)
+   Anh Tony chốt: có cả 2 nguồn, chọn bằng nút gạt.
+
+   🔴 CHÈN NGAY TRÊN ẢNH VỆ TINH, DƯỚI MỌI THỨ KHÁC. Gọi trước addHighway()
+      nên các layer tuyến/nhãn thêm sau sẽ tự nằm đè lên — không phải tính
+      `beforeId` cho từng lớp.
+   🔴 MẶC ĐỊNH TẮT. Cả buổi vừa dọn chữ cho đỡ rối, bật sẵn thêm một lớp
+      đầy tên đường là hỏng công.
+   ============================================================ */
+/* `nen-topo` KHÔNG nằm ở đây nữa — nó có nút riêng, bật/tắt độc lập với
+   lớp nền, để xem cao độ chồng lên bản đồ đường cũng được. */
+const LN_LAYERS = ['nen-esri-duong','nen-esri-diadanh','nen-osm'];
+let lnDangDung = 'tat';
+
+function veLopNen(){
+  /* --- Esri: 2 lớp tham chiếu, NỀN TRONG SUỐT THẬT --- */
+  map.addSource('esri-duong', { type:'raster', tileSize:256, maxzoom:19,
+    tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}'],
+    attribution:'Reference © Esri' });
+  map.addSource('esri-diadanh', { type:'raster', tileSize:256, maxzoom:19,
+    tiles:['https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'],
+    attribution:'Reference © Esri' });
+  /* --- OSM: đường phố VN đầy đủ hơn, NHƯNG không trong suốt --- */
+  map.addSource('osm-nen', { type:'raster', tileSize:256, maxzoom:19,
+    tiles:['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    attribution:'© OpenStreetMap contributors' });
+  /* --- ĐƯỜNG ĐỒNG MỨC: sinh tại chỗ từ DEM, CHỈ CÓ ĐƯỜNG, không chữ ---
+     Ngưỡng theo mức zoom: xa thì thưa (chỉ 100/500 m), gần thì dày dần.
+     🔴 Không khai `thresholds` theo zoom là ở mức zoom xa nó vẽ cả đường
+        10 m -> đặc kín màn hình, máy chậm mà nhìn cũng không ra gì. */
+  if(CO_CONTOUR){
+    map.addSource('dong-muc', {
+      type:'vector', maxzoom:15,
+      tiles:[ demContour.contourProtocolUrl({
+        thresholds:{ 9:[200,1000], 11:[100,500], 12:[50,250], 13:[25,100], 15:[10,50] },
+        elevationKey:'ele', levelKey:'level', contourLayer:'contours'
+      }) ],
+      attribution:'Đường đồng mức dựng từ Mapzen/AWS Terrain Tiles'
+    });
+  }
+
+  if(CO_CONTOUR){
+    map.addLayer({
+      id:'nen-topo', type:'line', source:'dong-muc', 'source-layer':'contours',
+      layout:{ visibility:'none', 'line-join':'round', 'line-cap':'round' },
+      paint:{
+        /* 🎨 TÔ MÀU THEO ĐỘ CAO (Anh Tony chốt thay cho ghi số mét).
+           Thang xanh lơ -> xanh lá -> vàng -> cam -> đỏ -> trắng, đúng lối
+           bản đồ địa hình. Đọc nhanh hơn số: nhìn màu là biết cao thấp,
+           không phải dò tìm con số rồi nhẩm.
+           🔴 Chọn tông SÁNG vì nền là ảnh vệ tinh vùng đồi rất tối —
+              màu đậm kiểu bản đồ giấy sẽ chìm mất. */
+        'line-color':['interpolate',['linear'],['get','ele'],
+          400,'#5BC8E8',   600,'#7FD98A',   800,'#E9E36B',
+         1000,'#F5A742',  1200,'#EE6B4D',  1400,'#FFFFFF'],
+        /* `level` = 1 là đường mốc chính -> đậm hơn để đọc được thế đất */
+        'line-width':['match',['get','level'], 1, 1.9, 0.8],
+        'line-opacity':['match',['get','level'], 1, 0.95, 0.6]
+      }
+    });
+  }
+  map.addLayer({ id:'nen-osm', type:'raster', source:'osm-nen',
+    layout:{visibility:'none'},
+    /* 🔴 Tile OSM là ảnh ĐẶC. Không hạ độ mờ thì nó che sạch ảnh vệ tinh,
+       coi như mất luôn cái đẹp của đồi chè. 0,55 là mức còn đọc được tên
+       đường mà vẫn thấy địa hình bên dưới. */
+    paint:{ 'raster-opacity':0.55 } });
+  map.addLayer({ id:'nen-esri-duong', type:'raster', source:'esri-duong',
+    layout:{visibility:'none'}, paint:{ 'raster-opacity':0.9 } });
+  map.addLayer({ id:'nen-esri-diadanh', type:'raster', source:'esri-diadanh',
+    layout:{visibility:'none'}, paint:{ 'raster-opacity':0.9 } });
+
+  dungNutLopNen();
+}
+
+function datLopNen(ma){
+  lnDangDung = ma;
+  const hien = {
+    tat  : [],
+    esri : ['nen-esri-duong','nen-esri-diadanh'],
+    osm  : ['nen-osm']
+  }[ma] || [];
+  LN_LAYERS.forEach(id=>{
+    if(map.getLayer(id))
+      map.setLayoutProperty(id,'visibility', hien.includes(id) ? 'visible' : 'none');
+  });
+}
+
+/* Thang màu — dựng đúng theo mốc màu dùng trong `line-color` của lớp đồng mức.
+   🔴 Sửa màu ở lớp thì PHẢI sửa cả bảng này. Hai chỗ rời nhau nên rất dễ
+      lệch, mà lệch thì chú giải nói một đằng bản đồ vẽ một nẻo — kiểu sai
+      không bao giờ báo lỗi. */
+const THANG_CAO = [
+  ['#FFFFFF','trên 1.400 m'],
+  ['#EE6B4D','1.200 m'],
+  ['#F5A742','1.000 m'],
+  ['#E9E36B','800 m'],
+  ['#7FD98A','600 m'],
+  ['#5BC8E8','dưới 400 m']
+];
+function dungThangCao(){
+  const h = document.getElementById('thangCao');
+  if(!h) return;
+  h.innerHTML = '<b>Độ cao</b>' + THANG_CAO.map(([m,t])=>
+    `<div class="hang"><span class="o" style="background:${m}"></span>${t}</div>`).join('');
+}
+dungThangCao();
+
+function dungNutLopNen(){
+  const hop = document.getElementById('nhomLN');
+  if(!hop) return;
+  const muc = [
+    { ma:'tat',  ten:'Tắt — chỉ ảnh vệ tinh', mau:'#64748B' },
+    { ma:'esri', ten:'Đường + địa danh (Esri)', mau:'#5FE5BE' },
+    { ma:'osm',  ten:'Bản đồ OSM (mờ 55%)',    mau:'#9BDC4C' }
+  ];
+  hop.innerHTML = '';
+  muc.forEach(m=>{
+    const b = document.createElement('button');
+    b.dataset.ma = m.ma;
+    b.className = (m.ma === lnDangDung) ? 'bat' : '';
+    b.innerHTML = `<span class="cham" style="background:${m.mau}"></span>${m.ten}`;
+    b.onclick = ()=>{
+      datLopNen(m.ma);
+      /* Chọn 1 trong 3 -> phải bỏ đánh dấu 2 cái kia, không thì nhìn như
+         đang bật cả 3 mà thực tế chỉ 1 cái có tác dụng. */
+      hop.querySelectorAll('button').forEach(x=> x.classList.toggle('bat', x.dataset.ma === m.ma));
+    };
+    hop.appendChild(b);
+  });
+}
+
+/* ============================================================
+   ⛰ ĐO CAO ĐỘ — ĐÃ GỠ HẲN 18/08/2026
+
+   Đã dựng rồi gỡ trong cùng buổi. Ghi lại để người sau khỏi làm lại:
+
+   `map.queryTerrainElevation()` đo ra SAI ~10 lần trên vùng này —
+   nghiệm thu thật cho: ngay dự án **−15 m** · gần Vincom 81 m ·
+   núi phía nam 349 m, trong khi Bảo Lộc là cao nguyên 800–1.000 m.
+   Sai số 10 lần nên KHÔNG phải do hệ số `exaggeration` (chỉ lệch 1,5 lần);
+   nghi hàm đọc từ tile DEM ở mức zoom thô, nhưng chưa kiểm chứng được.
+
+   🔴 Gỡ chứ không để tạm: bản đồ BÁN HÀNG, sale đọc số rồi nói với khách,
+      mà cao độ đúng là điểm bán của Bảo Lộc. Số sai tệ hơn không có số.
+
+   Anh Tony chốt: **không cần đo cao độ nữa, chỉ cần bản đồ địa hình**
+   -> nhu cầu này nay do lớp "Đường đồng mức (topo)" lo, xem veLopNen().
+
+   Muốn làm lại thì thử: đối chiếu API cao độ độc lập (Open-Elevation /
+   OpenTopoData), hoặc tự đọc và giải mã tile terrarium, không qua MapLibre.
+   ============================================================ */
+
+/* ============================================================
    LỚP TIỆN ÍCH QUANH DỰ ÁN  (18/08/2026 — Anh Tony đặt)
    Nguồn: OpenStreetMap (ODbL), lấy qua lay-tienich.html + LAY-OSM.bat.
 
@@ -1045,70 +1361,20 @@ function locTienIch(){
 }
 
 /* ============================================================
-   THẺ THÔNG TIN TUYẾN — rê chuột vào đường là hiện
-   (Anh Tony đặt 14/08/2026: dài · trạng thái · tổng vốn · hoàn thành)
-   🔴 MẶC ĐỊNH TẮT. Bật bằng nút "ⓘ Thông tin tuyến".
-      Lý do tắt sẵn: bản đồ này để KHÁCH xem, thẻ bám chuột suốt
-      thì che mất ảnh vệ tinh và làm rối màn hình điện thoại.
-   🔴 KHÔNG dùng maplibregl.Popup: Popup neo theo TOẠ ĐỘ bản đồ nên khi
-      nghiêng pitch 64° nó trôi lệch khỏi con trỏ. Đây là thẻ HTML bám
-      theo pixel chuột -> luôn đúng chỗ ở mọi góc nghiêng.
+   ⓘ THẺ THÔNG TIN TUYẾN (rê chuột) — ĐÃ GỠ 18/08/2026
+
+   Anh Tony: "cái thông tin tuyến, nó không có hành động gì nhỉ".
+   Kiểm ra đúng: `infoMode` chỉ được đọc ở ĐÚNG MỘT CHỖ —
+   `map.on('mousemove')`. Nghĩa là nó CHỈ chạy khi RÊ CHUỘT.
+
+   🔴 iPad KHÔNG có sự kiện rê chuột -> nút này chưa bao giờ làm gì trên
+      thiết bị tư vấn chính. Trên PC thì có, nhưng phải rê trúng lên đường.
+   🔴 Và nó TRÙNG chức năng: bấm vào tuyến đã ra popup với đúng thông tin
+      đó (dài · trạng thái · vốn · hoàn thành) — xem map.on('click', id).
+
+   => Anh chốt GỠ. Bớt 1 dòng menu, bớt 1 lớp rê chuột chạy nền.
+   Cần lại thì lấy ở backup *.bak-truoc-chip-20260818.
    ============================================================ */
-let infoMode = false;                       /* true = đang bật thẻ */
-const INFO_LAYERS = ['ql-hienhuu','ct-khaithac','ct-thicong','ct-dexuat-dai',
-                     'd-noicaotoc-vien','d-trungtam-vien','d-vanphong-vien','d-noithi'];
-const INFO_TAG = {
-  vanphong :{nen:'#0F172A', chu:'#fff', ten:'ĐƯỜNG RA CAO TỐC'},
-  noicaotoc:{nen:'#6D28D9', chu:'#fff', ten:'NỐI THẲNG CAO TỐC'},
-  vaotrungtam:{nen:'#0E9F9F', chu:'#fff', ten:'VÀO TRUNG TÂM BẢO LỘC'},
-  noithi   :{nen:'#475569', chu:'#fff', ten:'ĐƯỜNG NỘI THỊ'},
-  hienhuu  :{nen:'#E01B24', chu:'#fff', ten:'QUỐC LỘ · ĐANG CHẠY'},
-  khaithac :{nen:'#E8730C', chu:'#fff', ten:'CAO TỐC · ĐÃ THÔNG XE'},
-  thicong  :{nen:'#B98200', chu:'#fff', ten:'CAO TỐC · ĐANG THI CÔNG'},
-  dexuat   :{nen:'#2A6E93', chu:'#fff', ten:'CAO TỐC · MỚI ĐỀ XUẤT'}
-};
-
-function addTheThongTin(){
-  const the = document.getElementById('rdInfo');
-
-  function dat(x,y){
-    /* Giữ thẻ trong màn hình — gần mép phải/dưới thì lật ngược lại */
-    const w = the.offsetWidth || 290, h = the.offsetHeight || 120;
-    let l = x + 18, t = y + 18;
-    if(l + w > window.innerWidth  - 10) l = x - w - 18;
-    if(t + h > window.innerHeight - 10) t = y - h - 18;
-    the.style.left = Math.max(8,l) + 'px';
-    the.style.top  = Math.max(8,t) + 'px';
-  }
-
-  function ve(p){
-    const k = INFO_TAG[p.status] || {nen:'#334155',chu:'#fff',ten:p.status};
-    const d = [];
-    d.push(`<dt>Chiều dài</dt><dd>${p.dai||'—'}<span style="color:#64748B;font-weight:400"> · đo trên bản đồ ${p.daiVe||'—'}</span></dd>`);
-    d.push(`<dt>Trạng thái</dt><dd>${p.trangthai||'—'}</dd>`);
-    if(p.von)       d.push(`<dt>Tổng vốn</dt><dd>${p.von}</dd>`);
-    if(p.hoanthanh) d.push(`<dt>Hoàn thành</dt><dd>${p.hoanthanh}</dd>`);
-    the.innerHTML =
-      `<b class="tt">${p.ten||''}</b>
-       <span class="tag" style="background:${k.nen};color:${k.chu}">${k.ten}</span>
-       <dl>${d.join('')}</dl>`;
-    the.style.display = 'block';
-  }
-
-  /* 🔴 Bắt trên CANVAS chứ không phải map.on('mousemove', layerId,...):
-     bản dựng này có nhiều lớp chồng nhau (casing + nét chính), bắt theo
-     từng lớp sẽ nhấp nháy khi chuột đi qua ranh giới 2 lớp. Truy vấn 1 lần
-     bằng queryRenderedFeatures rồi lấy feature ĐẦU TIÊN là ổn định. */
-  map.on('mousemove', (e)=>{
-    if(!infoMode || pinMode){ the.style.display='none'; return; }
-    const co = INFO_LAYERS.filter(id=>map.getLayer(id));
-    const fs = map.queryRenderedFeatures(e.point, {layers:co});
-    if(!fs.length){ the.style.display='none'; return; }
-    ve(fs[0].properties);
-    dat(e.originalEvent.clientX, e.originalEvent.clientY);
-  });
-  map.on('mouseout', ()=>{ the.style.display='none'; });
-}
 
 /* ============================================================
    LỚP RANH GIỚI TỈNH  (14/08/2026)
@@ -1258,11 +1524,15 @@ const HANG = {
   khaithac:1, thicong:1, dexuat:2,      /* cao tốc */
   hienhuu:3,                            /* quốc lộ */
   noicaotoc:4, vaotrungtam:4, vanphong:4, /* đường từ dự án ra cao tốc */
+  /* 🆕 18/08 (Anh Tony) — MỐC ĐỊNH VỊ (Vincom, Núi Đại Bình).
+     Xếp SAU nhóm 4: cùng ngưỡng zoom với đường ra cao tốc, nhưng đè nhau thì
+     MỐC NHƯỜNG ĐƯỜNG — đường mới là thông điệp bán hàng chính. */
+  moc:5,
   noithi:9                              /* nội thị — thấp nhất, đã thu thành chấm */
 };
 /* Zoom TỐI THIỂU để nhãn được phép hiện. Zoom xa thì chỉ còn cao tốc.
    (Chấm nội thị không nằm ở đây — nó là layer circle, chặn bằng `minzoom`.) */
-const ZOOM_TOI_THIEU = { 1:0, 2:0, 3:8.6, 4:9.6, 9:11.4 };
+const ZOOM_TOI_THIEU = { 1:0, 2:0, 3:8.6, 4:9.6, 5:9.6, 9:11.4 };
 
 /* Danh sách MỌI nhãn tham gia cơ chế chống đè (chỉ chip HTML). */
 const NHAN = [];
@@ -1858,15 +2128,6 @@ const boxLegend = document.getElementById('legend');
 document.getElementById('btnLegend').onclick = ()=> boxLegend.classList.toggle('open');
 document.getElementById('btnLegendClose').onclick = ()=> boxLegend.classList.remove('open');
 
-/* 🔴 BẬT / TẮT THẺ THÔNG TIN TUYẾN (Anh Tony đặt 14/08/2026)
-   Mặc định TẮT — thẻ chỉ hiện khi Anh chủ động bật, không thường trực. */
-document.getElementById('btnInfo').onclick = (e)=>{
-  infoMode = !infoMode;
-  e.target.classList.toggle('gold', infoMode);
-  e.target.textContent = infoMode ? 'ⓘ Tắt thông tin tuyến' : 'ⓘ Thông tin tuyến';
-  if(!infoMode){ const t=document.getElementById('rdInfo'); if(t) t.style.display='none'; }
-};
-
 /* 🔴 BẬT / TẮT RANH GIỚI TỈNH (Anh Tony đặt 14/08).
    Chỉ đụng 2 layer + nhãn của chính lớp này, KHÔNG đụng lớp cao tốc. */
 document.getElementById('btnTinh').onclick = (e)=>{
@@ -1875,7 +2136,8 @@ document.getElementById('btnTinh').onclick = (e)=>{
     if(map.getLayer(id)) map.setLayoutProperty(id, 'visibility', tinhOn ? 'visible' : 'none');
   });
   tinhLabels.forEach(el=> el.style.display = tinhOn ? '' : 'none');
-  e.target.textContent = tinhOn ? '🗺 Tắt ranh giới tỉnh' : '🗺 Bật ranh giới tỉnh';
+  /* 18/08: nhãn CỐ ĐỊNH "🗺 Ranh giới tỉnh", báo bật/tắt bằng nút sáng màu */
+  e.target.classList.toggle('gold', tinhOn);
 };
 
 /* ============================================================
@@ -1930,7 +2192,69 @@ document.getElementById('btnHwToggle').onclick = (e)=>{
 /* 🔴 Pin dự án KHÔNG dùng marker mặc định của MapLibre —
    nó cùng cỡ với 6 chấm nút giao nên nhìn vào không biết đâu là dự án.
    Dùng element HTML riêng: vòng nhịp + giọt gold + tên, luôn nằm trên cùng. */
+/* ============================================================
+   🆕 18/08 — GHIM MỐC ĐỊNH VỊ (Anh Tony đặt)
+   🔴 Toạ độ ĐỌC TỪ `tienich-data.js` (điểm Anh Tony tự đánh dấu, cờ "tay":true),
+      KHÔNG gõ cứng, KHÔNG đoán. Thiếu điểm thì bỏ qua êm, không vỡ trang.
+   🔴 LUÔN HIỆN — cố ý KHÔNG nằm trong layer `TI_LAYER`, nên bấm tắt
+      "Lớp tiện ích" các ghim này vẫn còn.
+   Thêm mốc mới: chỉ cần thêm 1 dòng vào bảng dưới, KHÔNG đụng vào hàm.
+     khoa : chuỗi tìm trong tên điểm (đã bỏ dấu, thường)
+     phu  : dòng chữ phụ. BỎ TRỐNG = chip chỉ 1 dòng
+     nho  : true = cỡ nhỏ
+   ============================================================ */
+const GHIM_MOC = [
+  { khoa:'vincom',   phu:'TRUNG TÂM THÀNH PHỐ' },
+  { khoa:'dai binh', nho:true }        /* Anh Tony: nhỏ hơn, đúng 1 dòng */
+];
+
+function ghimMoc(){
+  const D = window.TIEN_ICH;
+  if(!D || !D.nhom){ console.warn('[ghim mốc] chưa có tienich-data.js — bỏ qua'); return; }
+
+  /* bỏ dấu để tìm cho chắc: dữ liệu có thể là NFC hay NFD, và `đ` KHÔNG bị
+     NFD tách ra (nó là chữ cái riêng) nên phải thay tay. */
+  const bo = s => (s||'').toLowerCase().normalize('NFD')
+                    .replace(/[̀-ͯ]/g,'').replace(/đ/g,'d');
+
+  GHIM_MOC.forEach(g => {
+    let d = null, nh = null;
+    /* lấy luôn ICON + MÀU của nhóm chứa điểm -> ghim ăn khớp với lớp tiện ích;
+       Anh đổi màu nhóm trong dữ liệu thì ghim tự đổi theo, khỏi sửa code */
+    Object.values(D.nhom).forEach(n => (n.diem||[]).forEach(p => {
+      if(!d && bo(p.ten).includes(g.khoa)){ d = p; nh = n; }
+    }));
+    if(!d){ console.warn('[ghim mốc] không thấy điểm "'+g.khoa+'" trong dữ liệu'); return; }
+
+    const mau  = (nh && nh.mau)  || '#475569';
+    const icon = (nh && nh.icon) || '📍';
+
+    const el = document.createElement('div');
+    el.className = 'vc-pin' + (g.nho ? ' nho' : '');
+    el.innerHTML =
+      `<div class="vc-chip" style="background:${mau}"><b>${icon} ${d.ten}</b>` +
+      (g.phu ? `<i>${g.phu}</i>` : '') + '</div>' +
+      `<span class="vc-noi"></span><span class="vc-cham" style="background:${mau}"></span>`;
+    /* anchor 'bottom' -> CHẤM NEO nằm đúng toạ độ, chip nhô lên trên */
+    new maplibregl.Marker({element:el, anchor:'bottom', offset:[0,1]})
+      .setLngLat([d.lng, d.lat]).addTo(map);
+
+    /* 🔴 18/08 (Anh Tony bắt lỗi trên ảnh) — ĐĂNG KÝ Ở HẠNG 5, **KHÔNG** `batTu`.
+       Bản đầu Em để `hang:0, batTu:true` sao chép từ pin dự án -> 2 mốc này
+       KHÔNG BAO GIỜ ẨN, nên lúc nhìn toàn tuyến cao tốc chúng vẫn nằm chình ình
+       và còn đè cả pin dự án. Nay chúng theo đúng luật chung:
+         . ngưỡng zoom ZOOM_TOI_THIEU[5] = 9.6  -> zoom xa là tự ẩn
+         . đè nhau thì mốc nhường đường (hạng 5 > 4)
+       Chip nằm TRONG luồng flex nên rect .vc-pin đã bao trọn cả chip lẫn chấm
+       neo -> đăng ký 1 phần tử là đủ. */
+    if(typeof NHAN !== 'undefined' && Array.isArray(NHAN)){
+      NHAN.push({ el:el, hang: (g.hang || HANG.moc) });
+    }
+  });
+}
+
 function addMarkers(){
+  ghimMoc();
   LOCATIONS.forEach((L)=>{
     const el = document.createElement('div');
     el.className = 'era-pin';
@@ -1965,21 +2289,13 @@ function buildLocList(){
 }
 
 /* ============================================================
-   5) NÚT XOAY 360° tự động (cinematic)
+   5) 18/08 — ĐÃ BỎ HẲN "NÚT XOAY 360° tự động".
+   Anh Tony gạch X trên ảnh. Gỡ CẢ nút lẫn hàm `spin()` + biến
+   `spinning`/`spinReq` — grep xác nhận không chỗ nào khác gọi tới,
+   để lại là code chết (bẫy layer ma 11/08 · 12/08 · 18/08).
    ============================================================ */
-let spinning=false, spinReq=null;
-function spin(){
-  if(!spinning) return;
-  map.setBearing(map.getBearing() + 0.35);
-  spinReq = requestAnimationFrame(spin);
-}
-document.getElementById('btnSpin').onclick = (e)=>{
-  spinning = !spinning;
-  e.target.textContent = spinning ? '⏸ Dừng xoay' : '↻ Xoay 360°';
-  if(spinning) spin(); else cancelAnimationFrame(spinReq);
-};
 
-/* Về góc tổng quan */
+/* Về Dự án (góc nhìn tổng quan) */
 document.getElementById('btnReset').onclick = ()=>{
   map.flyTo({ ...HOME, duration:2000, essential:true });
 };
@@ -2224,17 +2540,77 @@ window.addEventListener('resize', capNhatCoMan);
 /* iPad báo kích thước mới CHẬM hơn sự kiện xoay màn -> phải chờ rồi mới đo */
 window.addEventListener('orientationchange', ()=> setTimeout(capNhatCoMan, 260));
 
+/* 🆕 18/08 — mở / đóng BẢNG 2 "Danh sách 8 tuyến" */
+(function(){
+  const ds = document.getElementById('dstuyen'),
+        mo = document.getElementById('btnDsTuyen'),
+        dg = document.getElementById('btnDsClose');
+  if(!ds || !mo || !dg) return;
+  const dat = m => { ds.hidden = !m; mo.textContent = m ? '▴ Đóng danh sách' : '▾ Danh sách 8 tuyến'; };
+  mo.onclick = () => dat(ds.hidden);
+  dg.onclick = () => dat(false);
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') dat(false); });
+})();
+
+/* ============================================================
+   NÚT THU NHỎ — thanh công cụ & bảng chú giải  (18/08/2026)
+   🔴 Dùng class `gon` + CSS, KHÔNG ghi thẳng style.display lên từng nút.
+      Mấy nút này đã có 3 cơ chế khác đụng vào `display` rồi (chế độ
+      `?tool=1`, nút "Ẩn hết bảng" của màn nhỏ, nút Gửi/Chép điểm ghim).
+      Thêm một chỗ ghi `display` nữa là chúng đè nhau, mở lại thì có nút
+      hiện có nút không — hỏng ngầm, không báo lỗi.
+   ============================================================ */
+[['btnGonTools','tools'], ['btnGonLegend','legend']].forEach(([nut, hop])=>{
+  const b = document.getElementById(nut), h = document.getElementById(hop);
+  if(!b || !h) return;
+  b.onclick = (e)=>{
+    e.stopPropagation();
+    const gon = h.classList.toggle('gon');
+    /* 🔴 Ký tự phải CHẮC CHẮN có trong mọi font hệ thống. Bản trước dùng
+       ⌄ / ⌃ (U+2304/2303) — rất ít font Windows/iOS có, nên ra Ô VUÔNG RỖNG.
+       Cùng bài học với bẫy icon krpano 14/08: đừng chọn ký tự lạ. */
+    b.textContent = gon ? '+' : '–';
+    b.title = (gon ? 'Mở lại ' : 'Thu nhỏ ') + (hop === 'tools' ? 'bảng công cụ' : 'chú giải');
+  };
+});
+
+/* ============================================================
+   ⛰ XEM CAO ĐỘ — nút riêng, ngang cấp menu lớn (Anh Tony chốt 18/08)
+   Bật/tắt lớp đường đồng mức tô màu + bảng thang màu đi kèm.
+   Độc lập với "Lớp nền" nên chồng lên bản đồ đường cũng được.
+   ============================================================ */
+let caoDoOn = false;
+document.getElementById('btnCaoDo').onclick = (e)=>{
+  if(!map.getLayer('nen-topo')){
+    e.target.textContent = '⚠️ Chưa dựng được lớp cao độ';
+    setTimeout(()=>{ e.target.textContent = '⛰ Xem cao độ'; }, 2600);
+    return;
+  }
+  caoDoOn = !caoDoOn;
+  map.setLayoutProperty('nen-topo','visibility', caoDoOn ? 'visible' : 'none');
+  e.target.classList.toggle('gold', caoDoOn);
+  e.target.textContent = caoDoOn ? '⛰ Tắt cao độ' : '⛰ Xem cao độ';
+  const t = document.getElementById('thangCao');
+  if(t) t.classList.toggle('mo', caoDoOn);
+};
+
+/* Mở / đóng bảng chọn lớp nền */
+document.getElementById('btnLopNen').onclick = (e)=>{
+  const mo = document.getElementById('nhomLN').classList.toggle('mo');
+  e.target.classList.toggle('gold', mo);
+};
+
 /* Bật / tắt lớp tiện ích + mở bảng công tắc nhóm */
 document.getElementById('btnTienIch').onclick = (e)=>{
   if(!map.getLayer(TI_LAYER)){
     e.target.textContent = '⚠️ Chưa có dữ liệu tiện ích';
-    setTimeout(()=>{ e.target.textContent = '🏙 Bật tiện ích'; }, 2600);
+    setTimeout(()=>{ e.target.textContent = '🏙 Lớp tiện ích'; }, 2600);
     return;
   }
   tiOn = !tiOn;
   map.setLayoutProperty(TI_LAYER, 'visibility', tiOn ? 'visible' : 'none');
+  /* 18/08: nhãn CỐ ĐỊNH "🏙 Lớp tiện ích", báo bật/tắt bằng nút sáng màu */
   e.target.classList.toggle('gold', tiOn);
-  e.target.textContent = tiOn ? '🏙 Tắt tiện ích' : '🏙 Bật tiện ích';
   document.getElementById('nhomTI').classList.toggle('mo', tiOn);
 };
 
@@ -2253,6 +2629,6 @@ document.getElementById('btnAnHet').onclick = (e)=>{
      File caotoc-anim.js GIỮ NGUYÊN, chỉ ngắt dòng nạp. Bật lại = bỏ dấu chú thích. -->
 <!-- <script src="caotoc-anim.js?nc=20260814100000"></script> -->
 <!-- Thanh NAV chung cua web PGBL — them 14/08/2026 khi gan trang nay vao web ship -->
-<script src="../assets/eranav.js?nc=20260814224500" data-active="hatang"></script>
+<script src="/assets/eranav.js?nc=20260814224500" data-active="hatang"></script>
 </body>
 </html>

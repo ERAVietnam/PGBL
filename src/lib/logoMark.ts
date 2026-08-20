@@ -76,7 +76,7 @@ export function buildLogoMark({
       else shape.lineTo(x, y);
     });
     shape.closePath();
-
+    
     const geometry = new THREE.ExtrudeGeometry(shape, extrude);
     geometry.computeBoundingBox();
 
