@@ -272,8 +272,16 @@ const PK={pq:{t:'Phân khu Phú Quý',c:'#0E572D',bg:'#E7F0E9'},
 /* 🔴 DOI LKEY MOI LAN DOI DU LIEU GOC. Giu key cu thi trinh duyet cua Anh
    Tony khoi phuc ban nhap cu tu localStorage va BO QUA hotspot tinh trong
    tour.xml -> gim roi sai cho tren anh moi, khong bao mot dong loi nao.
-   Lich su: eratienich_elc_v2 -> _pgbl24_v1 -> _pgbl27_v1 (nay). */
-const LKEY='eratienich_pgbl27_v1';
+   Lich su: eratienich_elc_v2 -> _pgbl24_v1 -> _pgbl27_v1
+   -> _pgbl27_v2 (24/08: doi anh nen sang ban 24.08, anh moi = anh cu
+      phong 1.10106x + doi (-452.5,-247.0)px o thang 8900 -> 30 gim da
+      duoc nan lai trong tour.xml. Giu key v1 la may Anh van hien gim cu
+      LECH CHO ma khong bao loi).
+   -> _pgbl27_v3 (24/08: xoa gim ti_ga11 - An ninh 24/7 diem 2 - vi cho do
+      gio la DUONG CUT. 🔴 PHAI doi key: mo trang 1 lan la tiRestore() da
+      goi tiSaveDraft() ghi ca 30 gim vao localStorage, giu key v2 thi gim
+      vua xoa VAN HIEN LAI, im lang). */
+const LKEY='eratienich_pgbl27_v3';
 /* 🔴 Bat che do cong cu bang ?tool=1 - khoa CUNG ca phim tat, khong chi an nut.
    Khai o day (som) vi bang chu giai dung no de quyet co hien cham "chua cham". */
 var TOOLMODE = /[?&]tool=1(?:&|$)/.test(location.search);

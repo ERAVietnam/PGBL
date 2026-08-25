@@ -1,5 +1,5 @@
 /* ERA · PGBL — Thanh NAV gim day trang dung chung cho moi trang web.
-   Cach dung:  <script src="../assets/eranav.js" data-active="gallery"></script>
+   Cach dung:  <script src="/assets/eranav.js" data-active="gallery"></script>
    data-active nhan 1 trong: tour360 | hientrang | giohang | tienich | hatang
    (18/08 da BO 3 muc: ebro | nhamau | gallery — xem ghi chu o mang ITEMS)
    Dung duong dan tuyet doi (/...) -> chay dung khi goc site = 06-WEB/PGBL-web. */

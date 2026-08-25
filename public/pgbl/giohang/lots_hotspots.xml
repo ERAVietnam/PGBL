@@ -829,4 +829,100 @@
   <point ath="-0.161770" atv="-0.027850" />
 </hotspot>
 
+
+<!-- ============================================================
+     11 LO DA BAN NGOAI RO ERA - Anh Tony ve tay 24/08/2026
+     Nguon: bang "DO THI XANH - DA BAN". Mau tren ban do KHONG lay tu
+     lotstatus o day ma lay tu Google Sheet luc chay (stOf/CAUHINH.mau).
+     ============================================================ -->
+
+<hotspot name="lot_A5_22" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A5-22" lotarea="175" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.198903" atv="0.005626" />
+  <point ath="-0.179106" atv="0.027703" />
+  <point ath="-0.185230" atv="0.033257" />
+  <point ath="-0.205170" atv="0.011038" />
+</hotspot>
+
+<hotspot name="lot_A7_09" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A7-09" lotarea="103" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.207022" atv="-0.115724" />
+  <point ath="-0.203176" atv="-0.111167" />
+  <point ath="-0.222832" atv="-0.094502" />
+  <point ath="-0.224256" atv="-0.098205" />
+  <point ath="-0.225538" atv="-0.100199" />
+</hotspot>
+
+<hotspot name="lot_A7_10" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A7-10" lotarea="99" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.207022" atv="-0.115724" />
+  <point ath="-0.211010" atv="-0.120282" />
+  <point ath="-0.228671" atv="-0.105185" />
+  <point ath="-0.225538" atv="-0.100342" />
+</hotspot>
+
+<hotspot name="lot_A7_11" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A7-11" lotarea="100" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.214855" atv="-0.124697" />
+  <point ath="-0.211010" atv="-0.120282" />
+  <point ath="-0.228529" atv="-0.105185" />
+  <point ath="-0.233656" atv="-0.108745" />
+</hotspot>
+
+<hotspot name="lot_A7_12" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A7-12" lotarea="106" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.214855" atv="-0.124697" />
+  <point ath="-0.218559" atv="-0.129255" />
+  <point ath="-0.238641" atv="-0.112448" />
+  <point ath="-0.233656" atv="-0.108888" />
+</hotspot>
+
+<hotspot name="lot_A8_01" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A8-01" lotarea="99" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.118430" atv="-0.104900" />
+  <point ath="-0.114585" atv="-0.100342" />
+  <point ath="-0.132816" atv="-0.084959" />
+  <point ath="-0.136661" atv="-0.089517" />
+</hotspot>
+
+<hotspot name="lot_A8_02" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A8-02" lotarea="99" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.118430" atv="-0.104900" />
+  <point ath="-0.122276" atv="-0.109457" />
+  <point ath="-0.140507" atv="-0.094075" />
+  <point ath="-0.136661" atv="-0.089517" />
+</hotspot>
+
+<hotspot name="lot_A9_09" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="A9-09" lotarea="218" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="-0.149623" atv="-0.198619" />
+  <point ath="-0.141931" atv="-0.189645" />
+  <point ath="-0.161872" atv="-0.172696" />
+  <point ath="-0.169563" atv="-0.181812" />
+</hotspot>
+
+<hotspot name="lot_B3_06" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="B3-06" lotarea="100" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="0.115867" atv="0.110170" />
+  <point ath="0.120994" atv="0.113018" />
+  <point ath="0.132816" atv="0.092366" />
+  <point ath="0.127688" atv="0.089232" />
+</hotspot>
+
+<hotspot name="lot_B3_07" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="B3-07" lotarea="100" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="0.132816" atv="0.092366" />
+  <point ath="0.137943" atv="0.095357" />
+  <point ath="0.126122" atv="0.116009" />
+  <point ath="0.120994" atv="0.113018" />
+</hotspot>
+
+<hotspot name="lot_B4_26" style="LOT" fillcolor="0xC8102E" bordercolor="0xC8102E"
+         lotcode="B4-26" lotarea="100" lotdir="" lotprice="" lotstatus="ban">
+  <point ath="0.348739" atv="0.139225" />
+  <point ath="0.354722" atv="0.138798" />
+  <point ath="0.356146" atv="0.162584" />
+  <point ath="0.350164" atv="0.162869" />
+</hotspot>
+
 </krpano>
