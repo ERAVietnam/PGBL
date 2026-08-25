@@ -4,7 +4,7 @@
   "description": "Sa bàn phân lô, bộ lọc sản phẩm và tour 360 Khu đô thị Phú Gia Bảo Lộc.",
   "lang": "vi",
   "dir": "ltr",
-  "start_url": "/giohang/index.html",
+  "start_url": "/giohang/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],

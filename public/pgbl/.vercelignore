@@ -1,0 +1,46 @@
+# ==========================================================
+# .vercelignore  —  danh sach KHONG day len Vercel
+# ----------------------------------------------------------
+# Nho file nay, Anh Tony deploy THANG tu thu muc lam viec
+# PGBL-web, KHONG phai dong goi ra thu muc rieng nua.
+# Vercel CLI doc file nay giong het .gitignore.
+#
+# 🔴 Sua danh sach nay thi nho sua luon phan --exclude cua
+#    script dong goi trong nhat ky, cho 2 cho khong lech nhau.
+# ==========================================================
+
+# --- Cong cu van hanh, KHONG duoc lo ra ngoai ---
+banghang/
+test-net/
+_osm/
+
+# --- Thu muc backup cu ---
+tienich_cu_backup/
+
+# --- 25/08: hatang-v2 DA DE VAO /hatang/, day chi con la BAN NGUON ---
+#     De lot len mang la co 2 dia chi cung mot trang, Google an ca hai,
+#     va ban /hatang-v2/ khong bao gio duoc cap nhat nua.
+hatang-v2/
+
+# --- File backup, cong cu, tai lieu noi bo ---
+*.bak
+*.bak-*
+*.BAK*
+*.THUNGHIEM
+*.md
+*.py
+*.bat
+*.exe
+__pycache__/
+tour_testingserver
+tour_testingserver_macos
+
+# --- File krpano goc khong dung toi ---
+index-krpano-goc.html
+mat-bang.html
+Reload
+
+# --- Rac he thong ---
+.DS_Store
+Thumbs.db
+.vercel

@@ -42,7 +42,9 @@
   /* ---------- CẤU HÌNH — Anh Tony sửa ở đây ---------- */
   var CH = {
     LOP_THICONG : 'ct-thicong',       /* lớp nét đứt vàng, đang thi công        */
-    LOP_BAM     : ['ql-hienhuu', 'ct-khaithac', 'ct-thicong', 'ct-dexuat-dai'],
+    /* 24/08 (bản v2): thêm 2 lớp phương án cao tốc Phan Thiết–Bảo Lộc–Gia Nghĩa */
+    LOP_BAM     : ['ql-hienhuu', 'ct-khaithac', 'ct-thicong', 'ct-dexuat-dai',
+                   'ct-pa1-tim', 'ct-pa2-tim'],
     LOP_GLOW    : 'ct-glow-pulse',    /* lớp glow do file này tạo               */
     CHEN_TRUOC  : 'ct-casing',        /* glow nằm DƯỚI viền tối => loè ra ngoài */
 
@@ -63,6 +65,8 @@
     thicong   : '#FFC94B',
     hienhuu   : '#E01B24',
     dexuat    : '#7FD1FF',
+    pa1       : '#1D4ED8',   /* phương án 1 — giữ đúng màu bản đồ tỉnh (thêm 24/08) */
+    pa2       : '#E5399F',   /* phương án 2 */
     vanphong  : '#FFFFFF',   /* đường VP ERA -> cao tốc (thêm 14/08 ở chat khác) */
     noicaotoc : '#8B5CF6'
     /* Trạng thái lạ (chat khác thêm sau) -> tự dùng trắng, không lỗi. */

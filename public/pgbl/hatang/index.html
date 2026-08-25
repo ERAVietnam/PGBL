@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Bản đồ 3D dự án — ERA Vietnam</title>
+<title>Bản đồ 3D dự án (v2 · 2 phương án cao tốc) — ERA Vietnam</title>
 
 <!-- MapLibre GL JS (free, open-source) -->
 <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
@@ -17,11 +17,11 @@
 <script src="https://unpkg.com/maplibre-contour@0.0.5/dist/index.min.js"></script>
 
 <!-- Dữ liệu tuyến cao tốc (ước lượng) — nhúng bằng script src để mở file:// vẫn chạy -->
-<script src="caotoc-data.js?nc=20260814171500"></script>
+<script src="caotoc-data.js?nc=20260825v5"></script>
 <!-- Ranh giới tỉnh — ADDITIVE, gỡ 1 dòng này là bản đồ về như cũ -->
 <script src="ranhgioi-data.js?nc=20260814210000"></script>
 <!-- Tiện ích quanh dự án (OSM) — ADDITIVE, gỡ 1 dòng này là lớp tiện ích biến mất -->
-<script src="tienich-data.js?nc=20260818163000"></script>
+<script src="tienich-data.js?nc=20260825v3"></script>
 
 <style>
   /* 🔴 14/08: đổi sang ĐÚNG bộ màu dự án PGBL (chép từ 06-WEB\PGBL-web\index.html)
@@ -109,15 +109,24 @@
   .maplibregl-popup-content b{color:var(--text);}
   .maplibregl-popup-tip{border-top-color:rgba(13,38,32,.96)!important;border-bottom-color:rgba(13,38,32,.96)!important;}
   .maplibregl-popup-close-button{color:var(--text2);font-size:18px;}
+  /* 🆕 25/08 (Anh Tony: "trình bày gọn gàng lại, lược bớt thông tin không cần
+     thiết") — popup tuyến nay chỉ còn 4 dòng + ảnh nguồn + 1 link. */
+  .pu-tt{font-weight:700;font-size:11.5px;letter-spacing:.2px;margin:3px 0 4px;}
+  .pu-so{font-size:12.5px;color:var(--text);}
+  .pu-phu{font-size:11.5px;color:#8FA79A;margin-top:3px;line-height:1.35;}
+  .pu-anh{display:block;margin:7px 0 2px;text-decoration:none;}
+  .pu-anh img{display:block;width:100%;border-radius:7px;border:1px solid rgba(255,255,255,.18);}
+  .pu-anh i{display:block;font-style:normal;font-size:10px;color:#7E958A;margin-top:3px;line-height:1.3;}
+  .pu-link{display:inline-block;margin-top:5px;font-size:11.5px;font-weight:700;
+    color:#9BDC4C;text-decoration:none;border-bottom:1px solid rgba(155,220,76,.45);}
+  .pu-link:hover{color:#C6F08E;}
 
   /* Chú giải lớp cao tốc */
   /* 🔴 14/08 Anh Tony chốt: BẢNG CHÚ GIẢI để NỀN TRẮNG cho dễ đọc.
      Đây là bảng chữ dày đặc 8 dòng danh sách — nền tối làm mỏi mắt.
      Vẫn giữ chất ERA bằng viền + tiêu đề xanh rêu, không lạc khỏi bộ màu. */
   #legend{
-    /* NEXT 18/08: right:16px -> 64px, nhuong cho 2 nut zoom/fullscreen cua MapLibre
-       (dang top-right, rong ~29px + margin) khoi bi de. */
-    position:absolute;top:16px;right:64px;z-index:5;
+    position:absolute;top:16px;right:16px;z-index:5;
     background:#FFFFFF;border:1px solid rgba(13,38,32,.10);border-radius:16px;padding:11px 13px;
     box-shadow:0 10px 34px rgba(0,0,0,.34);font-size:12px;color:#2C4038;
     max-width:214px;
@@ -128,6 +137,10 @@
   #legend .sw.dash{border-top-style:dashed;border-color:#FFC94B;}
   #legend .sw.ql{border-top:5px solid #E01B24;}
   #legend .sw.band{border-top:9px solid #4FA8D8;opacity:.55;filter:blur(1.5px);}
+  #legend .sw.ql55{border-top:5px solid #A5121A;}
+  /* 🆕 24/08 (v2) — 2 phương án cao tốc Phan Thiết–Bảo Lộc–Gia Nghĩa */
+  #legend .sw.pa1{border-top:4px dashed #1D4ED8;}
+  #legend .sw.pa2{border-top:4px dashed #E5399F;}
   #legend .grp{margin:10px 0 3px;font-size:10px;font-weight:700;letter-spacing:.3px;color:#7C8E85;}
   #legend .warn{margin:8px 0 0;font-size:10.5px;line-height:1.35;color:#B00020;}
   #legend .dong{display:none;}   /* nút đóng chỉ dùng trên điện thoại */
@@ -355,7 +368,7 @@
   #btnGonTools{ top:8px; right:8px; }
   #tools.gon{ width:auto; padding:8px; gap:0; overflow:visible; }
   /* 🔴 Ẩn MỌI phần tử con trừ chính nút gọn — kể cả các <div> menu con
-     (#nhomTI/#nhomHW/#nhomLN), không thì thu gọn xong vẫn còn một cụm
+     (#nhomTI/#nhomHW/#nhomLN/#nhomTuyen), không thì thu gọn xong vẫn còn một cụm
      nút con lơ lửng. */
   #tools.gon > *:not(#btnGonTools){ display:none !important; }
   #tools.gon #btnGonTools{ position:static; }
@@ -492,15 +505,15 @@
   html.man-nho .rd-chip i{ display:none; }
 
   /* --- Công tắc con (tiện ích + lớp cao tốc) trong thanh công cụ --- */
-  #nhomTI, #nhomHW, #nhomLN{ display:none; flex-direction:column; gap:4px; margin:-2px 0 2px; padding-left:8px; }
-  #nhomTI.mo, #nhomHW.mo, #nhomLN.mo{ display:flex; }
-  #nhomTI button, #nhomHW button, #nhomLN button{
+  #nhomTI, #nhomHW, #nhomLN, #nhomTuyen{ display:none; flex-direction:column; gap:4px; margin:-2px 0 2px; padding-left:8px; }
+  #nhomTI.mo, #nhomHW.mo, #nhomLN.mo, #nhomTuyen.mo{ display:flex; }
+  #nhomTI button, #nhomHW button, #nhomLN button, #nhomTuyen button{
     text-align:left; padding:7px 10px; font-size:12px; border-radius:9px;
     border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--dim);
     cursor:pointer; display:flex; align-items:center; gap:7px;
   }
-  #nhomTI button .cham, #nhomHW button .cham, #nhomLN button .cham{ width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#555; }
-  #nhomTI button.bat, #nhomHW button.bat, #nhomLN button.bat{ color:var(--text); background:rgba(255,255,255,.07); }
+  #nhomTI button .cham, #nhomHW button .cham, #nhomLN button .cham, #nhomTuyen button .cham{ width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:#555; }
+  #nhomTI button.bat, #nhomHW button.bat, #nhomLN button.bat, #nhomTuyen button.bat{ color:var(--text); background:rgba(255,255,255,.07); }
 
   /* --- Nút ẩn/hiện TẤT CẢ bảng (chỉ có trên màn nhỏ) --- */
   #btnAnHet{ display:none; }
@@ -516,7 +529,7 @@
 <div id="map"></div>
 
 <div id="panel">
-  <h1>Bản đồ 3D dự án</h1>
+  <h1>Bản đồ 3D dự án <span style="opacity:.6;font-size:.72em">v2</span></h1>
   <p class="sub">Chọn vị trí • Ghim điểm • Xoay mọi hướng</p>
   <div id="locList"></div>
 </div>
@@ -528,11 +541,13 @@
 
   <p class="grp">✅ ĐANG CHẠY ĐƯỢC HÔM NAY</p>
   <div class="row"><span class="sw ql"></span> <b>Quốc lộ</b> (đường hiện hữu)</div>
+  <div class="row"><span class="sw ql55"></span> <b>QL.55</b> → Đa Mi → La Gi → <b>biển</b> <i>(189 km)</i></div>
   <div class="row"><span class="sw"></span> <b>Cao tốc</b> đã thông xe</div>
 
   <p class="grp">⛔ CHƯA CHẠY ĐƯỢC</p>
   <div class="row"><span class="sw dash"></span> Cao tốc đang thi công</div>
-  <div class="row"><span class="sw band"></span> Cao tốc mới đề xuất QH</div>
+  <div class="row"><span class="sw pa1"></span> <b>Phương án 1</b> · 143,81 km · <i>tỉnh đề xuất chọn</i></div>
+  <div class="row"><span class="sw pa2"></span> <b>Phương án 2</b> · 152,4 km</div>
 
   <p class="grp">🔗 ĐƯỜNG TỪ DỰ ÁN RA CAO TỐC</p>
   <div class="row"><span class="sw noict"></span> <b>Nguyễn Văn Cừ</b> — nối thẳng nút giao</div>
@@ -544,22 +559,26 @@
 
   <!-- 🆕 18/08 (Anh Tony chốt): danh sách 8 tuyến TÁCH sang bảng riêng bên dưới.
        Bảng chú giải cũ dài ~90 dòng, trên điện thoại phải cuộn mãi mới hết. -->
-  <button id="btnDsTuyen" class="mo-ds">▾ Danh sách 8 tuyến</button>
+  <button id="btnDsTuyen" class="mo-ds">▾ Danh sách tuyến (10 mục)</button>
 </div>
 
 <!-- 🆕 18/08: BẢNG 2 — danh sách tuyến. Mặc định ĐÓNG, mở bằng nút trong chú giải. -->
 <div id="dstuyen" hidden>
   <button class="dong" id="btnDsClose" aria-label="Đóng danh sách tuyến">✕</button>
-  <h2>8 tuyến đường qua Bảo Lộc</h2>
+  <h2>Các tuyến đường qua Bảo Lộc</h2>
 
   <p class="grp">ĐƯỜNG HIỆN HỮU</p>
   <ol>
     <li><b>Quốc lộ 20</b> · ~268 km · Dầu Giây → <b>xuyên tâm Bảo Lộc</b> → Đà Lạt</li>
     <li><b>Đường tránh TP Bảo Lộc</b> · ~15,4 km · nhánh QL20 đi vòng</li>
+    <li><b style="color:#E01B24">Quốc lộ 55</b> · ~229 km toàn tuyến · <b>trục ra biển</b><br>
+        <span style="color:#7C8E85">Bắt đầu từ <b>ngã 3 Đại Bình</b> (giao QL.20 Km123+900, P. Lộc Sơn)
+        → Đa Mi → Tánh Linh → Hàm Tân → <b>La Gi (biển)</b> → Hồ Tràm → Bình Châu.
+        Bản đồ vẽ <b>189 km</b>, chạy tới bờ biển.</span></li>
   </ol>
 
   <p class="grp">CAO TỐC · TRỤC BẮC–NAM · TP.HCM ↔ Đà Lạt</p>
-  <ol start="3">
+  <ol start="4">
     <li><b>TP.HCM – Long Thành – Dầu Giây</b> · 55,7 km · khai thác</li>
     <li><b>Dầu Giây – Tân Phú</b> · 60,2 km · thi công</li>
     <li><b>Tân Phú – Bảo Lộc</b> · 66 km · thi công</li>
@@ -567,10 +586,20 @@
     <li><b>Liên Khương – Prenn</b> · 19,2 km · khai thác</li>
   </ol>
 
-  <p class="grp">CAO TỐC · TRỤC ĐÔNG–TÂY · biển ↔ Tây Nguyên</p>
-  <ol start="8">
-    <li><b>Phan Thiết – Bảo Lộc – Gia Nghĩa</b> · 143,81 km · <b>đề xuất quy hoạch</b></li>
+  <p class="grp">CAO TỐC · TRỤC ĐÔNG–TÂY · biển ↔ Tây Nguyên · <b>2 PHƯƠNG ÁN, CHƯA DUYỆT</b></p>
+  <ol start="9">
+    <li><b style="color:#1D4ED8">Phương án 1</b> · <b>143,81 km</b> · 54.897 tỷ · 1.295 ha ·
+        7 cầu cạn · 9 hầm · <b>9 nút giao</b> · qua 13 xã, phường<br>
+        <span style="color:#7C8E85">Phan Thiết (Hàm Hiệp) → Đa Mi → Bảo Lộc → Gia Nghĩa.
+        <b>Tỉnh đang đề xuất chọn phương án này</b> — vốn thấp hơn, ít đất hơn, nhiều nút giao hơn.</span></li>
+    <li><b style="color:#E5399F">Phương án 2</b> · <b>152,4 km</b> · 73.385 tỷ · 1.372 ha ·
+        10 cầu cạn · 7 hầm · 5 nút giao<br>
+        <span style="color:#7C8E85">Bắc Bình (Ma Lâm) → QL.28B → Đại Ninh → QL.28 → Gia Nghĩa.
+        Dài hơn ~9 km, vốn cao hơn ~33%.</span></li>
   </ol>
+  <p class="warn" style="margin-top:8px">Hướng tuyến 2 phương án đồ lại từ bản đồ UBND tỉnh Lâm Đồng
+     công bố 06/03/2026 — <b>chưa có trong quy hoạch mạng lưới đường bộ quốc gia được duyệt</b>,
+     không phải hồ sơ tim tuyến pháp lý.</p>
 </div>
 
 <div id="tools">
@@ -586,6 +615,10 @@
   <button class="ghost gold" id="btnTinh">🗺 Ranh giới tỉnh</button>
   <button class="ghost" id="btnHwToggle">🛣 Lớp cao tốc</button>
   <div id="nhomHW"></div>
+  <!-- 🆕 25/08 (Anh Tony): "để ẩn và hiện các tuyến đường hiện có,
+       chủ yếu các đường lớn như cao tốc" -->
+  <button class="ghost" id="btnTuyenToggle">🛤 Ẩn/hiện từng tuyến</button>
+  <div id="nhomTuyen"></div>
   <!-- 🆕 18/08: lớp tiện ích + công tắc từng nhóm (Anh Tony đặt) -->
   <button class="ghost" id="btnTienIch">🏙 Lớp tiện ích</button>
   <div id="nhomTI"></div>
@@ -749,9 +782,19 @@ map.on('load', ()=>{
    🔴 Hướng tuyến VẼ ƯỚC LƯỢNG. Nét đứt = chưa thi công xong.
    ============================================================ */
 const HW_MAU_QUOCLO   = '#E01B24';   /* ĐỎ — quốc lộ hiện hữu (quy ước bản đồ VN) */
+/* 🆕 25/08 (Anh Tony): "QL55 xuống 1-2 tông màu đỏ" — QL.20 và QL.55 cùng là
+   quốc lộ nên cùng status 'hienhuu', để chung một màu là nhìn không tách được
+   đâu là trục ra biển. Hạ 2 tông (giữ nguyên sắc đỏ, chỉ tối và trầm hơn). */
+const HW_MAU_QL55     = '#A5121A';   /* đỏ đậm — QL.55, trục ra biển */
 const HW_MAU_KHAITHAC = '#E8730C';   /* cam đậm — cao tốc đã thông xe */
 const HW_MAU_THICONG  = '#FFC94B';   /* vàng — nét đứt, cao tốc đang thi công */
 const HW_MAU_DEXUAT   = '#7FD1FF';   /* xanh nhạt — dải mờ, mới đề xuất */
+/* 🆕 24/08/2026 (bản v2) — 2 PHƯƠNG ÁN cao tốc Phan Thiết–Bảo Lộc–Gia Nghĩa.
+   🔴 GIỮ ĐÚNG MÀU CỦA BẢN ĐỒ TỈNH: phương án 1 xanh dương, phương án 2 hồng.
+   Đừng đổi sang bảng màu khác — khách/sale hay mở bản đồ tỉnh ra đối chiếu,
+   đổi màu là mất luôn khả năng nhận ra "à đúng cái đường này". */
+const HW_MAU_PA1      = '#1D4ED8';   /* XANH DƯƠNG — phương án 1 (143,81 km) */
+const HW_MAU_PA2      = '#E5399F';   /* HỒNG — phương án 2 (152,4 km) */
 const HW_MAU_NOICT    = '#8B5CF6';   /* tím — đường nối thẳng vào cao tốc */
 const HW_MAU_NOITHI   = '#CFD6DE';   /* xám nhạt — đường nội thị Bảo Lộc */
 const hwLabels = [];                 /* các nhãn HTML của nút giao, để bật/tắt */
@@ -771,6 +814,8 @@ function addHighway(){
      có viền là dải mờ trông như đường đặc, mất hết ý nghĩa "chưa chốt". */
   map.addLayer({ id:'ct-casing', type:'line', source:'ct-tuyen',
     filter:['all',['!=',['get','status'],'dexuat'],
+                  ['!=',['get','status'],'pa1'],
+                  ['!=',['get','status'],'pa2'],
                   ['!=',['get','status'],'noithi'],
                   ['!=',['get','status'],'noicaotoc']],
     layout:{ 'line-cap':'round', 'line-join':'round' },
@@ -835,7 +880,9 @@ function addHighway(){
   map.addLayer({ id:'ql-hienhuu', type:'line', source:'ct-tuyen',
     filter:['==',['get','status'],'hienhuu'],
     layout:{ 'line-cap':'round', 'line-join':'round' },
-    paint:{ 'line-color':HW_MAU_QUOCLO,
+    /* 25/08: QL.55 tối hơn 2 tông so với QL.20 — tô theo DỮ LIỆU (`id`),
+       không tách lớp riêng, để khỏi phải nhớ thêm một tên lớp nữa. */
+    paint:{ 'line-color':['case',['==',['get','id'],'q55'], HW_MAU_QL55, HW_MAU_QUOCLO],
             'line-width':['interpolate',['linear'],['zoom'],7,3.5,12,7,16,11] } });
 
   /* Đoạn ĐANG KHAI THÁC — nét liền */
@@ -869,6 +916,25 @@ function addHighway(){
     paint:{ 'line-color':'#7FD1FF', 'line-opacity':0.85, 'line-dasharray':[1,2.2],
             'line-width':['interpolate',['linear'],['zoom'],7,1.5,12,2.5,16,3.5] } });
 
+  /* 🆕 24/08/2026 (bản v2) — 2 PHƯƠNG ÁN CAO TỐC PHAN THIẾT – BẢO LỘC – GIA NGHĨA.
+     Khác hẳn lớp 'dexuat' cũ: hướng tuyến này ĐÃ ĐƯỢC TỈNH CÔNG BỐ THÀNH BẢN ĐỒ,
+     đồ lại được nên vẽ NÉT RÕ chứ không còn phải vẽ dải mờ "đâu đó trong vùng này".
+     Vẫn để NÉT ĐỨT + một dải mờ hẹp vì tỉnh CHƯA duyệt và CHƯA chốt chọn phương án.
+     PA1 vẽ đậm hơn PA2 vì tỉnh đang đề xuất chọn PA1. */
+  [['pa1', HW_MAU_PA1, 0.17, 1.0], ['pa2', HW_MAU_PA2, 0.14, 0.78]].forEach(([st,mau,mo,gay])=>{
+    map.addLayer({ id:'ct-'+st+'-dai', type:'line', source:'ct-tuyen',
+      filter:['==',['get','status'],st],
+      layout:{ 'line-cap':'round', 'line-join':'round' },
+      paint:{ 'line-color':mau, 'line-opacity':mo,
+              'line-width':['interpolate',['linear'],['zoom'],7,8,12,22,16,52] } });
+    map.addLayer({ id:'ct-'+st+'-tim', type:'line', source:'ct-tuyen',
+      filter:['==',['get','status'],st],
+      layout:{ 'line-cap':'butt', 'line-join':'round' },
+      paint:{ 'line-color':mau, 'line-opacity':0.95, 'line-dasharray':[2.4,1.5],
+              'line-width':['interpolate',['linear'],['zoom'],
+                7, 2.6*gay, 12, 4.6*gay, 16, 7*gay] } });
+  });
+
   /* Chấm nút giao (lớp circle — KHÔNG cần font) */
   map.addLayer({ id:'ct-nut-cham', type:'circle', source:'ct-nut',
     paint:{ 'circle-radius':['interpolate',['linear'],['zoom'],7,3.5,13,7],
@@ -895,15 +961,33 @@ function addHighway(){
      14/08: Anh Tony chốt bỏ hết ghi chú/cảnh báo trong trang — để trung lập,
      sale tự diễn giải khi tư vấn. Ghi nguồn OpenStreetMap vẫn còn ở
      'attribution' của map.addSource (bắt buộc theo giấy phép ODbL, KHÔNG gỡ). */
-  ['ql-hienhuu','ct-khaithac','ct-thicong','ct-dexuat-dai'].forEach(id=>{
+  /* 🆕 25/08 — MỘT CHỖ DỰNG POPUP CHO MỌI TUYẾN.
+     Anh Tony chốt: gọn lại, bỏ khối cảnh báo đỏ dài, và với 2 phương án thì
+     KÈM ẢNH BẢN ĐỒ GỐC CỦA TỈNH + link bài báo "để tăng niềm tin".
+     🔴 Chỉ in dòng nào DỮ LIỆU CÓ — thêm/bớt thông tin thì sửa `caotoc-data.js`,
+        không phải sửa chỗ này. */
+  const MAU_TRANGTHAI = { khaithac:HW_MAU_KHAITHAC, thicong:HW_MAU_THICONG,
+    hienhuu:HW_MAU_QUOCLO, pa1:HW_MAU_PA1, pa2:HW_MAU_PA2, dexuat:HW_MAU_DEXUAT };
+  function popupTuyen(p){
+    const mau = (p.id==='q55' ? HW_MAU_QL55 : MAU_TRANGTHAI[p.status]) || '#C9A227';
+    const co = v => v && v !== '—' && v !== 'undefined';
+    return `<b>${p.ten}</b>`
+      + (co(p.trangthai) ? `<div class="pu-tt" style="color:${mau}">${p.trangthai}</div>` : '')
+      + (co(p.tomtat||p.dai) ? `<div class="pu-so">${p.tomtat || p.dai}</div>` : '')
+      + (co(p.von) ? `<div class="pu-so">Vốn ${p.von}</div>` : '')
+      + (co(p.huong) ? `<div class="pu-phu">${p.huong}</div>` : '')
+      + (co(p.anh) ? `<a class="pu-anh" href="${p.anh}" target="_blank" rel="noopener">`
+                     + `<img src="${p.anh}" alt="" loading="lazy">`
+                     + (co(p.anhChu) ? `<i>${p.anhChu}</i>` : '') + `</a>` : '')
+      + (co(p.link) ? `<a class="pu-link" href="${p.link}" target="_blank" rel="noopener">`
+                     + `${p.linkChu || 'Xem thêm'} ↗</a>` : '');
+  }
+  window.popupTuyen = popupTuyen;
+
+  ['ql-hienhuu','ct-khaithac','ct-thicong','ct-dexuat-dai','ct-pa1-dai','ct-pa2-dai'].forEach(id=>{
     map.on('click', id, (e)=>{
-      const p = e.features[0].properties;
-      new maplibregl.Popup({offset:12}).setLngLat(e.lngLat).setHTML(
-        `<b>Cao tốc ${p.ten}</b><br>
-         Trạng thái: <b style="color:${p.status==='khaithac'?HW_MAU_KHAITHAC:'#8A6D1F'}">${p.trangthai}</b><br>
-         Chiều dài công bố: ${p.dai} <span style="color:#999">(đo trên bản đồ: ${p.daiVe})</span><br>
-         <span style="color:#666">${p.ghichu}</span>`
-      ).addTo(map);
+      new maplibregl.Popup({offset:12, maxWidth:'300px'})
+        .setLngLat(e.lngLat).setHTML(popupTuyen(e.features[0].properties)).addTo(map);
     });
     map.on('mouseenter', id, ()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
     map.on('mouseleave', id, ()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
@@ -911,6 +995,7 @@ function addHighway(){
 
   veTienIch();
   veNutXuongCaoToc();
+  veBienNga3();
 }
 
 /* ============================================================
@@ -955,26 +1040,37 @@ function khoangToiTuyen(p, geom){
 
    ⚠️ Đánh đổi đã biết: chữ là ảnh raster, phóng quá cỡ sẽ hơi mềm nét.
       Vẽ @2x nên ở cỡ hiển thị thật (≤ 0,85) mắt không nhận ra.
-   ⚠️ Chữ cứng trong ảnh -> đổi nội dung phải sửa 2 biến DONG1/DONG2 dưới đây,
-      không sửa được từ dữ liệu. Chấp nhận vì cả 2 biển dùng chung một câu. */
-function iconBienGiaoNhau(){
+   ⚠️ Chữ nằm cứng trong ảnh -> đổi nội dung phải vẽ lại ảnh, không sửa được
+      từ dữ liệu. Chấp nhận: cả trang chỉ có vài tấm biển.
+
+   🆕 25/08 — THAM SỐ HOÁ. Trước đây câu chữ bị GÕ CỨNG trong hàm nên muốn
+   thêm một tấm biển khác là phải chép cả hàm 90 dòng. Nay nhận 3 tham số:
+   2 dòng chữ + CHIỀU CAO CỘT.
+   🔴 Cột cao thấp là để CHỐNG CHỒNG NHÃN, không phải cho đẹp: biển cắm ở
+   chân cột (icon-anchor 'bottom'), cột càng cao thì mặt biển càng nhô lên xa
+   khỏi mặt đường, thoát khỏi đám thẻ tên đường nằm ngay đó. */
+function iconBienThoi(DONG1, DONG2, hCotR){
   const R = 2;
-  const DONG1 = 'NÚT GIAO', DONG2 = 'LỐI RA';
   const FONT  = `700 ${10*R}px "Segoe UI",system-ui,-apple-system,Arial,sans-serif`;
 
   /* Đo chữ TRƯỚC để canvas vừa khít — đặt cứng bề rộng thì chữ dài hơn
      font hệ thống của máy khác là bị CẮT CỤT, không báo lỗi. */
   const do1 = document.createElement('canvas').getContext('2d');
   do1.font = FONT;
-  const wChu  = Math.max(do1.measureText(DONG1).width, do1.measureText(DONG2).width);
+  /* 🆕 25/08: cho phép BIỂN 1 DÒNG (Anh Tony: "Tên: NGÃ 3 ĐẠI BÌNH — bỏ cái
+     lối ra QL55 đi"). Dòng 2 rỗng thì đo mình dòng 1 và rút thấp tấm biển phụ,
+     không thì tấm biển cao gấp đôi mà nửa dưới trống trơn. */
+  const MOT_DONG = !DONG2;
+  const wChu  = MOT_DONG ? do1.measureText(DONG1).width
+                         : Math.max(do1.measureText(DONG1).width, do1.measureText(DONG2).width);
   const wBien = Math.ceil(wChu + 13*R);
 
   const sThoi = 34 * R;                      /* cạnh vuông trước khi xoay */
   const nc    = sThoi * Math.SQRT1_2;        /* nửa đường chéo hình thoi */
   const W     = Math.max(wBien, Math.ceil(nc*2 + 6*R));
   const hThoi = Math.ceil(nc*2 + 4*R);
-  const hBien = 27 * R;
-  const hCot  = 22 * R;
+  const hBien = (MOT_DONG ? 19 : 27) * R;
+  const hCot  = (hCotR || 22) * R;
   const H     = hThoi + hBien + hCot;
 
   const c = document.createElement('canvas');
@@ -1016,8 +1112,12 @@ function iconBienGiaoNhau(){
 
   x.font = FONT; x.textAlign = 'center'; x.textBaseline = 'middle';
   x.fillStyle = '#111111';
-  x.fillText(DONG1, cx, yBien + hBien*0.31);
-  x.fillText(DONG2, cx, yBien + hBien*0.71);
+  if(MOT_DONG){
+    x.fillText(DONG1, cx, yBien + hBien*0.52);
+  }else{
+    x.fillText(DONG1, cx, yBien + hBien*0.31);
+    x.fillText(DONG2, cx, yBien + hBien*0.71);
+  }
 
   /* --- MẶT BIỂN THOI --- */
   x.save();
@@ -1038,9 +1138,66 @@ function iconBienGiaoNhau(){
   return x.getImageData(0, 0, W, H);
 }
 
+/* Giữ nguyên tên hàm cũ để không phải sửa chỗ gọi — đây vẫn là tấm biển
+   "NÚT GIAO / LỐI RA" y hệt trước, cột 22. */
+function iconBienGiaoNhau(){ return iconBienThoi('NÚT GIAO', 'LỐI RA', 22); }
+
+/* ============================================================
+   🆕 25/08 — BIỂN "NGÃ 3 ĐẠI BÌNH"  (Anh Tony: "làm kiểu này đi")
+   Trước đây ngã 3 hiện bằng chip HTML như Vincom / Núi Đại Bình. Anh chốt đổi
+   sang ĐÚNG kiểu biển thoi của nút giao lối ra — vì đây cũng là một nút giao,
+   để 2 kiểu khác nhau cho cùng một loại đối tượng là khách đọc không ra.
+
+   🔴 25/08 (đợt 3) Anh Tony: "Tên: NGÃ 3 ĐẠI BÌNH — bỏ cái lối ra QL55 đi".
+   => biển CHỈ MỘT DÒNG. Chuyện "đây là lối ra QL.55" vẫn còn nguyên trong
+   popup khi bấm vào, không mất thông tin, chỉ là không phơi lên mặt bản đồ.
+
+   🔴 CỘT CAO 78 thay vì 22 (Anh Tony: "góc view này đang bị chồng nhau").
+   Ở góc nghiêng 3D, thẻ "QL20 · đường tránh" nằm ngay cạnh nút giao và đè lên
+   biển. Cột dài đẩy mặt biển lên cao, thoát hẳn đám thẻ mà CHÂN CỘT vẫn cắm
+   đúng toạ độ — không phải dời điểm, không phải nói dối vị trí.
+
+   🔴 Toạ độ ĐỌC TỪ `tienich-data.js` như GHIM_MOC, không gõ cứng.
+   ============================================================ */
+function veBienNga3(){
+  const D = window.TIEN_ICH;
+  if(!D || !D.nhom){ console.warn('[ngã 3] chưa có tienich-data.js — bỏ qua'); return; }
+  const bo = t => (t||'').toLowerCase().normalize('NFD')
+                   .replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+  let d = null;
+  Object.values(D.nhom).forEach(n => (n.diem||[]).forEach(q=>{
+    if(!d && bo(q.ten).includes('nga 3 dai binh')) d = q;
+  }));
+  if(!d){ console.warn('[ngã 3] không thấy điểm "Ngã 3 Đại Bình" trong dữ liệu'); return; }
+
+  try{ map.addImage('bien-nga3', iconBienThoi('NGÃ 3 ĐẠI BÌNH','', 78), {pixelRatio:2}); }
+  catch(e){ console.warn('[ngã 3] không nạp được icon:', e.message); return; }
+
+  map.addSource('nga3', { type:'geojson', data:{ type:'FeatureCollection', features:[{
+    type:'Feature',
+    properties:{ ten:d.ten, km:d.km },
+    geometry:{ type:'Point', coordinates:[d.lng, d.lat] } }] } });
+  map.addLayer({ id:'nga3', type:'symbol', source:'nga3',
+    layout:{ 'icon-image':'bien-nga3', 'icon-anchor':'bottom',
+      'icon-size':['interpolate',['linear'],['zoom'],8,0.40,12,0.58,16,0.80],
+      'icon-allow-overlap':true, 'icon-ignore-placement':true } });
+  map.on('click','nga3',(e)=>{
+    const q = e.features[0].properties;
+    new maplibregl.Popup({offset:16, maxWidth:'280px'})
+      .setLngLat(e.features[0].geometry.coordinates)
+      .setHTML(`<b>NGÃ 3 ĐẠI BÌNH</b>
+        <div class="pu-tt" style="color:${HW_MAU_QL55}">NÚT GIAO QL.20 × QL.55</div>
+        <div class="pu-so">QL.20 Km123+900 · phường Lộc Sơn</div>
+        <div class="pu-phu">Điểm đầu QL.55 — trục ra biển La Gi.
+          Cách dự án ~${q.km} km.</div>`).addTo(map);
+  });
+  map.on('mouseenter','nga3',()=>{ if(!pinMode) map.getCanvas().style.cursor='pointer'; });
+  map.on('mouseleave','nga3',()=>{ if(!pinMode) map.getCanvas().style.cursor=''; });
+}
+
 function veNutXuongCaoToc(){
   const T = window.CAOTOC_TUYEN.features;
-  const caoToc = T.filter(f=> ['khaithac','thicong','dexuat'].includes(f.properties.status));
+  const caoToc = T.filter(f=> ['khaithac','thicong','dexuat','pa1','pa2'].includes(f.properties.status));
   const fc = { type:'FeatureCollection', features:[] };
 
   T.forEach(f=>{
@@ -1434,7 +1591,9 @@ const CHIP_KIEU = {
   hienhuu : { mau:HW_MAU_QUOCLO,   nen:'#E01B24', chu:'#fff', icon:'🚗', phu:'QUỐC LỘ · đang chạy' },
   khaithac: { mau:HW_MAU_KHAITHAC, nen:'#E8730C', chu:'#fff', icon:'✅', phu:'CAO TỐC · đã thông xe' },
   thicong : { mau:HW_MAU_THICONG,  nen:'#B98200', chu:'#fff', icon:'🚧', phu:'CAO TỐC · đang thi công' },
-  dexuat  : { mau:HW_MAU_DEXUAT,   nen:'#2A6E93', chu:'#fff', icon:'📋', phu:'CAO TỐC · mới đề xuất' }
+  dexuat  : { mau:HW_MAU_DEXUAT,   nen:'#2A6E93', chu:'#fff', icon:'📋', phu:'CAO TỐC · mới đề xuất' },
+  pa1     : { mau:HW_MAU_PA1,      nen:'#1D4ED8', chu:'#fff', icon:'📋', phu:'ĐỀ XUẤT QH · PHƯƠNG ÁN 1' },
+  pa2     : { mau:HW_MAU_PA2,      nen:'#B02576', chu:'#fff', icon:'📋', phu:'ĐỀ XUẤT QH · PHƯƠNG ÁN 2' }
 };
 /* Tên ngắn hiện trên chip — dài quá thì che mất bản đồ */
 const CHIP_TEN = {
@@ -1443,9 +1602,12 @@ const CHIP_TEN = {
   nvc:'Nguyễn Văn Cừ → CAO TỐC', td:'Phan Đình Phùng → CAO TỐC',
   ltk:'Lý Thường Kiệt', pdp:'Phan Đình Phùng',
   q20:'QL20 · xuyên tâm Bảo Lộc', q20t:'QL20 · đường tránh',
+  q55:'QL.55 · Bảo Lộc → Đa Mi → biển',
   s1:'CT.29 · An Phú–Dầu Giây', s2:'CT.27 · Dầu Giây–Tân Phú',
   s3:'CT.27 · Tân Phú–Bảo Lộc', s4:'CT.27 · Bảo Lộc–Liên Khương',
-  s5:'CT.27 · Liên Khương–Prenn', s6:'Phan Thiết–Bảo Lộc–Gia Nghĩa'
+  s5:'CT.27 · Liên Khương–Prenn',
+  pa1:'PA1 · Phan Thiết–Bảo Lộc–Gia Nghĩa (143,81 km)',
+  pa2:'PA2 · Phan Thiết–Bảo Lộc–Gia Nghĩa (152,4 km)'
 };
 /* ============================================================
    🆕 18/08/2026 — TÌM ĐIỂM GIỮA TUYẾN (Anh Tony bắt lỗi "4 chấm lệch")
@@ -1481,11 +1643,26 @@ const NEO_TI_LE = {
 /* 🆕 18/08 — ĐẶT NHÃN Ở TOẠ ĐỘ CỤ THỂ, và cho phép MỘT TUYẾN CÓ NHIỀU NHÃN.
    Anh Tony ghim tay. Tuyến nào có tên ở đây thì BỎ HẲN vị trí tính tự động,
    dùng đúng danh sách toạ độ này — mỗi toạ độ sinh một thẻ.
-   Vì sao cần: s6 (Phan Thiết–Bảo Lộc–Gia Nghĩa) dài 152 km chạy chéo hết
-   khung nhìn; một nhãn ở giữa thì hai đầu tuyến không biết là đường gì. */
+   Vì sao cần: 2 phương án Phan Thiết–Bảo Lộc–Gia Nghĩa dài 144–152 km, chạy
+   chéo hết khung nhìn; một nhãn ở giữa thì hai đầu tuyến không biết là đường gì.
+
+   🆕 24/08/2026 (bản v2): tuyến 's6' cũ đã BỎ, thay bằng 'pa1' + 'pa2'.
+   🔴 Toạ độ dưới đây LẤY TỪ CHÍNH tim tuyến đã đồ (điểm thứ 28% và 72% chiều
+      dài), không phải ước lượng — nên nhãn luôn nằm ĐÚNG trên đường. Đặt 2
+      phương án ở 2 mốc khác nhau để 2 thẻ không đè lên nhau ở khúc chạy song song. */
 const NEO_DIEM = {
-  s6: [ [107.87793, 11.46110],    /* phía Phan Thiết — cách tim tuyến 2 m */
-        [107.73760, 11.69880] ]   /* phía Gia Nghĩa  — cách tim tuyến 141 m */
+  /* 🔄 25/08 (đợt 4): lấy lại theo hình học ĐÃ NẮN — toạ độ cũ tính trên
+     bản zic zac, lệch tới ~500 m nên thẻ có thể đứng hở khỏi đường. */
+  pa1: [ [107.95500, 11.28548],   /* PA1 · đoạn Đa Mi   (28% chiều dài) */
+         [107.83778, 11.79085] ],  /* PA1 · đoạn phía Gia Nghĩa (72%) */
+  pa2: [ [108.19544, 11.51494],   /* PA2 · đoạn Đại Ninh (28%) */
+         [108.02022, 12.01537] ],  /* PA2 · đoạn phía Gia Nghĩa (72%) */
+  /* 🆕 25/08 (Anh Tony: "QL55 cần vẽ ra biển, nhìn như hiện tại bị cụt") —
+     tuyến nay dài 189 km nên MỘT nhãn ở giữa là vô dụng: khúc Bảo Lộc không
+     biết đường gì, khúc bờ biển cũng vậy. Đặt 2 thẻ, toạ độ lấy từ CHÍNH tim
+     tuyến (km 6,9 và km 150) nên luôn nằm đúng trên đường. */
+  q55: [ [107.83855, 11.47483],   /* QL.55 · km 6,9 — khúc cạnh cụm hồ, đúng chỗ Anh chỉ */
+         [107.67859, 10.65038] ]  /* QL.55 · km 150 — La Gi, chỗ chạm biển */
 };
 
 function diemGiuaTheoDai(geom, tiLe){
@@ -1521,7 +1698,7 @@ function diemGiuaTheoDai(geom, tiLe){
      (2) khi 2 nhãn đè nhau thì cái hạng lớn hơn tự ẩn
    Thứ tự Anh Tony chốt: Dự án > Cao tốc > Quốc lộ > Đường ra cao tốc > Nội thị */
 const HANG = {
-  khaithac:1, thicong:1, dexuat:2,      /* cao tốc */
+  khaithac:1, thicong:1, dexuat:2, pa1:2, pa2:2,      /* cao tốc */
   hienhuu:3,                            /* quốc lộ */
   noicaotoc:4, vaotrungtam:4, vanphong:4, /* đường từ dự án ra cao tốc */
   /* 🆕 18/08 (Anh Tony) — MỐC ĐỊNH VỊ (Vincom, Núi Đại Bình).
@@ -1563,15 +1740,18 @@ const BOX_FC   = { type:'FeatureCollection', features:[] };
      · không phụ thuộc font hay CDN nào; cũng không dính bẫy đoán codepoint
        của bộ icon font (bẫy 14/08 với Phosphor). */
 const BOX_ICON = {
-  khaithac:'xe', thicong:'xaydung', dexuat:'tailieu',   /* cao tốc — Anh chốt nghĩa */
+  khaithac:'xe', thicong:'xaydung', dexuat:'tailieu', pa1:'tailieu', pa2:'tailieu',   /* cao tốc — Anh chốt nghĩa */
   hienhuu:'duong', noicaotoc:'renhanh', vaotrungtam:'thanhpho', vanphong:'toanha'
 };
 /* 🎨 Màu ô icon — Anh Tony chốt: "box màu trắng, icon xây dựng vàng,
    xe chạy màu xanh". Lấy ĐÚNG bộ màu bộ VR 360 (`06-WEB\PGBL-web\index.html`
    khối :root) chứ không tự pha: gold #BF9642 · lime #9BDC4C · teal #5FE5BE.
    Bản đầu lấy màu tuyến (vàng nâu #B98200) -> Anh chê xỉn, đúng. */
+/* 🆕 25/08 — ghi đè màu theo TỪNG TUYẾN (mạnh hơn BOX_MAU theo status).
+   Cần vì QL.20 và QL.55 cùng status 'hienhuu' nhưng phải khác màu. */
+const BOX_MAU_ID = { q55: HW_MAU_QL55 };
 const BOX_MAU = {
-  khaithac:'#9BDC4C', thicong:'#BF9642', dexuat:'#5FE5BE',   /* bộ màu 360 */
+  khaithac:'#9BDC4C', thicong:'#BF9642', dexuat:'#5FE5BE', pa1:'#1D4ED8', pa2:'#E5399F',   /* bộ màu 360 · 2 PA giữ màu bản đồ tỉnh */
   hienhuu:'#E01B24', noicaotoc:'#6D28D9', vaotrungtam:'#0E9F9F', vanphong:'#0F172A'
 };
 
@@ -1628,7 +1808,7 @@ function addChipTuyen(){
       BOX_FC.features.push({
         type:'Feature',
         properties:{
-          icon:'box-' + p.id, ten:ten, mau:BOX_MAU[p.status] || k.nen || '#BF9642', hang:hang,
+          icon:'box-' + p.id, ten:ten, mau:BOX_MAU_ID[p.id] || BOX_MAU[p.status] || k.nen || '#BF9642', hang:hang,
           /* 🔴 18/08 Anh Tony chốt: "chỉ cần từng nấy thông tin thôi" —
              thân thẻ CHỈ 1 DÒNG phụ đề, đúng như chip cũ. Bỏ hẳn km, tổng vốn,
              mốc hoàn thành khỏi mặt bản đồ.
@@ -1962,6 +2142,18 @@ function veCalloutBox(){
   });
   map.on('click','callout-box',(e)=>{
     const p = e.features[0].properties;
+    /* 🆕 25/08: bấm vào THẺ NHÃN nay ra ĐÚNG cái popup như bấm vào ĐƯỜNG.
+       Trước đây 2 chỗ in 2 kiểu khác nhau — khách bấm nhầm chỗ là thấy
+       thiếu ảnh, thiếu link, tưởng web lỗi. Thẻ nhãn chỉ giữ `icon` = 'box-<id>'
+       nên dò ngược ra feature gốc theo id. */
+    const ma = String(p.icon || '').replace(/^box-/, '');
+    const g  = (window.CAOTOC_TUYEN.features.find(f=>f.properties.id===ma) || {}).properties;
+    if(g){
+      new maplibregl.Popup({offset:14, maxWidth:'300px'})
+        .setLngLat(e.features[0].geometry.coordinates)
+        .setHTML(window.popupTuyen(g)).addTo(map);
+      return;
+    }
     /* 🔴 MapLibre BIẾN MẢNG TRONG properties THÀNH CHUỖI JSON khi đi qua
        source geojson — phải parse lại, không thì in ra nguyên dấu ngoặc. */
     const ds = Array.isArray(p.chiTiet) ? p.chiTiet : JSON.parse(p.chiTiet || '[]');
@@ -2057,8 +2249,9 @@ function veChamNoiThi(){
    là phải tắt luôn cả đường, thành ra tắt xong chẳng còn gì để xem. */
 const HW_DUONG = ['ct-casing','d-noithi','d-noicaotoc-vien','d-noicaotoc',
                   'd-trungtam-vien','d-trungtam','d-vanphong-vien','d-vanphong','ql-hienhuu',
-                  'ct-khaithac','ct-thicong','ct-dexuat-dai','ct-dexuat-tim','ct-nut-cham'];
-const HW_NHAN  = ['callout','callout-box','nut-xuong','cham-noithi'];
+                  'ct-khaithac','ct-thicong','ct-dexuat-dai','ct-dexuat-tim',
+                  'ct-pa1-dai','ct-pa1-tim','ct-pa2-dai','ct-pa2-tim','ct-nut-cham'];
+const HW_NHAN  = ['callout','callout-box','nut-xuong','nga3','cham-noithi'];
 const HW_LAYERS = HW_DUONG.concat(HW_NHAN);
 
 /* 🔴 Lề khi bay phải tính THEO BỀ RỘNG MÀN.
@@ -2187,6 +2380,69 @@ document.getElementById('btnHwToggle').onclick = (e)=>{
 };
 
 /* ============================================================
+   🆕 25/08 — ẨN / HIỆN TỪNG TUYẾN  (Anh Tony đặt)
+   "chủ yếu các đường lớn như cao tốc" -> chỉ liệt kê trục lớn, KHÔNG đưa
+   đường nội thị và đường dẫn vào đây (đã có công tắc riêng, và 10 nút là
+   vừa đủ một màn iPad, nhiều hơn là thành danh sách phải cuộn).
+
+   🔴 CÁCH LÀM: LỌC LẠI DỮ LIỆU NGUỒN, không tắt từng layer.
+   Lý do: một tuyến được vẽ bởi NHIỀU lớp (viền tối + dải mờ + tim), mà nhãn
+   của nó lại nằm ở source KHÁC (`callout-box` / `callout`). Đi tắt theo tên
+   lớp là kiểu gì cũng sót một chỗ, rồi tắt đường xong nhãn vẫn lơ lửng giữa
+   trời — đúng họ lỗi "gỡ thẻ mà quên chỗ ghi tên nó". Lọc ở nguồn thì mọi
+   lớp ăn theo, thêm lớp mới sau này cũng không phải nhớ sửa chỗ này.
+   ============================================================ */
+const TUYEN_BAT_TAT = ['pa1','pa2','s1','s2','s3','s4','s5','q20','q20t','q55'];
+const AN_TUYEN = new Set();
+
+function apDungAnTuyen(){
+  const src = map.getSource && map.getSource('ct-tuyen');
+  if(!src) return;
+  const goc = window.CAOTOC_TUYEN;
+  src.setData(Object.assign({}, goc, {
+    features: goc.features.filter(f => !AN_TUYEN.has(f.properties.id))
+  }));
+  const an = [...AN_TUYEN];
+  /* Nhãn: lọc theo `icon` vì đó là chỗ DUY NHẤT thẻ nhãn còn giữ mã tuyến
+     ('box-<id>' / 'callout-<id>'). Không còn tuyến nào ẩn thì trả filter về
+     null cho MapLibre khỏi phải lọc mỗi khung hình. */
+  if(map.getLayer('callout-box'))
+    map.setFilter('callout-box', an.length
+      ? ['!',['in',['get','icon'],['literal', an.map(i=>'box-'+i)]]] : null);
+  if(map.getLayer('callout'))
+    map.setFilter('callout', an.length
+      ? ['!',['in',['get','icon'],['literal', an.map(i=>'callout-'+i)]]] : null);
+}
+
+function dungNutTuyen(){
+  const hop = document.getElementById('nhomTuyen');
+  if(!hop || !window.CAOTOC_TUYEN) return;
+  hop.innerHTML = '';
+  TUYEN_BAT_TAT.forEach(ma=>{
+    const f = window.CAOTOC_TUYEN.features.find(x=>x.properties.id===ma);
+    if(!f) return;                                  /* thiếu tuyến -> bỏ qua êm */
+    const p = f.properties;
+    const mau = BOX_MAU_ID[ma] || (CHIP_KIEU[p.status]||{}).mau || '#888';
+    const b = document.createElement('button');
+    b.className = 'bat';
+    b.title = p.ten;
+    b.innerHTML = `<span class="cham" style="background:${mau}"></span>${CHIP_TEN[ma] || p.ten}`;
+    b.onclick = ()=>{
+      if(AN_TUYEN.has(ma)) AN_TUYEN.delete(ma); else AN_TUYEN.add(ma);
+      b.classList.toggle('bat', !AN_TUYEN.has(ma));
+      apDungAnTuyen();
+    };
+    hop.appendChild(b);
+  });
+}
+dungNutTuyen();
+
+document.getElementById('btnTuyenToggle').onclick = (e)=>{
+  const mo = document.getElementById('nhomTuyen').classList.toggle('mo');
+  e.target.classList.toggle('gold', mo);
+};
+
+/* ============================================================
    3) GHIM MARKER các vị trí trong LOCATIONS
    ============================================================ */
 /* 🔴 Pin dự án KHÔNG dùng marker mặc định của MapLibre —
@@ -2205,7 +2461,14 @@ document.getElementById('btnHwToggle').onclick = (e)=>{
    ============================================================ */
 const GHIM_MOC = [
   { khoa:'vincom',   phu:'TRUNG TÂM THÀNH PHỐ' },
-  { khoa:'dai binh', nho:true }        /* Anh Tony: nhỏ hơn, đúng 1 dòng */
+  /* 🔴 25/08 (bản v2): khoá cũ là 'dai binh' — nay dữ liệu có THÊM "Ngã 3 Đại
+     Bình" nên chuỗi đó khớp CẢ HAI. Vòng lặp lấy điểm ĐẦU TIÊN tìm thấy nên
+     sẽ im lặng ghim nhầm khi thứ tự nhóm đổi. Siết lại thành 'nui dai binh'. */
+  { khoa:'nui dai binh', nho:true },   /* Anh Tony: nhỏ hơn, đúng 1 dòng */
+  /* 🔴 25/08 (đợt 2): NGÃ 3 ĐẠI BÌNH ĐÃ CHUYỂN sang BIỂN THOI (`veBienNga3`),
+     Anh Tony chốt "làm kiểu này đi". Cố ý KHÔNG khai ở đây nữa — khai cả 2 chỗ
+     là mọc 2 nhãn chồng nhau ngay một điểm. Muốn quay lại kiểu chip thì trả
+     dòng cũ vào đây VÀ gỡ lời gọi `veBienNga3()`. */
 ];
 
 function ghimMoc(){
@@ -2226,8 +2489,10 @@ function ghimMoc(){
     }));
     if(!d){ console.warn('[ghim mốc] không thấy điểm "'+g.khoa+'" trong dữ liệu'); return; }
 
-    const mau  = (nh && nh.mau)  || '#475569';
-    const icon = (nh && nh.icon) || '📍';
+    /* 25/08: cho phép khai riêng `mau`/`icon` ngay trong GHIM_MOC —
+       không khai thì vẫn lấy của nhóm như cũ (giữ nguyên hành vi cũ). */
+    const mau  = g.mau  || (nh && nh.mau)  || '#475569';
+    const icon = g.icon || (nh && nh.icon) || '📍';
 
     const el = document.createElement('div');
     el.className = 'vc-pin' + (g.nho ? ' nho' : '');
@@ -2546,7 +2811,7 @@ window.addEventListener('orientationchange', ()=> setTimeout(capNhatCoMan, 260))
         mo = document.getElementById('btnDsTuyen'),
         dg = document.getElementById('btnDsClose');
   if(!ds || !mo || !dg) return;
-  const dat = m => { ds.hidden = !m; mo.textContent = m ? '▴ Đóng danh sách' : '▾ Danh sách 8 tuyến'; };
+  const dat = m => { ds.hidden = !m; mo.textContent = m ? '▴ Đóng danh sách' : '▾ Danh sách tuyến (10 mục)'; };
   mo.onclick = () => dat(ds.hidden);
   dg.onclick = () => dat(false);
   document.addEventListener('keydown', e => { if(e.key === 'Escape') dat(false); });
