@@ -4,15 +4,23 @@
    Sinh lai bang: banghang/index.html -> nut XUAT FILE DU PHONG
    KHONG SUA TAY.
    ------------------------------------------------------------------
-   24/08/2026: xuat lai TU GOOGLE SHEET (sinh bang script, khong qua
-   trinh duyet). Ban cu 18/08 DA LOI THOI: A5-06 tu "Da ban" ve "Lock",
-   nhieu lo doi Lock/Con hang -> khach mat mang se thay SAI.
+   26/08/2026: xuat lai TU GOOGLE SHEET truoc khi dong goi gui IT
+   (sinh bang script qua gviz/tq, khong qua trinh duyet).
+   🟢 DOI CHIEU VOI BAN 24/08: 0 lo doi trang thai, 0 lo them, 0 lo mat.
+      Ban 24/08 VAN CON DUNG - chi doi moi dau thoi gian.
    Ban nay = 111 lo: 100 lo ro ERA + 11 lo DA BAN ngoai ro
    (A5-22, A7-09..12, A8-01, A8-02, A9-09, B3-06, B3-07, B4-26).
+   Thong ke: 50 "Con hang" . 50 "Lock" . 11 "Da ban".
+   ------------------------------------------------------------------
+   ⚠️ 26/08 - SHEET CO 112 DONG NHUNG CHI 111 LO: ma A5-22 BI GO 2 LAN
+      (2 dong cung trang thai "Da ban" nen khong gay lech). Script da bo
+      trung. Ngay nao 2 dong trung ma KHAC trang thai thi dong nao
+      DUNG SAU se an dong truoc - IM LANG. Anh Tony xoa dong thua tren
+      Sheet cho chac.
    Ma lo da ep pad 2 chu so (Sheet go "A7-9" -> "A7-09"). Da ep NFC.
    ================================================================== */
 window.ERA_TT_SNAPSHOT = {
-  luc: "24/08/2026 12:11",
+  luc: "26/08/2026 20:16",
   lots: [
   {ma:"A11-01", st:"Còn hàng", gia:"", note:"", ngay:"", nguoi:""},
   {ma:"A11-02", st:"Còn hàng", gia:"", note:"", ngay:"", nguoi:""},

@@ -122,10 +122,33 @@
 	</scene>
 
 	<scene name="scene_matbang_flycam" title="Mã lô trên flycam" onstart="">
-		<!-- 11/08: huong khoi dong Anh Tony chot (do lai tu 8 moc POI tren anh chup, sai so ~3px) -->
+		<!-- 11/08: huong khoi dong Anh Tony chot (do lai tu 8 moc POI tren anh chup, sai so ~3px)
+		     🔴 26/08: DOI ANH NEN sang "toan-canh-360-gio-hang" (lop phan lo ve lai,
+		     co in san ma lo + dien tich). Da do khop hinh truoc khi doi:
+		     SIFT+RANSAC 17.546 inlier, phong 1,000000 . xoay 0,0000 do .
+		     doi (0,00 . 0,00) px . sai so trung vi 0,016 px  =>  NEN KHOP TUYET DOI,
+		     nen hlookat/vlookat/fov duoi day GIU NGUYEN, 24 POI cung khong phai sua.
+		     Ban cu: tour.xml.bak-truoc-anhmoi-20260826  (anh panos/map-pgbl-360.jpg
+		     van con tren dia, chua xoa). -->
 		<view hlookat="-171.6" vlookat="8.7" fovtype="MFOV" fov="100" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
-		<image>
-			<sphere url="panos/map-pgbl-360.jpg" />
+
+		<preview url="panos/toan-canh-360-gio-hang.tiles/preview.jpg" />
+
+		<!-- 🔴 26/08: doi tu <sphere> single-image sang MULTIRES.
+		     Ly do: anh moi co CHU NHO (ma lo + m2). Single sphere 8192 len dien
+		     thoai bi gioi han texture 4096 keo xuong mot nua -> chu mo khong doc
+		     noi. MULTIRES chia tile nen giu duoc net. Cau truc y het scene
+		     "scene_02-toan-canh" dang chay on. -->
+		<image type="CUBE" prealign="0|0.0|0" multires="true" tilesize="512">
+			<level tiledimagewidth="2624" tiledimageheight="2624">
+				<cube url="panos/toan-canh-360-gio-hang.tiles/%s/l3/%v/l3_%s_%v_%h.jpg" />
+			</level>
+			<level tiledimagewidth="1280" tiledimageheight="1280">
+				<cube url="panos/toan-canh-360-gio-hang.tiles/%s/l2/%v/l2_%s_%v_%h.jpg" />
+			</level>
+			<level tiledimagewidth="640" tiledimageheight="640">
+				<cube url="panos/toan-canh-360-gio-hang.tiles/%s/l1/%v/l1_%s_%v_%h.jpg" />
+			</level>
 		</image>
 	</scene>
 
