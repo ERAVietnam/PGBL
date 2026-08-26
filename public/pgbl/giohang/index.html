@@ -211,6 +211,32 @@ body{padding-bottom:0!important}
 #hits{position:absolute;left:12px;top:12px;background:var(--grn);color:#fff;border-radius:7px;
       padding:6px 12px;font-size:11.5px;font-weight:700;z-index:5}
 
+/* 🔴 26/08 - Anh Tony chot: AN "so lo dang hien thi" vi con so bi SAI.
+   Nguyen nhan goc da tim ra: lo A13-02 co dien tich a:0, ma thanh truot
+   dien tich lay AMIN=80 (dong 978 loc v>0) nen match() luon loai no
+   => chip ghi 254 ma sa ban chi ve 253. Lech dung 1 lo.
+   AN BANG CSS, KHONG XOA JS: cac phan tu van con trong DOM, cac dong
+   gan textContent ('hits' / 'kShow' / 'fabSo' / 'sideSo') chay binh thuong,
+   khong the vo. Muon bat lai chi can xoa 2 dong duoi day. */
+#hits{display:none}
+#kpiShow{display:none}
+/* 26/08 dot 2 - Anh Tony: "an het". Hai cho nay CHI HIEN TREN MOBILE nen
+   Anh khong thay tren iPad ngang, nhung sale mo bang dien thoai van doc phai. */
+#fabSo{display:none}
+/* 🔴 #sideSo PHAI dung visibility CHU KHONG display:none.
+   Rule "#sideTop #sideSo{flex:1}" (dong 277) khien no la MIENG DEM day nut
+   "Xong" sang mep phai. display:none la mat mieng dem => nut "Xong" tut ve
+   sat trai, vo bo cuc ngan keo. visibility giu nguyen o trong, chi giau chu. */
+#sideSo{visibility:hidden}
+/* 🔴 26/08 - Anh Tony chot: AN nhom "RO HANG ERA" (3 chip Tat ca / Gio hang
+   mo ban / Gio hang CDT). AN CSS, khong xoa JS => build() van ve 3 chip do
+   vao #cEra binh thuong, khong the vo.
+   ⚠️ HE QUA PHAI BIET: F.era khong doi duoc nua, no DUNG YEN o gia tri mac
+   dinh 'era' (dong 729) = GIO HANG MO BAN. Trang gio hang tu nay chi con
+   mot ro duy nhat: 100 lo ERA + 11 lo da ban, khach thay 61 lo.
+   Muon mac dinh khac thi doi chu 'era' o dong 729 thanh 'all' hoac 'out'. */
+#grpEra{display:none}
+
 /* ==================================================================
    🔴 19/08 . KHOI @media PHAI NAM CUOI <style> — DUNG DOI LEN TREN
    ------------------------------------------------------------------
@@ -367,7 +393,7 @@ body{padding-bottom:0!important}
     <div class="sub">Bấm vào lô để xem chi tiết &middot; lăn chuột phóng to &middot; kéo để di chuyển</div>
   </div>
   <div class="kpi">
-    <div><b id="kShow" style="color:var(--gold)">0</b><span>Lô hiển thị</span></div>
+    <div id="kpiShow"><b id="kShow" style="color:var(--gold)">0</b><span>Lô hiển thị</span></div>
     <div><b id="kTong" style="color:var(--grn)">0</b><span>Tổng số lô</span></div>
     <div><b id="kCon"  style="color:var(--grn)">0</b><span>Còn hàng</span></div>
   </div>
@@ -402,7 +428,7 @@ body{padding-bottom:0!important}
     <!-- TANG 2 - loc chinh -->
     <div class="tier">
       <div class="tl">Bộ lọc chính<i></i></div>
-      <div class="grp"><h3>Rổ hàng ERA</h3><div class="chips" id="cEra"></div></div>
+      <div class="grp" id="grpEra"><h3>Rổ hàng ERA</h3><div class="chips" id="cEra"></div></div>
       <div class="grp"><h3>Trạng thái</h3><div class="chips" id="cSt"></div></div>
       <!-- 🔴 14/08 Anh Tony chốt: nút xoá bộ lọc dời LÊN ĐÂY (ngay dưới Trạng thái)
            và đổi sang MÀU ĐỎ. Trước nằm tít dưới đáy cột — phải cuộn hết bộ lọc
@@ -611,7 +637,8 @@ window.eraFS = function(){
   document.addEventListener('webkitfullscreenchange', ghiNhoThoat);
 })();
 
-/* ---- HƯỚNG DẪN BỘ LỌC: hiện lúc mở trang, ẩn rồi mở lại bằng nút "?" ---- */
+/* ---- HƯỚNG DẪN BỘ LỌC: 26/08 Anh Tony chốt KHÔNG tự bung khi mở trang.
+       Chỉ hiện khi bấm nút "?" ở tiêu đề "Xem nhanh". Nội dung popup để nguyên. ---- */
 (function(){
   var nen=document.getElementById('hdNen');
   if(!nen) return;
@@ -632,8 +659,9 @@ window.eraFS = function(){
   if(b) b.onclick=function(e){ e.stopPropagation(); e.preventDefault();
                                try{ document.getElementById('hdTat').checked=false; }catch(x){}
                                mo(); };
-  var tat=false; try{ tat = localStorage.getItem(TAT)==='1'; }catch(e){}
-  if(!tat) setTimeout(mo, 400);   /* chờ trang vẽ xong rồi mới bật, đỡ giật */
+  /* 🔴 26/08 - BO HAN doan tu bung luc mo trang (truoc day: setTimeout(mo,400)
+     neu localStorage 'pgbl_hd_loc_tat' chua bat). Popup nay gio CHI mo bang nut "?".
+     Khoa TAT giu lai vi ham dong() con ghi, khong con quyet dinh gi nua. */
 })();
 
 /* ==================================================================
@@ -642,6 +670,17 @@ window.eraFS = function(){
    nay. Sua xong luu file va F5 trinh duyet la thay ngay.
    ================================================================== */
 const CAUHINH = {
+
+  /* 0. TONG SAN PHAM TOAN DU AN - SO CO DINH, KHONG TINH TU DU LIEU.
+     🔴 26/08 Anh Tony chot: o "TONG SO LO" tren dau trang phai ghi 357 -
+     day la QUY MO DU AN, khong phai so lo dang hien thi duoc.
+     Truoc day o nay tinh anLock(LOTS).length => khach thay 304 (354 lo trong
+     du lieu tru 50 lo Lock), nhan vien ERA thay 354 - CUNG MOT O MA 2 NGUOI
+     DOC RA 2 SO, va ca hai deu khong phai tong that.
+     ⚠️ Du lieu LOTS hien co 354 lo, thieu 3 ma A6-01 . A12-08 . A13-11 (nam
+     trong gio an CDT, Anh Tony chot khong can bo sung). 354 + 3 = 357.
+     Doi quy mo du an thi SUA DUNG 1 SO O DAY. */
+  tongSanPham: 357,
 
   /* 1. MAU THEO TRANG THAI  (ma mau HEX, doi thoai mai) */
   mau: {
@@ -691,7 +730,7 @@ const CAUHINH = {
      Cac ma truong dang co: th=so thua  z=phan khu  a=dien tich
                             h=huong  f=mat tien  d=chieu sau  l=loai can
                             lg=lo gioi  cd1/cd2=chieu dai 1/2  cr1/cr2=chieu rong 1/2
-                            khu=ten khu (tu suy: ma A -> Khu Phu Gia, ma B -> Khu Gia An)
+                            khu=ten khu (tu suy: ma A -> Khu Phu Quy, ma B -> Khu Gia An)
      Nguon so lieu 100 lo ERA: Excel "PGBL - 100 lo giao Era VN da fix" sheet Dieu chinh (12/08) */
   thongTin: [
     ['Khu'          , 'khu'       ],
@@ -878,7 +917,9 @@ function apply(){
      co kiem null vi ban desktop van co the chua ve xong DOM luc goi som */
   const _fs=document.getElementById('fabSo');  if(_fs) _fs.textContent = n;
   const _ss=document.getElementById('sideSo'); if(_ss) _ss.textContent = n+' lô';
-  document.getElementById('kTong').textContent=anLock(LOTS).length;
+  /* 🔴 26/08 - so CO DINH toan du an, KHONG dem tu LOTS va KHONG loc Lock.
+     Xem giai thich day du o CAUHINH.tongSanPham dau khoi cau hinh. */
+  document.getElementById('kTong').textContent=CAUHINH.tongSanPham;
   document.getElementById('kCon').textContent=con;
   document.getElementById('hits').textContent = n+' lô đang hiển thị';
   veChuGiai();
@@ -919,9 +960,9 @@ function toLoChon(nhay){
     if(++i >= CAUHINH.nhayLan*2){ clearInterval(blinkT); kp.set(h+'.fillalpha', CAUHINH.doDamChon); }
   }, 240);
 }
-/* 12/08 - Anh Tony chot: ma A = Khu Phu Gia, ma B = Khu Gia An */
+/* 26/08 - Anh Tony sua: ma A = Khu Phu Quy (truoc ghi nham "Khu Phu Gia"), ma B = Khu Gia An */
 function khuCua(ma){
-  return String(ma||'').charAt(0).toUpperCase()==='B' ? 'Khu Gia An' : 'Khu Phú Gia';
+  return String(ma||'').charAt(0).toUpperCase()==='B' ? 'Khu Gia An' : 'Khu Phú Quý';
 }
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
 function detail(c){

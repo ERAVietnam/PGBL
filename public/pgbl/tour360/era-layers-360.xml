@@ -128,7 +128,13 @@
 
     if(hotspot[get(i)].islot == true,
       set(hlay, 'sp');
-      set(hcnt, true);
+      <!-- 🔴 26/08: gim lo CHUA MO BAN (co 'khoa', dat trong addPin cua
+           tour.html) van ton tai de giu toa do nhung KHONG DEM vao bang.
+           Khong loai ra thi bang ghi "San pham . 100" trong khi khach
+           chi nhin thay 50 -> sale doc bang xong tuong web loi.
+           Trong che do ?tool=1 co 'khoa' KHONG duoc dat, nen luc gim
+           Anh van thay du 100. -->
+      if(hotspot[get(i)].khoa == true, set(hcnt, false); , set(hcnt, true); );
     );
 
     if(hlay == '',

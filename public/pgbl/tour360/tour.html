@@ -675,19 +675,172 @@ window.eraPoiExport = function(code){
        (2) Cua so chon ma lo khi dat gim  +  luu nhap localStorage
        (3) Goi y tu dong: tu vai lo Anh da dat, suy ra vi tri cac lo con lai
      ================================================================== -->
-<script src="lots-era-100.js?nc=20260812093000"></script>
+<!-- 🔴 26/08 Anh Tony chot: TRANG THAI LO LAY TU GOOGLE SHEET, dung chung
+     nguon voi /giohang/ va /banghang/. Thu tu du phong cua ERA_TT:
+        Sheet  ->  assets/trang-thai-snapshot.js  ->  localStorage
+     Thu tu 2 the nay giu y het ben giohang/index.html. -->
+<script src="/assets/trang-thai-config.js?nc=20260812160000"></script>
+<script src="/assets/trang-thai-snapshot.js?nc=20260826"></script>
+<script src="lots-era-100.js?nc=20260826b"></script>
 <script>
 (function(){
-	var LKEY = 'eralots_flycam';
+	/* 🔴 26/08: LKEY doi tu 'eralots_flycam' -> '_v2'.
+	   Hom nay XOA SACH 11 gim cu (anh nen doi, toa do cu vo nghia) va
+	   Anh se gim lai 100 lo. Giu key cu la trinh duyet Anh KHOI PHUC
+	   11 gim cu tu localStorage roi BO QUA era_lots_data() moi - im
+	   lang, khong mot dong loi. Dung ho loi da dinh 2 lan ngay 24/08. */
+	var LKEY = 'eralots_flycam_v2';
 	var BYMA = {}, i;
 	for(i=0;i<LOTS_ERA100.length;i++){ BYMA[LOTS_ERA100[i].c] = LOTS_ERA100[i]; }
 
+	/* ================= TRANG THAI BAN HANG (26/08, dot 5) =================
+	   🔴 TRUOC DAY: 50 ma "chua mo ban" go CUNG trong lots-era-100.js
+	      (`LOTS_CHUA_MO_BAN`). DA BO HAN.
+	      Ly do: Sheet la nguon that cua /giohang/ va /banghang/. De them mot
+	      danh sach cung o day la HAI NGUON CUNG NOI VE MOT VIEC — Anh khoa
+	      them mot lo tren Sheet thi gio hang doi ngay con tour VAN HIEN lo do
+	      cho khach, khong loi, khong canh bao. Dung ho loi da can nhieu lan.
+
+	   Gio: `Lock` tren Sheet  ==  lo chua mo ban  ==  gim an o ban khach.
+
+	   ⏱️ HAI NHIP NAP, co chu y:
+	     nhip 1 (DONG BO, co ngay)  : doc window.ERA_TT_SNAPSHOT
+	     nhip 2 (bat dong bo, ~1-8s): ERA_TT.nap() -> Sheet, xong thi de len
+	   Khong co nhip 1 thi trong luc cho Google, TT_DATA rong -> moi lo deu
+	   "khong phai Lock" -> KHACH THAY CA 50 LO KHOA trong vai giay. */
+	var TT_DATA = null;          /* null = chua biet gi */
+	var TT_NHAN = '';
+
+	function ttTuSnapshot(){
+		var s = window.ERA_TT_SNAPSHOT, out = {};
+		if(!s || !Array.isArray(s.lots) || !window.ERA_TT) return null;
+		s.lots.forEach(function(l){
+			if(!l || !l.ma) return;
+			out[ERA_TT.chuanMa(l.ma)] = { st: ERA_TT.chuan(l.st), gia: l.gia || '', note: l.note || '' };
+		});
+		TT_NHAN = 'File dự phòng' + (s.luc ? ' · ' + s.luc : '');
+		return Object.keys(out).length ? out : null;
+	}
+	function stCua(ma){
+		var r = TT_DATA && TT_DATA[ma];
+		return (r && r.st) || 'Còn hàng';
+	}
+	var TOOLMODE = /[?&]tool=1(&|$)/.test(location.search);
+
+	/* 🔴 26/08 Anh Tony chot: them hau to  ?era  cho SALE xem du 100 lo.
+	   Tach bach 2 viec:
+	     ?era    chi HIEN du 100 gim, KHONG mo bo cong cu gim
+	     ?tool=1 moi mo bo cong cu (dat/keo/xuat code)
+	   De chung mot cua thi sale lo tay keo gim la lech het du lieu.
+	   ⚠️ CO Y KHONG nhan ?tool=0 — doc nhu "tat cong cu" nen de nham, va
+	      khach to mo sua ?tool=1 thanh ?tool=0 la vo tinh thay hang khoa. */
+	var ERAMODE  = /[?&]era(=|&|$)/.test(location.search);
+	var HIEN_KHOA = TOOLMODE || ERAMODE;
+
+	/* 🔴 Chua biet trang thai thi coi nhu KHOA (an). Tha an nham mot lo con
+	   ban duoc, con hon lo ra cho khach mot lo chu dau tu chua cho ban. */
+	function laKhoa(ma){
+		if(!TT_DATA) return true;
+		return stCua(ma) === 'Lock';
+	}
+
 	function K(){ return document.getElementById('krpanoSWFObject'); }
+
+	/* ---- NAP TRANG THAI: nhip 1 dong bo, nhip 2 tu Sheet ---- */
+	TT_DATA = ttTuSnapshot();
+	if(window.ERA_TT){
+		ERA_TT.nap().then(function(kq){
+			if(!kq || !kq.data || !Object.keys(kq.data).length) return;
+			TT_DATA = kq.data;
+			TT_NHAN = kq.nhan + (kq.luc ? ' · ' + kq.luc : '');
+			apTrangThai();          /* de len ket qua cua snapshot */
+		}).catch(function(){});
+	}
 	function hn(ma){ return 'lot_' + String(ma).split('-').join('_'); }
 	function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 	/* thu tu cac gim da dat - de nut XOA LO VUA DAT biet xoa cai nao */
 	var order = [];
+
+	/* ============ (0) BO LOC  (26/08 - Anh Tony dat) ============
+	   Loc theo DIEN TICH (2 thanh keo) + GO MA LO.
+
+	   🔴🔴 LUAT SONG CON: BO LOC KHONG DUOC DUNG `visible`.
+	   `visible` da co HAI chu khac: (a) an 50 lo chua mo ban;
+	   (b) panel LOP HIEN THI trong era-layers-360.xml bat/tat lop
+	   "San pham" — no con nho `lay_hid` de biet cai nao chinh no da an.
+	   Chen chan vao la 3 nguon cung ghi mot co, gim bien mat ma khong
+	   ai biet tai cai nao (dung ho loi da can 2 lan: 12/08 va 26/08).
+	   => Bo loc chi dung `alpha` + `enabled`. Hai co doc lap han.
+
+	   ALPHA0 nho do mo GOC cua tung gim (1 = lo mo ban, 0.42 = lo khoa
+	   dang xem bang ?era). Bo loc tra ve dung do mo goc, khong phai 1. */
+	var ALPHA0 = {};
+	var LOC = { q:'', min:0, max:0, st:'' };
+	var LOC_MIN = 0, LOC_MAX = 0;
+
+	function dsLot(){
+		/* tap lo dang co nghia trong che do hien tai */
+		return LOTS_ERA100.filter(function(l){ return HIEN_KHOA || !laKhoa(l.c); });
+	}
+	function lotQuaLoc(l){
+		if(LOC.q){
+			var q = LOC.q.toUpperCase();
+			if(l.c.toUpperCase().indexOf(q) < 0 && String(l.z).toUpperCase().indexOf(q) < 0) return false;
+		}
+		if(LOC_MAX > 0 && (l.a < LOC.min || l.a > LOC.max)) return false;
+		if(LOC.st && stCua(l.c) !== LOC.st) return false;
+		return true;
+	}
+
+	/* Sheet ve sau -> tinh lai TAT CA: lo nao khoa, do mo goc, dai dien tich,
+	   so dem tren tung nut trang thai. Goi lai bao nhieu lan cung duoc. */
+	function apTrangThai(){
+		var k = K(); if(!k) return;
+		LOTS_ERA100.forEach(function(l){
+			var nm = hn(l.c);
+			if(ALPHA0[l.c] === undefined) return;        /* gim chua dat */
+			var kh = laKhoa(l.c);
+			ALPHA0[l.c] = (kh && HIEN_KHOA) ? 0.42 : 1;
+			if(kh && !HIEN_KHOA){
+				k.set('hotspot[' + nm + '].visible', false);
+				k.set('hotspot[' + nm + '].enabled', false);
+				k.set('hotspot[' + nm + '].khoa', true);
+			}else{
+				k.set('hotspot[' + nm + '].visible', true);
+				k.set('hotspot[' + nm + '].khoa', false);
+				k.set('hotspot[' + nm + '].bgborder',
+				      kh ? '1 0xE08B2A 0.85' : '1 0x7ADD8B 0.80');
+			}
+		});
+		dungBoLoc();      /* dung bang loc lan dau, hoac tinh lai dai dien tich */
+		capNhatDaiVaNut();
+		apLoc();
+	}
+	function apLoc(){
+		var k = K(); if(!k) return;
+		var n = 0;
+		dsLot().forEach(function(l){
+			var nm = hn(l.c);
+			if(ALPHA0[l.c] === undefined) return;      /* gim chua dat */
+			var ok = lotQuaLoc(l);
+			if(ok) n++;
+			k.set('hotspot[' + nm + '].alpha',   ok ? ALPHA0[l.c] : 0);
+			k.set('hotspot[' + nm + '].enabled', ok);
+		});
+		var d = document.getElementById('elf-dem');
+		if(d) d.textContent = 'Đang hiện ' + n + ' / ' + dsLot().length + ' lô';
+		var chip = document.getElementById('elf-chip');
+		if(chip){
+			var dangLoc = !!LOC.q || !!LOC.st
+			            || (LOC_MAX > 0 && (LOC.min > LOC_MIN || LOC.max < LOC_MAX));
+			/* 26/08: cung tong DA VANG, luc dang loc thi dam hon mot bac —
+			   de Anh liec la biet co dang loc khong, khong phai mo bang ra xem. */
+			chip.style.background  = dangLoc ? '#E3B94F' : '#F2E2BE';
+			chip.style.borderColor = dangLoc ? 'rgba(74,59,20,.45)' : 'rgba(74,59,20,.22)';
+			chip.textContent = dangLoc ? ('LỌC · ' + n) : 'LỌC LÔ';
+		}
+	}
 
 	/* ============ (1) BOX THONG TIN ============ */
 	var mx = 0, my = 0, pinned = false;
@@ -707,14 +860,23 @@ window.eraPoiExport = function(code){
 		return b;
 	}
 
-	/* 12/08 - Anh Tony chot: ma A = KHU PHU GIA, ma B = KHU GIA AN */
+	/* 12/08 - Anh Tony chot: ma A = KHU PHU QUY, ma B = KHU GIA AN
+	   🔴 26/08 Anh Tony sua ten khu: "Khu Phu Gia" -> "KHU PHU QUY".
+	   ⚠️ CHI doi TEN PHAN KHU. "Phu Gia Bao Loc" la TEN DU AN, nam o
+	      hon 40 cho khac (tieu de trang, wordmark, manifest, skin...) —
+	      TUYET DOI khong thay hang loat, thay het la doi luon ten du an.
+	   Ben `giohang/index.html` da doi truoc (18:03 hom nay, phien chat
+	   khac) va ghi la 'Khu Phú Quý'; o day de IN HOA vi chip hien in hoa. */
 	function khuCua(ma){
 		var c = String(ma || '').charAt(0).toUpperCase();
-		return c === 'B' ? 'KHU GIA AN' : 'KHU PHÚ GIA';
+		return c === 'B' ? 'KHU GIA AN' : 'KHU PHÚ QUÝ';
 	}
 
+	/* 🔴 26/08: bo qua ca so 0 — GIONG HET bo loc ben giohang/index.html
+	   (`v===undefined||v===''||v===0`). De lot so 0 vao la bang in
+	   "Lo gioi 0 m", sale doc xong tuong dat khong co duong. */
 	function rowHtml(k, v, unit){
-		if(v === '' || v == null) return '';
+		if(v === '' || v == null || v === 0) return '';
 		return '<div style="display:flex;justify-content:space-between;gap:18px;padding:3px 0;font-size:12px;">'
 			+ '<span style="color:#83A08D;">' + k + '</span>'
 			+ '<span style="color:#EDF8EF;font-weight:600;">' + esc(v) + (unit || '') + '</span></div>';
@@ -728,16 +890,39 @@ window.eraPoiExport = function(code){
 				+ '<div style="font-size:11px;color:#83A08D;margin-top:4px;">Chưa có dữ liệu cho lô này</div>';
 			return b;
 		}
+		/* 🔴 26/08 Anh Tony chot: bang nay in DAY DU nhu bang chi tiet ben
+		   `giohang/index.html` (CAUHINH.thongTin), truoc day thieu han 4 so
+		   kich thuoc lo -> sale mo tour ra van phai bam sang trang gio hang.
+		   Thu tu giu Y HET ben do: Khu . Dien tich . CD1 . CD2 . CR1 . CR2 .
+		   Huong . Lo gioi;  ma lo + loai hinh nam tren dau.
+		   ⚠️ cr1/cr2 co the la CHUOI kieu "9.70 - 5.39" (lo meo, 2 canh khac
+		   nhau) — in nguyen van, dung ep ve so. Da qua esc(). */
 		b.innerHTML =
 			'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;">'
 			+ '<span style="font-size:17px;font-weight:800;letter-spacing:.4px;">' + esc(l.c) + '</span>'
 			+ '<span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#7ADD8B;">' + esc(khuCua(l.c)) + '</span>'
 			+ '</div>'
+			+ (l.l ? '<div style="font-size:11.5px;color:#9FBFA8;margin-top:2px;">' + esc(l.l) + '</div>' : '')
 			+ '<div style="height:1px;background:rgba(203,240,214,.16);margin:9px 0 5px;"></div>'
-			+ rowHtml('Diện tích đất', l.a,  ' m²')
-			+ rowHtml('Hướng',        l.h)
-			+ rowHtml('Lộ giới',      l.lg, ' m')
-			+ rowHtml('Loại hình',    l.l)
+			+ rowHtml('Diện tích đất', l.a,   ' m²')
+			+ rowHtml('Chiều dài 1',   l.cd1, ' m')
+			+ rowHtml('Chiều dài 2',   l.cd2, ' m')
+			+ rowHtml('Chiều rộng 1',  l.cr1, ' m')
+			+ rowHtml('Chiều rộng 2',  l.cr2, ' m')
+			+ rowHtml('Hướng',         l.h)
+			+ rowHtml('Lộ giới',       l.lg,  ' m')
+			/* 26/08: chip tinh trang, lay tu Sheet. Mau dung y het giohang
+			   (ERA_TT.MAU) de sale nhin 2 trang khong phai doi mat.
+			   ⚠️ CO Y KHONG in GIA o day — Sheet co cot gia nhung tour la
+			      trang khach xem; dua gia len la quyet dinh san pham,
+			      cho Anh Tony chot. */
+			+ (function(){
+				var st = stCua(l.c);
+				var mau = (window.ERA_TT && ERA_TT.MAU && ERA_TT.MAU[st]) || '#888888';
+				return '<div style="display:inline-block;margin-top:9px;padding:3px 10px;border-radius:20px;'
+					+ 'background:' + mau + ';color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.3px;">'
+					+ esc(st) + '</div>';
+			})()
 			+ (pinned ? '<div style="font-size:10px;color:#83A08D;margin-top:7px;">Bấm ra ngoài để đóng</div>' : '');
 		return b;
 	}
@@ -775,6 +960,33 @@ window.eraPoiExport = function(code){
 		var k = K(); if(!k) return;
 		var name = hn(ma);
 		k.call("era_lot(" + ath + "," + atv + ",'" + ma + "'," + name + ")");
+
+		/* 🔴 26/08: lo CHUA MO BAN -> gim VAN DUOC TAO (de con toa do, de
+		   con XUAT CODE ra du 100 dong) nhung khong hien cho khach.
+		   Trong ?tool=1 thi hien mo di, kem vien cam, de Anh phan biet
+		   duoc lo nao dang khoa ma van keo chinh binh thuong. */
+		if(laKhoa(ma)){
+			if(HIEN_KHOA){
+				/* 🔴 Van de MO + vien cam ke ca trong ?era. Cho hien y het lo
+				   mo ban la sale KHONG PHAN BIET DUOC, tu van nham lo chua
+				   mo ban cho khach — sai sot nay dat hon nhieu so voi viec
+				   nhin hoi mo mot chut. */
+				k.set('hotspot[' + name + '].alpha', 0.42);
+				k.set('hotspot[' + name + '].bgborder', '1 0xE08B2A 0.85');
+			}else{
+				k.set('hotspot[' + name + '].visible', false);
+				k.set('hotspot[' + name + '].enabled', false);
+				/* 🔴 co rieng cho bang LOP HIEN THI: era-layers-360.xml doc co nay
+				   de KHONG dem lo dang khoa vao so "San pham . N". Khong co no
+				   thi bang ghi 100 trong khi khach chi thay 50.
+				   ⚠️ KHONG dat co nay trong ?tool=1 -> luc gim Anh van thay du 100. */
+				k.set('hotspot[' + name + '].khoa', true);
+			}
+		}
+
+		/* nho do mo GOC de bo loc tra ve dung muc nay, khong phai 1 */
+		ALPHA0[ma] = (laKhoa(ma) && HIEN_KHOA) ? 0.42 : 1;
+
 		var p = order.indexOf(ma); if(p >= 0) order.splice(p, 1);
 		order.push(ma);
 	}
@@ -798,7 +1010,145 @@ window.eraPoiExport = function(code){
 		}else{
 			k.call('era_lots_data()');
 		}
+		dungBoLoc();   /* 26/08: gim nap xong moi dung duoc bang loc */
 	};
+
+	/* ============ (2b) BANG LOC ============ */
+	function dungBoLoc(){
+		if(document.getElementById('elf-chip')) { apLoc(); return; }
+		var ds = dsLot(); if(!ds.length) return;
+		var aa = ds.map(function(l){ return l.a; });
+		LOC_MIN = Math.min.apply(null, aa);
+		LOC_MAX = Math.max.apply(null, aa);
+		LOC.min = LOC_MIN; LOC.max = LOC_MAX;
+
+		var css = document.createElement('style');
+		css.textContent =
+			/* 🔴 26/08 (Anh Tony khoanh tay tren anh iPad): chip doi tu goc TRAI
+			   (duoi panel LOP HIEN THI) sang goc PHAI TREN, nam ben TRAI cum 3
+			   nut tron cua skin krpano (i / loa / toan man).
+			   Cum nut do cach mep phai ~30px, moi nut ~37px  ->  chua 76px de
+			   chip khong dam vao. Bang loc thi bam mep phai luon (right 16). */
+			'#elf-chip{position:absolute;right:76px;top:20px;z-index:70;padding:7px 13px;border-radius:9px;'
+			+ 'font:700 11.5px/1 Inter,Arial,sans-serif;color:#4A3B14;background:#F2E2BE;'
+			+ 'border:1px solid rgba(74,59,20,.22);cursor:pointer;user-select:none;letter-spacing:.4px;'
+			+ 'box-shadow:0 2px 10px rgba(0,0,0,.28);}'
+			/* 🔴 Bang loc phai NE COT NUT TRON cua skin krpano (i / loa / toan man)
+			   nam sat mep phai. De right:16 la bang trum len 3 nut do, bam khong
+			   duoc. Lay right:76 = thang hang duoi chip, chua tron cot nut. */
+			+ '#elf-pan{position:absolute;right:76px;top:58px;z-index:70;width:236px;display:none;'
+			+ 'background:rgba(13,38,32,.94);border:1px solid rgba(242,226,190,.35);border-radius:12px;'
+			+ 'padding:12px 13px;font-family:Inter,Arial,sans-serif;color:#EDF8EF;'
+			+ 'box-shadow:0 10px 30px rgba(0,0,0,.45);}'
+			+ '#elf-pan.mo{display:block;}'
+			+ '#elf-pan input[type=text]{width:100%;box-sizing:border-box;padding:8px 9px;border-radius:8px;'
+			+ 'border:1px solid rgba(203,240,214,.2);background:#0E2821;color:#EDF8EF;font-size:12.5px;outline:none;}'
+			+ '#elf-pan .lb{font-size:10.5px;color:#83A08D;margin:11px 0 5px;letter-spacing:.3px;}'
+			+ '#elf-st{display:flex;flex-wrap:wrap;gap:5px;}'
+			+ '#elf-st button{flex:1 1 auto;padding:6px 7px;border-radius:7px;cursor:pointer;'
+			+ 'border:1px solid rgba(203,240,214,.22);background:rgba(255,255,255,.05);color:#CFE3D6;'
+			+ 'font:700 10.5px Inter,Arial,sans-serif;white-space:nowrap;}'
+			+ '#elf-st button.on{background:#F2E2BE;color:#4A3B14;border-color:rgba(74,59,20,.3);}'
+			+ '#elf-ng{font-size:9.5px;color:#6E8A78;margin-top:8px;line-height:1.35;}'
+			+ '#elf-pan input[type=range]{width:100%;margin:2px 0;accent-color:#7ADD8B;}'
+			+ '#elf-dem{font-size:11px;color:#7ADD8B;font-weight:700;margin-top:10px;}'
+			+ '#elf-xoa{margin-top:9px;width:100%;padding:8px;border:0;border-radius:8px;background:#2A4A3E;'
+			+ 'color:#EDF8EF;font:700 11.5px Inter,Arial,sans-serif;cursor:pointer;}'
+			/* 🔴 iPad gen 9 NGANG = 1080 CSS -> di nhanh desktop. Man hep hon
+			   (iPad DOC 810) thi thu chip lai mot chut, bang loc hep theo mh. */
+			+ '@media (max-width:820px){#elf-chip{right:70px;top:14px;padding:6px 11px;font-size:11px;}'
+			+ '#elf-pan{right:70px;top:50px;width:min(232px,64vw);}}';
+		document.head.appendChild(css);
+
+		var chip = document.createElement('div');
+		chip.id = 'elf-chip'; chip.textContent = 'LỌC LÔ';
+		var pan = document.createElement('div');
+		pan.id = 'elf-pan';
+		pan.innerHTML =
+			'<input type="text" id="elf-q" placeholder="Gõ mã lô, vd A8 hoặc B4-17">'
+			+ '<div class="lb">Tình trạng</div>'
+			+ '<div id="elf-st">'
+			+   '<button data-v="" class="on">Tất cả</button>'
+			+   '<button data-v="Còn hàng">Còn hàng</button>'
+			+   '<button data-v="Đã cọc">Đã cọc</button>'
+			+   '<button data-v="Đã bán">Đã bán</button>'
+			/* Nut "Lock" CHI co trong ?era / ?tool=1. Ban khach khong thay lo
+			   khoa nen them nut nay la thua, va con lo ra chuyen co hang giu. */
+			+   (HIEN_KHOA ? '<button data-v="Lock">Chưa mở bán</button>' : '')
+			+ '</div>'
+			+ '<div class="lb">Diện tích <span id="elf-dt">' + LOC_MIN + ' – ' + LOC_MAX + ' m²</span></div>'
+			+ '<input type="range" id="elf-r1" min="' + LOC_MIN + '" max="' + LOC_MAX + '" value="' + LOC_MIN + '">'
+			+ '<input type="range" id="elf-r2" min="' + LOC_MIN + '" max="' + LOC_MAX + '" value="' + LOC_MAX + '">'
+			+ '<div id="elf-dem"></div>'
+			+ '<button id="elf-xoa">XOÁ LỌC</button>'
+			+ '<div id="elf-ng"></div>';
+		document.body.appendChild(chip); document.body.appendChild(pan);
+
+		var q = pan.querySelector('#elf-q'), r1 = pan.querySelector('#elf-r1'),
+		    r2 = pan.querySelector('#elf-r2'), dt = pan.querySelector('#elf-dt');
+		function docThanh(){
+			/* 2 thanh keo co the bi keo cheo nhau -> luon lay min/max that */
+			LOC.min = Math.min(+r1.value, +r2.value);
+			LOC.max = Math.max(+r1.value, +r2.value);
+			dt.textContent = LOC.min + ' – ' + LOC.max + ' m²';
+			apLoc();
+		}
+		chip.onclick = function(){ pan.classList.toggle('mo'); };
+		q.oninput  = function(){ LOC.q = q.value.trim(); apLoc(); };
+		r1.oninput = docThanh; r2.oninput = docThanh;
+
+		/* nut tinh trang - bam 1 cai, bo chon cac cai kia */
+		Array.prototype.forEach.call(pan.querySelectorAll('#elf-st button'), function(b){
+			b.onclick = function(){
+				LOC.st = b.getAttribute('data-v');
+				Array.prototype.forEach.call(pan.querySelectorAll('#elf-st button'), function(x){
+					x.classList.toggle('on', x === b);
+				});
+				apLoc();
+			};
+		});
+
+		pan.querySelector('#elf-xoa').onclick = function(){
+			q.value = ''; LOC.q = ''; LOC.st = '';
+			Array.prototype.forEach.call(pan.querySelectorAll('#elf-st button'), function(x){
+				x.classList.toggle('on', x.getAttribute('data-v') === '');
+			});
+			r1.value = LOC_MIN; r2.value = LOC_MAX;
+			docThanh();
+		};
+		apLoc();
+	}
+
+	/* Sheet ve muon hon luc dung bang -> dai dien tich va so tren nut phai
+	   tinh lai theo tap lo MOI, khong thi thanh keo con dai cu (thieu/thua
+	   vung chet) va nut trang thai dem sai. */
+	function capNhatDaiVaNut(){
+		var pan = document.getElementById('elf-pan'); if(!pan) return;
+		var ds = dsLot(); if(!ds.length) return;
+		var aa = ds.map(function(l){ return l.a; });
+		var mi = Math.min.apply(null, aa), ma = Math.max.apply(null, aa);
+		var r1 = pan.querySelector('#elf-r1'), r2 = pan.querySelector('#elf-r2');
+		if(mi !== LOC_MIN || ma !== LOC_MAX){
+			var rongHet = (LOC.min <= LOC_MIN && LOC.max >= LOC_MAX);  /* Anh chua dong vao thanh keo */
+			LOC_MIN = mi; LOC_MAX = ma;
+			r1.min = r2.min = mi; r1.max = r2.max = ma;
+			if(rongHet){ r1.value = mi; r2.value = ma; LOC.min = mi; LOC.max = ma; }
+			pan.querySelector('#elf-dt').textContent = LOC.min + ' – ' + LOC.max + ' m²';
+		}
+		/* dem so lo cho tung tinh trang, in ngay tren nut */
+		var d = {};
+		ds.forEach(function(l){ var s = stCua(l.c); d[s] = (d[s] || 0) + 1; });
+		Array.prototype.forEach.call(pan.querySelectorAll('#elf-st button'), function(b){
+			var v = b.getAttribute('data-v');
+			var ten = v ? (v === 'Lock' ? 'Chưa mở bán' : v) : 'Tất cả';
+			var n = v ? (d[v] || 0) : ds.length;
+			b.textContent = ten + ' ' + n;
+			b.disabled = (n === 0);
+			b.style.opacity = n ? 1 : .4;
+		});
+		var ng = pan.querySelector('#elf-ng');
+		if(ng) ng.innerHTML = TT_NHAN ? ('&#9679; Tình trạng bán hàng: ' + TT_NHAN) : '';
+	}
 
 	window.eraLotDelLast = function(){
 		var k = K(); if(!k) return;
@@ -836,12 +1186,17 @@ window.eraPoiExport = function(code){
 			q = (q || '').toUpperCase().trim();
 			var list = LOTS_ERA100.filter(function(l){ return !q || l.c.toUpperCase().indexOf(q) >= 0 || l.z.toUpperCase().indexOf(q) >= 0; });
 			var html = list.map(function(l){
-				var done = placed[l.c];
+				var done = placed[l.c], kh = laKhoa(l.c);
+				/* 26/08: lo chua mo ban van gim duoc (can toa do cho dot sau),
+				   chi danh dau bang cham cam de Anh biet no se an o ban khach. */
+				var phai = done ? 'đã đặt · đặt lại' : (esc(l.l) + ' · ' + l.a + 'm²');
 				return '<div class="elp-it" data-ma="' + l.c + '" style="display:flex;justify-content:space-between;align-items:center;'
 					+ 'gap:10px;padding:9px 11px;border-radius:8px;cursor:pointer;margin-bottom:4px;'
 					+ 'background:' + (done ? 'rgba(122,221,139,.10)' : 'rgba(255,255,255,.04)') + ';">'
-					+ '<span style="font-weight:700;font-size:13px;color:' + (done ? '#7ADD8B' : '#EDF8EF') + ';">' + l.c + '</span>'
-					+ '<span style="font-size:11px;color:#83A08D;">' + (done ? 'đã đặt · đặt lại' : esc(l.l) + ' · ' + l.a + 'm²') + '</span>'
+					+ '<span style="font-weight:700;font-size:13px;color:' + (done ? '#7ADD8B' : '#EDF8EF') + ';">'
+					+ (kh ? '<span style="color:#E08B2A;" title="Chưa mở bán đợt này">&#9679; </span>' : '') + l.c + '</span>'
+					+ '<span style="font-size:11px;color:' + (kh ? '#E08B2A' : '#83A08D') + ';">'
+					+ (kh ? 'chưa mở bán · ' : '') + phai + '</span>'
 					+ '</div>';
 			}).join('');
 			document.getElementById('elp-list').innerHTML = html || '<div style="color:#83A08D;font-size:12px;padding:8px;">Không tìm thấy lô nào</div>';
@@ -995,8 +1350,13 @@ window.eraPoiExport = function(code){
 			added++;
 		});
 		k.call('era_lots_save_draft()');
+		/* 26/08: dem rieng so lo se AN o ban khach, de Anh biet minh dang
+		   nhin 100 gim nhung khach chi thay phan mo ban. */
+		var nkhoa = 0;
+		order.forEach(function(m){ if(laKhoa(m)) nkhoa++; });
 		k.set('layer[lots_readout].html', 'Đã bung ' + added + ' lô · sai số trên ' + pairs.length
-			+ ' mốc ≈ ' + (Math.round(rms*100)/100) + '° · kéo chỉnh lô nào lệch');
+			+ ' mốc ≈ ' + (Math.round(rms*100)/100) + '° · kéo chỉnh lô nào lệch'
+			+ (nkhoa ? '<br><span style="color:#E08B2A;">' + nkhoa + ' lô chấm cam = chưa mở bán, khách sẽ KHÔNG thấy</span>' : ''));
 	};
 })();
 </script>
