@@ -358,9 +358,11 @@
   .nut-gon{
     position:absolute; z-index:2; width:24px; height:24px; padding:0;
     border:1px solid var(--line); border-radius:50%; cursor:pointer;
-    font:700 13px/22px 'Segoe UI',system-ui,Arial,sans-serif; text-align:center;
+    display:flex; align-items:center; justify-content:center;
+    font:700 13px/1 'Segoe UI',system-ui,Arial,sans-serif; text-align:center;
     background:rgba(255,255,255,.10); color:var(--text2);
     transition:transform .18s ease, background .18s ease;
+    box-sizing:border-box;
   }
   .nut-gon:hover{ background:rgba(255,255,255,.20); color:var(--text); }
 
@@ -2894,6 +2896,6 @@ document.getElementById('btnAnHet').onclick = (e)=>{
      File caotoc-anim.js GIỮ NGUYÊN, chỉ ngắt dòng nạp. Bật lại = bỏ dấu chú thích. -->
 <!-- <script src="caotoc-anim.js?nc=20260814100000"></script> -->
 <!-- Thanh NAV chung cua web PGBL — them 14/08/2026 khi gan trang nay vao web ship -->
-<script src="/assets/eranav.js?nc=20260814224500" data-active="hatang"></script>
+<script src="../assets/eranav.js?nc=20260826c" data-active="hatang"></script>
 </body>
 </html>

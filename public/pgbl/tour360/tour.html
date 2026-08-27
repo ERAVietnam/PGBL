@@ -679,8 +679,8 @@ window.eraPoiExport = function(code){
      nguon voi /giohang/ va /banghang/. Thu tu du phong cua ERA_TT:
         Sheet  ->  assets/trang-thai-snapshot.js  ->  localStorage
      Thu tu 2 the nay giu y het ben giohang/index.html. -->
-<script src="/assets/trang-thai-config.js?nc=20260812160000"></script>
-<script src="/assets/trang-thai-snapshot.js?nc=20260826"></script>
+<script src="../assets/trang-thai-config.js?nc=20260812160000"></script>
+<script src="../assets/trang-thai-snapshot.js?nc=20260826"></script>
 <script src="lots-era-100.js?nc=20260826b"></script>
 <script>
 (function(){
@@ -1009,6 +1009,44 @@ window.eraPoiExport = function(code){
 			if(ban > 0){ K().call('era_lots_save_draft()'); }   /* ghi lai nhap da sach */
 		}else{
 			k.call('era_lots_data()');
+
+			/* 🔴🔴🔴 27/08 — DONG NAY LA THU CHAN "LO 50 LO CHUA MO BAN".
+			   ĐỪNG XOÁ, VÀ ĐỪNG ĐỂ NHÁNH NÀY CHẠY MÀ THIẾU NÓ.
+
+			   Chuyen gi da xay ra: era_lots_data() la action KRPANO, no goi
+			   era_lot(...) 100 lan THANG TRONG KRPANO — KHONG di qua datLot()
+			   ben JS. Ma datLot() (dong ~988) la CHO DUY NHAT gan ALPHA0.
+			   => Di nhanh nay xong thi ALPHA0 RONG.
+
+			   ALPHA0 rong thi CA HAI ham dieu khien hien thi deu chet lang:
+			     apTrangThai()  co  "if(ALPHA0[l.c] === undefined) return;"
+			     apLoc()        co  y het dong do
+			   -> bo qua sach 100 lo. Hau qua that do duoc tren ban Vercel:
+			        gim lo 100 · dang hien 100 · co 'khoa' chua tung duoc dat
+			        bang loc ghi "Dang hien 0 / 50 lo"  (loc bam khong an gi)
+			   Tuc la KHACH THAY DU 50 LO CHU DAU TU CHUA CHO BAN.
+
+			   🔴 VI SAO NGHIEM THU 26/08 KHONG BAT DUOC: may Anh Tony co san
+			   ban nhap gim trong localStorage nen luon di NHANH TREN
+			   (addPin -> datLot -> ALPHA0 day du -> an dung 50 lo).
+			   Chi may LA — tuc moi may khach, va moi ban deploy moi — mo i
+			   di nhanh duoi nay. **Thu gi chi chay dung tren dung mot may thi
+			   coi nhu chua duoc nghiem thu.**
+
+			   ⚠️ CO Y KHONG dong vao mang `order`: no chi phuc vu XUAT CODE va
+			   ghi ban nhap trong ?tool=1. Xem ghi chu trong nhat ky 27/08. */
+			var soDat = 0;
+			LOTS_ERA100.forEach(function(l){
+				/* XML khong tao gim nay thi bo qua — dung tao ALPHA0 ao,
+				   khong thi apLoc() se set alpha cho mot hotspot khong ton tai. */
+				if(k.get('hotspot[' + hn(l.c) + '].name') == null) return;
+				ALPHA0[l.c] = (laKhoa(l.c) && HIEN_KHOA) ? 0.42 : 1;
+				soDat++;
+			});
+			/* Co gim that thi ap trang thai ngay — dung doi nhip Sheet, vi neu
+			   Sheet ve TRUOC luc nay thi apTrangThai() cua nhip 2 da chay hut
+			   roi va KHONG BAO GIO chay lai. */
+			if(soDat) apTrangThai();
 		}
 		dungBoLoc();   /* 26/08: gim nap xong moi dung duoc bang loc */
 	};
@@ -1374,7 +1412,7 @@ window.eraPoiExport = function(code){
      GO BO = xoa khoi <script> nay den het khoi <style>/<script> ben duoi,
      roi bo dau chu thich quanh cac dong era_navitem trong file skin.
      ================================================================ -->
-<script src="/assets/eranav.js?nc=20260819" data-active="auto"></script>
+<script src="../assets/eranav.js?nc=20260826c" data-active="auto"></script>
 
 <!-- ERA · 19/08 — CHONG DE NHAN POI. ADDITIVE: go 1 dong nay la tour ve y nhu cu.
      Khong dung `visible` (era-layers-360.xml da chiem) — chi dung `alpha`. -->
