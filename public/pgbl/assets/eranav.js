@@ -1,11 +1,44 @@
 /* ERA · PGBL — Thanh NAV gim day trang dung chung cho moi trang web.
-   Cach dung:  <script src="/assets/eranav.js" data-active="gallery"></script>
+   Cach dung:  <script src="../assets/eranav.js" data-active="gallery"></script>
    data-active nhan 1 trong: tour360 | hientrang | giohang | tienich | hatang
    (18/08 da BO 3 muc: ebro | nhamau | gallery — xem ghi chu o mang ITEMS)
-   Dung duong dan tuyet doi (/...) -> chay dung khi goc site = 06-WEB/PGBL-web. */
+
+   🔴🔴 26/08 — BO HAN DUONG DAN TUYET DOI. VI SAO (bai hoc dat gia):
+   Ban cu ghi thang href '/giohang/index.html'. Dau '/' = GOC DOMAIN, nen no
+   CHI dung khi web nam ngay goc domain. IT deploy vao THU MUC CON
+   'pgbl.era.com.vn/pgbl/' -> moi duong dan '/...' tro ra ngoai thu muc web:
+     /assets/trang-thai-config.js    404   (thuc te o /pgbl/assets/...)
+     /giohang/index.html             404   (thuc te o /pgbl/giohang/...)
+   Hau qua that ngay 26/08: window.ERA_TT khong ton tai -> apTrangThai() chet ->
+   50 lo "Lock" (CDT chua cho ban) HIEN HET cho khach, khong mot dong loi.
+
+   ✅ CACH XU: tu do GOC SITE tu chinh src cua file nay (ROOT ben duoi), roi
+   moi href deu ghep tu ROOT. Nho vay chay dung du web dat o '/', '/pgbl/',
+   hay bat ky thu muc nao — va chay thu o may cung khong con ke goc web. */
 (function () {
-  var me = document.currentScript;
+  var me = document.currentScript ||
+           (function () {   /* du phong khi script nap kieu defer/dong */
+             var a = document.querySelectorAll('script[src*="eranav.js"]');
+             return a.length ? a[a.length - 1] : null;
+           })();
   var active = (me && me.getAttribute('data-active')) || '';
+
+  /* ROOT = goc cua web, luon co '/' o cuoi.
+     Do bang cach cat duoi '/assets/eranav.js' khoi src cua chinh file nay:
+       https://x.vn/pgbl/assets/eranav.js?nc=1  ->  ROOT = '/pgbl/'
+       https://x.vn/assets/eranav.js            ->  ROOT = '/'
+     🔴 Do bang src CHU KHONG phai location.pathname — pathname la duong dan
+     cua TRANG dang mo, moi trang mot do sau khac nhau; src cua file nay thi
+     luon co dang <ROOT>/assets/eranav.js du mo tu trang nao. */
+  var ROOT = (function () {
+    try {
+      var src = (me && me.src) || '';
+      if (!src) return '/';
+      var p = new URL(src, location.href).pathname;
+      var i = p.lastIndexOf('/assets/');
+      return i < 0 ? '/' : p.slice(0, i + 1);
+    } catch (e) { return '/'; }
+  })();
 
   // Bao dam co Phosphor Light (neu trang chua nap)
   if (!document.querySelector('link[href*="@phosphor-icons/web"]')) {
@@ -26,10 +59,14 @@
      ca 2 dau). Con 5 muc thi vua khit moi thiet bi.
      ⚠️ 3 THU MUC /ebro/ · /gallery/ VAN CON NGUYEN tren dia, chi go khoi menu.
      BAT LAI = them lai dong tuong ung vao mang ITEMS duoi day:
-       { id:'ebro',    href:'/ebro/index.html',    icon:'ph-book-open',  label:'E-Brochure' }
+       { id:'ebro',    href:'ebro/index.html',     icon:'ph-book-open',  label:'E-Brochure' }
        { id:'nhamau',  href:'#',                   icon:'ph-house-line', label:'Nhà mẫu', soon:true }
-       { id:'gallery', href:'/gallery/index.html', icon:'ph-images',     label:'Gallery' }
+       { id:'gallery', href:'gallery/index.html',  icon:'ph-images',     label:'Gallery' }
      Nho bat lai DONG THOI o ca 3 cho (mang nay · index.html · era-txv-skin-pgbl.xml). */
+  /* 🔴 26/08 — href KHONG CON dau '/' o dau. Chung la duong dan TUONG DOI SO
+     VOI ROOT; luc ve ra HTML se ghep ROOT + href (xem cuoi file).
+     THEM MUC MOI THI CUNG DUNG KIEU NAY — them dau '/' vao la hong lai y het
+     loi 26/08 (web dat trong thu muc con thi bam menu ra 404). */
   var ITEMS = [
     { id: 'tour360',  href: '/tour360/?startscene=scene_matbang_flycam', icon: 'ph-mountains', label: 'Toàn cảnh' },
     { id: 'hientrang', href: '/tour360/?startscene=scene_02-toan-canh',  icon: 'ph-drone',     label: 'Flycam hiện trạng' },
@@ -55,6 +92,8 @@
       var hScene = h[1] ? (new URLSearchParams(h[1])).get('startscene') || '' : '';
       if (scene && hScene) { if (scene === hScene) hit = it.id; return; }
       if (!scene && !hScene) {
+        /* 🔴 phai ghep ROOT vao truoc khi so — h[0] nay la duong dan
+           tuong doi so voi ROOT, con `path` la duong dan tuyet doi cua trang. */
         var hp = h[0].replace(/\/index\.html$/, '/');
         if (hp === path) hit = it.id;
       }
